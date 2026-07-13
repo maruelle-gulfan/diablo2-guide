@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Sorceress">
+  <defs>
+    <radialGradient id="sBg" cx="50%" cy="45%" r="70%">
+      <stop offset="0%"  stop-color="#0a2a4a"/>
+      <stop offset="55%" stop-color="#050f1e"/>
+      <stop offset="100%" stop-color="#000"/>
+    </radialGradient>
+    <radialGradient id="sOrb" cx="35%" cy="35%" r="70%">
+      <stop offset="0%"  stop-color="#ffffff"/>
+      <stop offset="30%" stop-color="#a0e8ff"/>
+      <stop offset="70%" stop-color="#2a8fd0"/>
+      <stop offset="100%" stop-color="#0a2050"/>
+    </radialGradient>
+    <linearGradient id="sStaff" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#7a5010"/>
+      <stop offset="50%" stop-color="#4a3008"/>
+      <stop offset="100%" stop-color="#1a1004"/>
+    </linearGradient>
+    <filter id="sGlow"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="sSoft"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#sBg)"/>
+
+  <!-- Magic aura swirl -->
+  <g opacity="0.3" filter="url(#sGlow)">
+    <circle cx="200" cy="200" r="150" fill="none" stroke="#4dc4e8" stroke-width="1"/>
+    <circle cx="200" cy="200" r="120" fill="none" stroke="#4dc4e8" stroke-width="1"/>
+  </g>
+
+  <!-- Star sparkles in background -->
+  <g fill="#a0e8ff" opacity="0.7">
+    <circle cx="60"  cy="60"  r="1.5"/>
+    <circle cx="330" cy="80"  r="1"/>
+    <circle cx="70"  cy="320" r="1.5"/>
+    <circle cx="345" cy="290" r="1"/>
+    <circle cx="120" cy="90"  r="1"/>
+    <circle cx="290" cy="120" r="1"/>
+    <circle cx="90"  cy="240" r="1"/>
+    <circle cx="315" cy="220" r="1.5"/>
+  </g>
+
+  <!-- Staff (vertical, behind orb) -->
+  <line x1="200" y1="80" x2="200" y2="340" stroke="url(#sStaff)" stroke-width="10" stroke-linecap="round"/>
+  <!-- Staff wrappings -->
+  <g stroke="#c8862d" stroke-width="1.5" opacity="0.7">
+    <line x1="190" y1="120" x2="210" y2="120"/>
+    <line x1="190" y1="128" x2="210" y2="128"/>
+    <line x1="190" y1="290" x2="210" y2="290"/>
+    <line x1="190" y1="298" x2="210" y2="298"/>
+  </g>
+  <!-- Staff top ornament (holding orb) -->
+  <g fill="#c8862d" stroke="#4a3008" stroke-width="1.5">
+    <path d="M 180 155 Q 200 135 220 155 L 220 175 L 180 175 Z"/>
+    <path d="M 175 175 L 225 175 L 220 185 L 180 185 Z"/>
+  </g>
+  <!-- Staff bottom cap -->
+  <path d="M 190 335 L 210 335 L 205 350 L 195 350 Z" fill="#c8862d" stroke="#4a3008"/>
+
+  <!-- Orb glow halo -->
+  <circle cx="200" cy="180" r="90" fill="#4dc4e8" opacity="0.2" filter="url(#sGlow)"/>
+  <circle cx="200" cy="180" r="70" fill="#a0e8ff" opacity="0.25" filter="url(#sGlow)"/>
+
+  <!-- Orb -->
+  <circle cx="200" cy="180" r="60" fill="url(#sOrb)" stroke="#0a2050" stroke-width="2"/>
+  <!-- Orb highlight -->
+  <ellipse cx="180" cy="160" rx="20" ry="15" fill="#ffffff" opacity="0.6"/>
+  <ellipse cx="175" cy="155" rx="8" ry="6" fill="#ffffff" opacity="0.9"/>
+
+  <!-- Three elemental symbols orbiting orb -->
+  <!-- Ice snowflake (top-left) -->
+  <g transform="translate(120, 100)" stroke="#a0e8ff" stroke-width="2" fill="none" filter="url(#sSoft)">
+    <line x1="0" y1="-14" x2="0" y2="14"/>
+    <line x1="-12" y1="-7" x2="12" y2="7"/>
+    <line x1="-12" y1="7"  x2="12" y2="-7"/>
+    <path d="M 0 -14 L -3 -10 M 0 -14 L 3 -10"/>
+    <path d="M 0 14  L -3 10  M 0 14  L 3 10"/>
+  </g>
+
+  <!-- Fireball (top-right) -->
+  <g transform="translate(280, 100)" filter="url(#sSoft)">
+    <circle r="12" fill="#e67e22"/>
+    <circle r="8"  fill="#f5cc5c"/>
+    <path d="M -8 -8 Q -14 -18 -6 -22" stroke="#e67e22" stroke-width="2" fill="none"/>
+    <path d="M 8 -8  Q 14 -18 6 -22"  stroke="#e67e22" stroke-width="2" fill="none"/>
+  </g>
+
+  <!-- Lightning bolt (bottom, between orb and staff bottom) -->
+  <g transform="translate(200, 275)" filter="url(#sSoft)">
+    <polygon points="-6,-14 4,-4 -2,-2 6,14 -4,4 2,2" fill="#f5f560" stroke="#c8b820" stroke-width="1"/>
+  </g>
+
+  <!-- Corner ornaments -->
+  <g fill="#4dc4e8" opacity="0.6">
+    <path d="M 20 20 L 55 20 L 55 25 L 25 25 L 25 55 L 20 55 Z"/>
+    <path d="M 380 20 L 345 20 L 345 25 L 375 25 L 375 55 L 380 55 Z"/>
+    <path d="M 20 380 L 55 380 L 55 375 L 25 375 L 25 345 L 20 345 Z"/>
+    <path d="M 380 380 L 345 380 L 345 375 L 375 375 L 375 345 L 380 345 Z"/>
+  </g>
+
+  <text x="200" y="380" font-family="Georgia, serif" font-size="19" font-weight="bold"
+        fill="#a0e8ff" text-anchor="middle" letter-spacing="5" opacity="0.9">SORCERESS</text>
+</svg>

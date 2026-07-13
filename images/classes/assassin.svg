@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Assassin">
+  <defs>
+    <radialGradient id="asBg" cx="50%" cy="45%" r="70%">
+      <stop offset="0%"  stop-color="#4a2810"/>
+      <stop offset="55%" stop-color="#1a0e05"/>
+      <stop offset="100%" stop-color="#000"/>
+    </radialGradient>
+    <linearGradient id="asBlade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#f0f0f0"/>
+      <stop offset="45%" stop-color="#a0a0a0"/>
+      <stop offset="100%" stop-color="#3a3a3a"/>
+    </linearGradient>
+    <linearGradient id="asBladeEdge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"  stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#d0d0d0"/>
+      <stop offset="100%" stop-color="#606060"/>
+    </linearGradient>
+    <linearGradient id="asHood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#2a1810"/>
+      <stop offset="100%" stop-color="#000"/>
+    </linearGradient>
+    <radialGradient id="asEye" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#ffb060"/>
+      <stop offset="60%" stop-color="#e8823a"/>
+      <stop offset="100%" stop-color="#5a2010"/>
+    </radialGradient>
+    <filter id="asGlow"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#asBg)"/>
+
+  <!-- Shadow smoke wisps -->
+  <g fill="#000" opacity="0.5" filter="url(#asGlow)">
+    <ellipse cx="80"  cy="340" rx="60" ry="15"/>
+    <ellipse cx="320" cy="340" rx="60" ry="15"/>
+    <ellipse cx="200" cy="360" rx="90" ry="18"/>
+  </g>
+
+  <!-- Ambient sparks -->
+  <g fill="#e8823a" opacity="0.5">
+    <circle cx="60"  cy="100" r="1.5"/>
+    <circle cx="340" cy="120" r="1"/>
+    <circle cx="75"  cy="280" r="1"/>
+    <circle cx="325" cy="270" r="1.5"/>
+  </g>
+
+  <!-- Hood silhouette (top) -->
+  <path d="M 200 60
+           C 140 70, 115 130, 130 200
+           C 135 220, 140 240, 145 255
+           L 255 255
+           C 260 240, 265 220, 270 200
+           C 285 130, 260 70, 200 60 Z"
+        fill="url(#asHood)" stroke="#000" stroke-width="2"/>
+  <!-- Hood inner shadow -->
+  <path d="M 165 190 Q 200 220 235 190 L 235 245 Q 200 260 165 245 Z" fill="#000" opacity="0.9"/>
+
+  <!-- Face (barely visible, in shadow) -->
+  <path d="M 175 200 Q 200 230 225 200 L 225 235 Q 200 245 175 235 Z" fill="#2a1a10" opacity="0.7"/>
+
+  <!-- Glowing eyes -->
+  <ellipse cx="185" cy="205" rx="8" ry="4" fill="url(#asEye)" filter="url(#asGlow)"/>
+  <ellipse cx="215" cy="205" rx="8" ry="4" fill="url(#asEye)" filter="url(#asGlow)"/>
+  <ellipse cx="185" cy="205" rx="4" ry="2" fill="#ffcc80"/>
+  <ellipse cx="215" cy="205" rx="4" ry="2" fill="#ffcc80"/>
+
+  <!-- Hood highlight edge -->
+  <path d="M 155 130 Q 170 100 200 90" stroke="#5a3020" stroke-width="2" fill="none" opacity="0.7"/>
+  <path d="M 245 130 Q 230 100 200 90" stroke="#5a3020" stroke-width="2" fill="none" opacity="0.7"/>
+
+  <!-- Crossed Katar claws (below, X-shape) -->
+  <!-- Left katar (going from bottom-left to upper-right) -->
+  <g>
+    <!-- Handle grip -->
+    <rect x="60" y="315" width="55" height="18" rx="3" fill="#3a2010" stroke="#000" stroke-width="1.5"/>
+    <line x1="70" y1="315" x2="70" y2="333" stroke="#5a3520" stroke-width="1"/>
+    <line x1="80" y1="315" x2="80" y2="333" stroke="#5a3520" stroke-width="1"/>
+    <line x1="90" y1="315" x2="90" y2="333" stroke="#5a3520" stroke-width="1"/>
+    <line x1="100" y1="315" x2="100" y2="333" stroke="#5a3520" stroke-width="1"/>
+    <!-- Guard -->
+    <rect x="115" y="310" width="12" height="28" fill="#606060" stroke="#000" stroke-width="1.5"/>
+    <!-- Main blade (long, tapering) -->
+    <polygon points="127,315 260,275 275,285 265,295 127,333" fill="url(#asBlade)" stroke="#000" stroke-width="1.5"/>
+    <!-- Blade edge highlight -->
+    <polygon points="127,315 260,275 275,285 130,320" fill="url(#asBladeEdge)" opacity="0.6"/>
+    <!-- Blade point -->
+    <polygon points="260,275 285,283 275,285" fill="#ffffff"/>
+    <!-- Secondary blade prong -->
+    <polygon points="127,320 200,300 205,308 127,328" fill="#7a7a7a" stroke="#000" stroke-width="1"/>
+  </g>
+
+  <!-- Right katar (going from bottom-right to upper-left) -->
+  <g>
+    <rect x="285" y="315" width="55" height="18" rx="3" fill="#3a2010" stroke="#000" stroke-width="1.5"/>
+    <line x1="295" y1="315" x2="295" y2="333" stroke="#5a3520" stroke-width="1"/>
+    <line x1="305" y1="315" x2="305" y2="333" stroke="#5a3520" stroke-width="1"/>
+    <line x1="315" y1="315" x2="315" y2="333" stroke="#5a3520" stroke-width="1"/>
+    <line x1="325" y1="315" x2="325" y2="333" stroke="#5a3520" stroke-width="1"/>
+    <rect x="273" y="310" width="12" height="28" fill="#606060" stroke="#000" stroke-width="1.5"/>
+    <polygon points="273,315 140,275 125,285 135,295 273,333" fill="url(#asBlade)" stroke="#000" stroke-width="1.5"/>
+    <polygon points="273,315 140,275 125,285 270,320" fill="url(#asBladeEdge)" opacity="0.6"/>
+    <polygon points="140,275 115,283 125,285" fill="#ffffff"/>
+    <polygon points="273,320 200,300 195,308 273,328" fill="#7a7a7a" stroke="#000" stroke-width="1"/>
+  </g>
+
+  <!-- Blood drips on blade tips -->
+  <g fill="#8b0000" opacity="0.7">
+    <path d="M 275 285 q 2 5 -1 10 q 1 -3 1 -6 Z"/>
+    <path d="M 125 285 q -2 5 1 10 q -1 -3 -1 -6 Z"/>
+  </g>
+
+  <!-- Corner ornaments -->
+  <g fill="#e8823a" opacity="0.6">
+    <path d="M 20 20 L 55 20 L 55 25 L 25 25 L 25 55 L 20 55 Z"/>
+    <path d="M 380 20 L 345 20 L 345 25 L 375 25 L 375 55 L 380 55 Z"/>
+    <path d="M 20 380 L 55 380 L 55 375 L 25 375 L 25 345 L 20 345 Z"/>
+    <path d="M 380 380 L 345 380 L 345 375 L 375 375 L 375 345 L 380 345 Z"/>
+  </g>
+
+  <text x="200" y="390" font-family="Georgia, serif" font-size="19" font-weight="bold"
+        fill="#ffb060" text-anchor="middle" letter-spacing="5" opacity="0.9">ASSASSIN</text>
+</svg>

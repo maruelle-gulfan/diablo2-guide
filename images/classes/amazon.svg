@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Amazon">
+  <defs>
+    <radialGradient id="aBg" cx="50%" cy="45%" r="70%">
+      <stop offset="0%"  stop-color="#4a2f0e"/>
+      <stop offset="55%" stop-color="#1a0e04"/>
+      <stop offset="100%" stop-color="#000"/>
+    </radialGradient>
+    <linearGradient id="aGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#f5cc5c"/>
+      <stop offset="50%" stop-color="#e8a33d"/>
+      <stop offset="100%" stop-color="#7a4a10"/>
+    </linearGradient>
+    <filter id="aGlow"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#aBg)"/>
+
+  <!-- Sun / target rings -->
+  <circle cx="200" cy="200" r="140" fill="none" stroke="#e8a33d" stroke-width="1" opacity="0.25"/>
+  <circle cx="200" cy="200" r="110" fill="none" stroke="#e8a33d" stroke-width="1" opacity="0.35"/>
+  <circle cx="200" cy="200" r="80"  fill="none" stroke="#e8a33d" stroke-width="1" opacity="0.5"/>
+  <!-- Sun rays -->
+  <g stroke="#e8a33d" stroke-width="2" opacity="0.4">
+    <line x1="200" y1="50"  x2="200" y2="80"/>
+    <line x1="200" y1="320" x2="200" y2="350"/>
+    <line x1="50"  y1="200" x2="80"  y2="200"/>
+    <line x1="320" y1="200" x2="350" y2="200"/>
+    <line x1="95"  y1="95"  x2="115" y2="115"/>
+    <line x1="285" y1="285" x2="305" y2="305"/>
+    <line x1="305" y1="95"  x2="285" y2="115"/>
+    <line x1="115" y1="285" x2="95"  y2="305"/>
+  </g>
+
+  <!-- Bow (curved, vertical) -->
+  <g stroke="url(#aGold)" stroke-width="6" fill="none" stroke-linecap="round" filter="url(#aGlow)" opacity="0.9">
+    <path d="M 140 90 Q 90 200 140 310"/>
+  </g>
+  <g stroke="url(#aGold)" stroke-width="7" fill="none" stroke-linecap="round">
+    <path d="M 140 90 Q 90 200 140 310"/>
+  </g>
+  <!-- Bow string -->
+  <line x1="140" y1="90" x2="140" y2="310" stroke="#f5cc5c" stroke-width="1.5" opacity="0.8"/>
+  <!-- Bow tips -->
+  <circle cx="140" cy="90"  r="4" fill="#f5cc5c"/>
+  <circle cx="140" cy="310" r="4" fill="#f5cc5c"/>
+
+  <!-- Arrow (drawn back, angled) -->
+  <g stroke="url(#aGold)" stroke-width="4" stroke-linecap="round">
+    <line x1="140" y1="200" x2="300" y2="200"/>
+  </g>
+  <!-- Arrowhead -->
+  <polygon points="300,200 285,190 285,210" fill="#f5cc5c" stroke="#7a4a10" stroke-width="1"/>
+  <polygon points="305,200 292,192 292,208" fill="#e8a33d"/>
+  <!-- Fletching -->
+  <polygon points="140,200 155,190 155,210" fill="#7a4a10"/>
+  <polygon points="150,200 165,193 165,207" fill="#c8862d"/>
+
+  <!-- Crossed javelin (behind, subtle) -->
+  <line x1="60" y1="340" x2="340" y2="60" stroke="#7a4a10" stroke-width="3" opacity="0.4"/>
+  <polygon points="340,60 325,68 332,80" fill="#c8862d" opacity="0.5"/>
+
+  <!-- Gothic corner ornaments -->
+  <g fill="#e8a33d" opacity="0.6">
+    <path d="M 20 20 L 55 20 L 55 25 L 25 25 L 25 55 L 20 55 Z"/>
+    <path d="M 380 20 L 345 20 L 345 25 L 375 25 L 375 55 L 380 55 Z"/>
+    <path d="M 20 380 L 55 380 L 55 375 L 25 375 L 25 345 L 20 345 Z"/>
+    <path d="M 380 380 L 345 380 L 345 375 L 375 375 L 375 345 L 380 345 Z"/>
+  </g>
+
+  <!-- Class name -->
+  <text x="200" y="380" font-family="Georgia, serif" font-size="20" font-weight="bold"
+        fill="#f5cc5c" text-anchor="middle" letter-spacing="6" opacity="0.85">AMAZON</text>
+</svg>

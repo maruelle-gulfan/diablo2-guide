@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Paladin">
+  <defs>
+    <radialGradient id="pBg" cx="50%" cy="45%" r="70%">
+      <stop offset="0%"  stop-color="#4a3810"/>
+      <stop offset="55%" stop-color="#1a1408"/>
+      <stop offset="100%" stop-color="#000"/>
+    </radialGradient>
+    <linearGradient id="pShield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#f8e090"/>
+      <stop offset="45%" stop-color="#d4af37"/>
+      <stop offset="100%" stop-color="#6a4d10"/>
+    </linearGradient>
+    <linearGradient id="pShieldInner" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#e8d478"/>
+      <stop offset="100%" stop-color="#8b6a1a"/>
+    </linearGradient>
+    <radialGradient id="pRay" cx="50%" cy="50%" r="60%">
+      <stop offset="0%"   stop-color="#fff8c0" stop-opacity="0.9"/>
+      <stop offset="60%"  stop-color="#f0d060" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#f0d060" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="pGlow"><feGaussianBlur stdDeviation="4"/></filter>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#pBg)"/>
+
+  <!-- Divine sunburst rays -->
+  <g stroke="#f0d060" stroke-width="2" opacity="0.35">
+    <line x1="200" y1="200" x2="200" y2="30"/>
+    <line x1="200" y1="200" x2="200" y2="370"/>
+    <line x1="200" y1="200" x2="30"  y2="200"/>
+    <line x1="200" y1="200" x2="370" y2="200"/>
+    <line x1="200" y1="200" x2="80"  y2="80"/>
+    <line x1="200" y1="200" x2="320" y2="80"/>
+    <line x1="200" y1="200" x2="80"  y2="320"/>
+    <line x1="200" y1="200" x2="320" y2="320"/>
+    <line x1="200" y1="200" x2="60"  y2="140"/>
+    <line x1="200" y1="200" x2="340" y2="140"/>
+    <line x1="200" y1="200" x2="60"  y2="260"/>
+    <line x1="200" y1="200" x2="340" y2="260"/>
+  </g>
+
+  <!-- Halo -->
+  <circle cx="200" cy="200" r="150" fill="url(#pRay)"/>
+
+  <!-- Kite Shield -->
+  <path d="M 200 90
+           C 130 90, 105 130, 105 180
+           C 105 260, 155 320, 200 355
+           C 245 320, 295 260, 295 180
+           C 295 130, 270 90, 200 90 Z"
+        fill="url(#pShield)" stroke="#4a3510" stroke-width="3"/>
+
+  <!-- Shield inner border -->
+  <path d="M 200 110
+           C 145 110, 125 140, 125 180
+           C 125 250, 165 305, 200 335
+           C 235 305, 275 250, 275 180
+           C 275 140, 255 110, 200 110 Z"
+        fill="url(#pShieldInner)" stroke="#8b6a1a" stroke-width="1.5"/>
+
+  <!-- Heraldic cross (large, centered) -->
+  <g fill="#f8e090" stroke="#4a3510" stroke-width="2">
+    <!-- Vertical bar -->
+    <path d="M 190 130 L 210 130 L 214 260 L 200 275 L 186 260 Z"/>
+    <!-- Horizontal bar -->
+    <path d="M 145 175 L 255 175 L 250 195 L 150 195 Z"/>
+    <!-- Center emblem -->
+    <circle cx="200" cy="185" r="18" fill="#d4af37" stroke="#4a3510" stroke-width="2"/>
+    <circle cx="200" cy="185" r="10" fill="#f8e090"/>
+  </g>
+
+  <!-- Cross highlight -->
+  <path d="M 195 135 L 205 135 L 207 250" stroke="#fff8c0" stroke-width="1.5" fill="none" opacity="0.7"/>
+  <path d="M 150 180 L 250 180" stroke="#fff8c0" stroke-width="1" opacity="0.5"/>
+
+  <!-- Center emblem glow -->
+  <circle cx="200" cy="185" r="6" fill="#ffffff" opacity="0.9" filter="url(#pGlow)"/>
+
+  <!-- Shield rivets -->
+  <g fill="#8b6a1a">
+    <circle cx="145" cy="125" r="3"/>
+    <circle cx="255" cy="125" r="3"/>
+    <circle cx="120" cy="180" r="3"/>
+    <circle cx="280" cy="180" r="3"/>
+    <circle cx="150" cy="270" r="3"/>
+    <circle cx="250" cy="270" r="3"/>
+    <circle cx="200" cy="340" r="3"/>
+  </g>
+
+  <!-- Small hammer overlay (bottom-right of shield) -->
+  <g transform="translate(275, 275) rotate(45)" opacity="0.9">
+    <rect x="-2" y="-30" width="4" height="45" fill="#7a5010" stroke="#3a2508" stroke-width="0.5"/>
+    <rect x="-14" y="-40" width="28" height="18" rx="2" fill="url(#pShield)" stroke="#4a3510" stroke-width="1.5"/>
+    <rect x="-10" y="-37" width="20" height="4" fill="#f8e090" opacity="0.5"/>
+  </g>
+
+  <!-- Corner ornaments -->
+  <g fill="#f0d060" opacity="0.6">
+    <path d="M 20 20 L 55 20 L 55 25 L 25 25 L 25 55 L 20 55 Z"/>
+    <path d="M 380 20 L 345 20 L 345 25 L 375 25 L 375 55 L 380 55 Z"/>
+    <path d="M 20 380 L 55 380 L 55 375 L 25 375 L 25 345 L 20 345 Z"/>
+    <path d="M 380 380 L 345 380 L 345 375 L 375 375 L 375 345 L 380 345 Z"/>
+  </g>
+
+  <text x="200" y="390" font-family="Georgia, serif" font-size="19" font-weight="bold"
+        fill="#f8e090" text-anchor="middle" letter-spacing="5" opacity="0.9">PALADIN</text>
+</svg>

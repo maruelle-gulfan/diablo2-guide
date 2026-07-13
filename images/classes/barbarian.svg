@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Barbarian">
+  <defs>
+    <radialGradient id="bBg" cx="50%" cy="45%" r="70%">
+      <stop offset="0%"  stop-color="#5a1a10"/>
+      <stop offset="55%" stop-color="#1e0805"/>
+      <stop offset="100%" stop-color="#000"/>
+    </radialGradient>
+    <linearGradient id="bSteel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#d0d0d0"/>
+      <stop offset="50%" stop-color="#7a7a7a"/>
+      <stop offset="100%" stop-color="#2a2a2a"/>
+    </linearGradient>
+    <linearGradient id="bHorn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#4a3a1a"/>
+      <stop offset="60%" stop-color="#2a1e08"/>
+      <stop offset="100%" stop-color="#000"/>
+    </linearGradient>
+    <filter id="bGlow"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#bBg)"/>
+
+  <!-- Blood spatters -->
+  <g fill="#8b0000" opacity="0.35">
+    <circle cx="60"  cy="80"  r="3"/>
+    <circle cx="80"  cy="120" r="2"/>
+    <circle cx="340" cy="70"  r="2.5"/>
+    <circle cx="320" cy="110" r="2"/>
+    <circle cx="70"  cy="310" r="2"/>
+    <circle cx="340" cy="320" r="3"/>
+    <path d="M 350 200 q -5 5 -8 15 q 4 -3 8 -5 Z"/>
+    <path d="M 50  220 q -5 5 -8 15 q 4 -3 8 -5 Z"/>
+  </g>
+
+  <!-- Crossed battle axes (behind helm) -->
+  <g stroke="#4a3520" stroke-width="10" stroke-linecap="round" opacity="0.95">
+    <line x1="90"  y1="320" x2="290" y2="90"/>
+    <line x1="310" y1="320" x2="110" y2="90"/>
+  </g>
+  <!-- Axe handles wrapping -->
+  <g stroke="#8b4513" stroke-width="3" opacity="0.6">
+    <line x1="130" y1="270" x2="145" y2="255"/>
+    <line x1="270" y1="270" x2="255" y2="255"/>
+    <line x1="150" y1="250" x2="165" y2="235"/>
+    <line x1="250" y1="250" x2="235" y2="235"/>
+  </g>
+  <!-- Axe heads (left blade at top-right) -->
+  <g fill="url(#bSteel)" stroke="#1a1a1a" stroke-width="2">
+    <!-- Top-right axe -->
+    <path d="M 290 90 L 340 60 L 355 90 L 340 130 L 300 115 Z"/>
+    <path d="M 290 90 L 340 60 L 335 80 L 300 100 Z" fill="#e8e8e8" opacity="0.5"/>
+    <!-- Top-left axe -->
+    <path d="M 110 90 L 60 60 L 45 90 L 60 130 L 100 115 Z"/>
+    <path d="M 110 90 L 60 60 L 65 80 L 100 100 Z" fill="#e8e8e8" opacity="0.5"/>
+  </g>
+  <!-- Bloodstained blade edges -->
+  <path d="M 355 90 L 340 130" stroke="#8b0000" stroke-width="2" opacity="0.7"/>
+  <path d="M 45 90  L 60 130"  stroke="#8b0000" stroke-width="2" opacity="0.7"/>
+  <!-- Axe pommels -->
+  <circle cx="90"  cy="320" r="8" fill="#4a3520"/>
+  <circle cx="310" cy="320" r="8" fill="#4a3520"/>
+
+  <!-- Horned Helm -->
+  <!-- Horns (curved) -->
+  <path d="M 140 155 Q 100 130 70 100 Q 90 115 130 145" fill="url(#bHorn)" stroke="#000" stroke-width="1.5"/>
+  <path d="M 260 155 Q 300 130 330 100 Q 310 115 270 145" fill="url(#bHorn)" stroke="#000" stroke-width="1.5"/>
+  <!-- Horn ridges -->
+  <g stroke="#000" stroke-width="1" opacity="0.5" fill="none">
+    <path d="M 88 132 Q 100 138 120 142"/>
+    <path d="M 105 118 Q 115 125 128 133"/>
+    <path d="M 312 132 Q 300 138 280 142"/>
+    <path d="M 295 118 Q 285 125 272 133"/>
+  </g>
+
+  <!-- Helm main body -->
+  <path d="M 140 160
+           C 140 130, 170 115, 200 115
+           C 230 115, 260 130, 260 160
+           L 260 220
+           L 245 230
+           L 200 240
+           L 155 230
+           L 140 220 Z"
+        fill="url(#bSteel)" stroke="#1a1a1a" stroke-width="2.5"/>
+
+  <!-- Helm nose guard -->
+  <path d="M 190 160 L 190 250 L 210 250 L 210 160 Z" fill="url(#bSteel)" stroke="#1a1a1a" stroke-width="2"/>
+
+  <!-- Eye slits (glowing red) -->
+  <path d="M 158 175 L 183 175 L 180 190 L 160 190 Z" fill="#000"/>
+  <path d="M 242 175 L 217 175 L 220 190 L 240 190 Z" fill="#000"/>
+  <path d="M 162 178 L 179 178 L 177 187 L 164 187 Z" fill="#ff4020" filter="url(#bGlow)" opacity="0.9"/>
+  <path d="M 238 178 L 221 178 L 223 187 L 236 187 Z" fill="#ff4020" filter="url(#bGlow)" opacity="0.9"/>
+
+  <!-- Rivets -->
+  <g fill="#3a3a3a">
+    <circle cx="160" cy="145" r="3"/>
+    <circle cx="200" cy="135" r="3"/>
+    <circle cx="240" cy="145" r="3"/>
+    <circle cx="150" cy="215" r="3"/>
+    <circle cx="250" cy="215" r="3"/>
+  </g>
+
+  <!-- Helm highlight -->
+  <path d="M 155 140 Q 175 125 200 125" stroke="#e0e0e0" stroke-width="2" fill="none" opacity="0.5"/>
+
+  <!-- Corner ornaments -->
+  <g fill="#d94a3d" opacity="0.6">
+    <path d="M 20 20 L 55 20 L 55 25 L 25 25 L 25 55 L 20 55 Z"/>
+    <path d="M 380 20 L 345 20 L 345 25 L 375 25 L 375 55 L 380 55 Z"/>
+    <path d="M 20 380 L 55 380 L 55 375 L 25 375 L 25 345 L 20 345 Z"/>
+    <path d="M 380 380 L 345 380 L 345 375 L 375 375 L 375 345 L 380 345 Z"/>
+  </g>
+
+  <text x="200" y="380" font-family="Georgia, serif" font-size="19" font-weight="bold"
+        fill="#ff6a4a" text-anchor="middle" letter-spacing="5" opacity="0.85">BARBARIAN</text>
+</svg>
