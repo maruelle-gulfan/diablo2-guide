@@ -19,6 +19,7 @@
       <li><a href="#acts"        data-page="acts">Acts</a></li>
       <li><a href="#bosses"      data-page="bosses">Bosses</a></li>
       <li><a href="#runewords"   data-page="runewords">Runewords</a></li>
+      <li><a href="#items"       data-page="items">Items</a></li>
       <li><a href="#cube"        data-page="cube">Cube</a></li>
       <li><a href="#breakpoints" data-page="breakpoints">Breakpoints</a></li>
       <li><a href="#tips"        data-page="tips">Tips</a></li>
@@ -1726,6 +1727,185 @@
         <strong>Cold Mastery (Sorc only):</strong> Passive -res to cold only, works on immunes at 1/5 efficiency.
       </div>
 
+      <h3 class="subsection-title">📊 Treasure Class (TC) Reference</h3>
+      <p class="subsection-desc">Every monster is assigned a Treasure Class — a pool of items they can roll. Higher TC = access to better uniques. To drop a unique item, the monster's TC must be ≥ that item's quality level (qlvl).</p>
+
+      <div class="tc-table-wrap">
+        <table class="tc-table">
+          <thead>
+            <tr>
+              <th>TC</th>
+              <th>Notable Items (qlvl)</th>
+              <th>Where to Find (Hell)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TC 60-66</td>
+              <td>Tarnhelm (25), Nagelring (7), Iceblink (36), Stealskull (37), Ali Baba (5)</td>
+              <td>Nightmare bosses, early Hell champions</td>
+            </tr>
+            <tr>
+              <td>TC 72</td>
+              <td>Skullder's Ire (42), War Traveler (42), Rockstopper (31), Wormskull, Vampire Gaze (41)</td>
+              <td>Nightmare Baal, Hell Act 1-2 bosses</td>
+            </tr>
+            <tr class="tc-highlight">
+              <td>TC 78 <span class="tc-tag">MEPH</span></td>
+              <td>Shako (62), Mara's (67), SoJ (29), HoZ (42), Wizardspike (61), Vipermagi (29), Chance Guards perfect, Occulus (42), Jalal's Mane (42), Lidless Wall (41), Wisp (76)</td>
+              <td><strong>Hell Mephisto</strong> (best general farm — mlvl 87 → TC 78)</td>
+            </tr>
+            <tr class="tc-highlight">
+              <td>TC 81-84 <span class="tc-tag">DIA/PINDLE</span></td>
+              <td>Trang's set, Verdungo's (63), Highlord's (65), Bul-Kathos (58), Nord's Tenderizer, Fleshripper, Doombringer, Grandfather (81, requires ilvl 81+)</td>
+              <td>Hell Diablo, Andariel (quest), Pindleskin (Nihl's red portal)</td>
+            </tr>
+            <tr class="tc-highlight tc-elite">
+              <td>TC 87 <span class="tc-tag">ELITE</span></td>
+              <td><strong>Griffon's Eye (76), Windforce (73), Death's Fathom (73), Andariel's Visage (83), Arachnid Mesh (80), Homunculus (75), Titan's Revenge (42*), Astreon's, Tyrael's Might, Steelrend, Steelshade, Boneflame</strong></td>
+              <td><strong>Hell Baal throne minions</strong> (Lister pack), <strong>Nihlathak (quest)</strong>, <strong>Cow King</strong>, Uber Pindleskin</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bp-note">
+        <strong>Key rules:</strong><br>
+        • <strong>qlvl vs ilvl:</strong> qlvl = the item's inherent quality level. ilvl = the roll-instance's item level (based on monster mlvl). To drop, monster mlvl ≥ item qlvl.<br>
+        • <strong>Andariel's boosted quest drop</strong> = one-time-per-difficulty biased roll (pretends like a much higher TC roll). This is why Hell Andy is such a good "one-and-done" farm.<br>
+        • <strong>Nihlathak's quest drop</strong> = same mechanic, but he's TC 87 already so his non-quest drops are already elite.<br>
+        • <strong>Players 8 (/players 8):</strong> Increases monster HP but also boosts unique/set drop chance (~7× vs. /players 1). Use on all farming runs.
+      </div>
+
+      <h3 class="subsection-title">🎯 Boss Drop Reference</h3>
+      <p class="subsection-desc">The best farming targets in the game — what each drops, and why you'd farm it.</p>
+
+      <div class="drop-grid">
+
+        <div class="drop-card">
+          <h4>Andariel <span class="drop-act">Act 1</span></h4>
+          <div class="drop-loc">📍 Catacombs Lvl 4</div>
+          <div class="drop-tc">mlvl 75 · TC 84 · Quest drop = boosted</div>
+          <ul>
+            <li><strong>Shako</strong>, Mara's, SoJ, BK, HoZ</li>
+            <li>Occulus, Vipermagi, Wizardspike</li>
+            <li>Jalal's Mane, Highlord's, Verdungo's</li>
+            <li>Titan's Revenge, Death's Fathom (rare)</li>
+            <li>Andariel's Visage (rare — needs TC 87 roll)</li>
+          </ul>
+          <p class="drop-tip">💡 Best "single-boss" farm. Quest drop = biased. Save a fresh quest for each level-up run.</p>
+        </div>
+
+        <div class="drop-card">
+          <h4>Mephisto <span class="drop-act">Act 3</span></h4>
+          <div class="drop-loc">📍 Durance of Hate Lvl 3</div>
+          <div class="drop-tc">mlvl 87 · TC 78 · Highest density farm</div>
+          <ul>
+            <li><strong>Shako, Mara's, SoJ, BK, HoZ</strong></li>
+            <li>Occulus, Jalal's Mane, Lidless Wall</li>
+            <li>Wizardspike, Wisp Projector</li>
+            <li>Highlord's, Trang's set, most mid-elite uniques</li>
+            <li><em>Cannot</em> drop TC 87 (Griffon's/Windforce/etc.)</li>
+          </ul>
+          <p class="drop-tip">💡 THE king of MF farming. Fast, safe, huge item volume. Use "moat trick" (kite him across the bridge).</p>
+        </div>
+
+        <div class="drop-card">
+          <h4>Diablo <span class="drop-act">Act 4</span></h4>
+          <div class="drop-loc">📍 Chaos Sanctuary</div>
+          <div class="drop-tc">mlvl 94 · TC 84 · Higher pool than Meph</div>
+          <ul>
+            <li>All Mephisto drops PLUS:</li>
+            <li>Grandfather (needs ilvl 81+, so Hell only)</li>
+            <li>Nord's Tenderizer, Doombringer, Fleshripper</li>
+            <li>Better ilvl on affixes = higher rare-item potential</li>
+            <li><em>Cannot</em> drop TC 87 elite pool</li>
+          </ul>
+          <p class="drop-tip">💡 Slower than Meph but higher-quality drops. Do a full Chaos clear for the seal bosses + Diablo combo.</p>
+        </div>
+
+        <div class="drop-card">
+          <h4>Baal (Throne Minions) <span class="drop-act">Act 5</span></h4>
+          <div class="drop-loc">📍 Throne of Destruction</div>
+          <div class="drop-tc">mlvl 88-99 · Waves are TC 87!</div>
+          <ul>
+            <li><strong>Griffon's Eye, Windforce, Death's Fathom</strong></li>
+            <li><strong>Andariel's Visage, Arachnid Mesh, Homunculus</strong></li>
+            <li>Titan's Revenge, Astreon's, Tyrael's Might</li>
+            <li>Steelrend, Boneflame, most elite chase items</li>
+            <li>Baal himself is only TC 84 (worse than his waves!)</li>
+          </ul>
+          <p class="drop-tip">💡 Farm the WAVES more than Baal himself. Wave 5 (Lister pack) is prime TC 87 loot territory.</p>
+        </div>
+
+        <div class="drop-card">
+          <h4>Countess <span class="drop-act">Act 1</span></h4>
+          <div class="drop-loc">📍 Forgotten Tower Lvl 5</div>
+          <div class="drop-tc">Rune drop guaranteed · Hell: up to Ist</div>
+          <ul>
+            <li><strong>Rune drops:</strong> Ral→Ist (Hell); Sol→Ko (NM)</li>
+            <li>Perfect gems, keys (Terror Key)</li>
+            <li>Low-tier uniques as bonus loot</li>
+            <li>Extremely fast run (~30 seconds each)</li>
+          </ul>
+          <p class="drop-tip">💡 The ONLY rune-focused farm. Run 200+ times for high runes. Bring MF gear too — she drops small uniques.</p>
+        </div>
+
+        <div class="drop-card">
+          <h4>Travincal Council <span class="drop-act">Act 3</span></h4>
+          <div class="drop-loc">📍 Travincal (before Durance)</div>
+          <div class="drop-tc">3 councilmen · Fast HoZ + gold farm</div>
+          <ul>
+            <li><strong>Herald of Zakarum</strong> (very common drop here)</li>
+            <li>Massive gold piles (they carry gold)</li>
+            <li>Mid-tier uniques + set items</li>
+            <li>Great for early rune drops from champions</li>
+          </ul>
+          <p class="drop-tip">💡 Best HoZ farm in the game. Also amazing gold-run for Gheed's discount + repair costs.</p>
+        </div>
+
+        <div class="drop-card">
+          <h4>Pindleskin <span class="drop-act">Act 5</span></h4>
+          <div class="drop-loc">📍 Nihlathak's Red Portal</div>
+          <div class="drop-tc">mlvl 86 · TC 84 · ~5-second kill</div>
+          <ul>
+            <li>Shako, Mara's, SoJ, BK, HoZ</li>
+            <li>Highlord's, Verdungo's, Grandfather (rare)</li>
+            <li>Most non-TC-87 elite uniques</li>
+            <li>Fastest single-target boss run in the game</li>
+          </ul>
+          <p class="drop-tip">💡 The speedrun MF king. Take the red portal in Anya's Camp → kill Pindle → new game → repeat. 100+ runs/hour possible.</p>
+        </div>
+
+        <div class="drop-card">
+          <h4>Nihlathak <span class="drop-act">Act 5</span></h4>
+          <div class="drop-loc">📍 Halls of Vaught</div>
+          <div class="drop-tc">mlvl 90 · TC 87 (quest boosted!)</div>
+          <ul>
+            <li>All TC 87 elite items possible</li>
+            <li><strong>Griffon's Eye, Windforce, Death's Fathom</strong></li>
+            <li>Andariel's Visage, Arachnid, Homunculus</li>
+            <li>Also drops keys (Hate Key for ubers)</li>
+            <li>Dangerous: Corpse Explosion can 1-shot you!</li>
+          </ul>
+          <p class="drop-tip">💡 Elite drop pool + fast, but dangerous. Bring Cannot Be Frozen and clear corpses before fighting him.</p>
+        </div>
+
+        <div class="drop-card">
+          <h4>Cow King <span class="drop-act">Secret Cow Lvl</span></h4>
+          <div class="drop-loc">📍 Cube: Tome of TP + Wirt's Leg (kill Diablo first)</div>
+          <div class="drop-tc">mlvl 92 · TC 87 elite pool</div>
+          <ul>
+            <li>All TC 87 elite items</li>
+            <li>Massive gem/rune drops from cow packs</li>
+            <li>Cows drop keys (Destruction Key for ubers)</li>
+            <li><strong>WARNING:</strong> Killing him closes cow level FOREVER on that character/difficulty!</li>
+          </ul>
+          <p class="drop-tip">💡 Farm the cows for XP + loot; AVOID killing the King unless you want him dead. Best XP farm in the game.</p>
+        </div>
+
+      </div>
+
     </div>
   </section>
 
@@ -2378,6 +2558,1025 @@
         </div>
 
       </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════ ITEMS ═══════════════════════════ -->
+  <section id="items" class="section section-dark page-section">
+    <div class="container">
+      <h2 class="section-title">Items & Magic Find</h2>
+      <p class="section-desc">The gear progression path — from your first unique drops to endgame power spikes.</p>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" data-item-filter="all">All Items</button>
+        <button class="filter-btn" data-item-filter="early">🥉 Early MF</button>
+        <button class="filter-btn" data-item-filter="mid">🥈 Midgame MF</button>
+        <button class="filter-btn" data-item-filter="end">🥇 Endgame MF</button>
+        <button class="filter-btn" data-item-filter="spike">⚡ Powerspikes</button>
+      </div>
+
+      <!-- ─────────────── EARLY MF ─────────────── -->
+      <div class="item-group" data-item-cat="early">
+        <h3 class="item-group-title">🥉 Early Magic Find (Normal → Early Nightmare)</h3>
+        <p class="item-group-note">Cheap uniques and sets that get you started. Every one of these can drop in Normal or be gambled from vendors. Total goal: <strong>~150-200% MF</strong> for your first Mephisto/Andariel runs.</p>
+
+        <div class="items-grid">
+
+          <div class="item-card tier-early">
+            <div class="item-header"><h4>Nagelring</h4><span class="item-slot">Ring</span></div>
+            <div class="item-req">Req Lvl 7 · Unique</div>
+            <ul class="item-stats">
+              <li><strong>+15-30% Magic Find</strong></li>
+              <li>+50-75 Attack Rating</li>
+              <li>+1-2 Mana After Each Kill</li>
+              <li>Attacker Takes Damage of 3</li>
+            </ul>
+            <p class="item-tip">💡 Wear two! Cheapest MF ring in the game. Perfect roll = 30% MF each.</p>
+          </div>
+
+          <div class="item-card tier-early">
+            <div class="item-header"><h4>Chance Guards</h4><span class="item-slot">Gloves</span></div>
+            <div class="item-req">Req Lvl 15 · Unique</div>
+            <ul class="item-stats">
+              <li><strong>+25-40% Magic Find</strong></li>
+              <li>+2 to Mana After Each Kill</li>
+              <li>+20 to Attack Rating</li>
+              <li>25% Extra Gold from Monsters</li>
+            </ul>
+            <p class="item-tip">💡 Best MF gloves until endgame — keep them equipped for your entire early game.</p>
+          </div>
+
+          <div class="item-card tier-early">
+            <div class="item-header"><h4>Tarnhelm</h4><span class="item-slot">Helm</span></div>
+            <div class="item-req">Req Lvl 15 · Unique Skull Cap</div>
+            <ul class="item-stats">
+              <li><strong>+25-50% Magic Find</strong></li>
+              <li>+1 to All Skills</li>
+              <li>+2 Mana After Each Kill</li>
+              <li>75% Extra Gold from Monsters</li>
+            </ul>
+            <p class="item-tip">💡 +1 skills AND MF? Amazing early. Use until you find Shako.</p>
+          </div>
+
+          <div class="item-card tier-early">
+            <div class="item-header"><h4>Goldwrap</h4><span class="item-slot">Belt</span></div>
+            <div class="item-req">Req Lvl 27 · Unique Heavy Belt</div>
+            <ul class="item-stats">
+              <li><strong>+30% Magic Find</strong></li>
+              <li>10% Increased Attack Speed</li>
+              <li>+25-40 to Defense</li>
+              <li>50-80% Extra Gold from Monsters</li>
+            </ul>
+            <p class="item-tip">💡 The go-to MF belt. Combines MF, IAS, and gold — good all around.</p>
+          </div>
+
+          <div class="item-card tier-early">
+            <div class="item-header"><h4>Ali Baba</h4><span class="item-slot">1H Sword</span></div>
+            <div class="item-req">Req Lvl 5 · Unique Tulwar</div>
+            <ul class="item-stats">
+              <li><strong>+1% MF per Character Level</strong> (max 99% at Clvl 99)</li>
+              <li>+1% Extra Gold per Character Level (max 99%)</li>
+              <li>+15% Increased Attack Speed · +15 Dexterity</li>
+              <li>+5 to Mana After Each Kill</li>
+            </ul>
+            <p class="item-tip">💡 MF scales with your level — mediocre early, decent by Clvl 60+. Great for gold runs.</p>
+          </div>
+
+          <div class="item-card tier-early">
+            <div class="item-header"><h4>Angelic Halo + Wings</h4><span class="item-slot">Ring + Amulet Combo</span></div>
+            <div class="item-req">Req Lvl 12 · Partial Set (2 pieces)</div>
+            <ul class="item-stats">
+              <li><strong>+12% MF per Character Level</strong> (partial bonus on Halo)</li>
+              <li>At Clvl 25 = ~300% MF · Clvl 50 = ~600% MF</li>
+              <li>+95 Life total · +15 Mana per Kill total</li>
+              <li>Both pieces gamble-able from vendors</li>
+            </ul>
+            <p class="item-tip">💡 THE early MF king. Loses SoJ/Mara slots but nothing beats it in Normal/NM. Drop it once you get real endgame jewelry.</p>
+          </div>
+
+          <div class="item-card tier-early">
+            <div class="item-header"><h4>Rhyme Shield</h4><span class="item-slot">Runeword</span></div>
+            <div class="item-req">Req Lvl 29 · Shael + Eth</div>
+            <ul class="item-stats">
+              <li><strong>+25% Magic Find</strong></li>
+              <li>Cannot Be Frozen</li>
+              <li>+40% Faster Block Rate</li>
+              <li>All Resistances +25</li>
+            </ul>
+            <p class="item-tip">💡 CBF + MF in one cheap shield. Any 2-socket shield works.</p>
+          </div>
+
+          <div class="item-card tier-early">
+            <div class="item-header"><h4>Stealskull</h4><span class="item-slot">Helm</span></div>
+            <div class="item-req">Req Lvl 35 · Unique Casque</div>
+            <ul class="item-stats">
+              <li><strong>+30-50% Magic Find</strong></li>
+              <li>+10% Increased Attack Speed</li>
+              <li>+10% Faster Hit Recovery</li>
+              <li>4-6% Life &amp; Mana Stolen per Hit</li>
+            </ul>
+            <p class="item-tip">💡 The other early MF helm — pick Tarnhelm for casters, Stealskull for melee (leech + IAS).</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ─────────────── MIDGAME MF ─────────────── -->
+      <div class="item-group" data-item-cat="mid">
+        <h3 class="item-group-title">🥈 Midgame Magic Find (Nightmare → Early Hell)</h3>
+        <p class="item-group-note">You've finished Nightmare and cleared some Hell. These items form your first "real" MF loadout while you farm for endgame gear. Target: <strong>250-350% MF</strong> for effective Hell farming.</p>
+
+        <div class="items-grid">
+
+          <div class="item-card tier-mid">
+            <div class="item-header"><h4>Skullder's Ire</h4><span class="item-slot">Armor</span></div>
+            <div class="item-req">Req Lvl 42 · Unique Russet Armor</div>
+            <ul class="item-stats">
+              <li><strong>+1% MF per Character Level</strong> (max 99% at Clvl 99)</li>
+              <li>+1 to All Skills</li>
+              <li>+160-200% Enhanced Defense</li>
+              <li>+2 Mana After Each Kill · Damage Reduced 10%</li>
+            </ul>
+            <p class="item-tip">💡 THE MF armor. Socket an Ist rune (+25% MF in armor) for ~124% MF total at Clvl 99.</p>
+          </div>
+
+          <div class="item-card tier-mid">
+            <div class="item-header"><h4>War Traveler</h4><span class="item-slot">Boots</span></div>
+            <div class="item-req">Req Lvl 42 · Unique Battle Boots</div>
+            <ul class="item-stats">
+              <li><strong>+30-50% Magic Find</strong></li>
+              <li>+25% Faster Run/Walk</li>
+              <li>+10 Vitality · +10 Strength</li>
+              <li>Adds 15-25 Damage · Attacker Takes Damage 5-10</li>
+            </ul>
+            <p class="item-tip">💡 The ONLY unique boots with MF in vanilla D2. Universal endgame boots for most builds.</p>
+          </div>
+
+          <div class="item-card tier-mid">
+            <div class="item-header"><h4>Gheed's Fortune</h4><span class="item-slot">Grand Charm</span></div>
+            <div class="item-req">Req Lvl 62 · Unique Grand Charm</div>
+            <ul class="item-stats">
+              <li><strong>+20-40% Magic Find</strong></li>
+              <li>80-160% Extra Gold from Monsters</li>
+              <li>Reduces All Vendor Prices 10-15%</li>
+              <li>Takes 3 inventory slots</li>
+            </ul>
+            <p class="item-tip">💡 The only unique GC worth carrying full-time for MF. Perfect roll = 40% MF!</p>
+          </div>
+
+          <div class="item-card tier-mid">
+            <div class="item-header"><h4>Perfect Topaz Sockets</h4><span class="item-slot">Gems · DIY MF</span></div>
+            <div class="item-req">Anytime · Gem</div>
+            <ul class="item-stats">
+              <li><strong>+24% MF per Perfect Topaz (helm/armor only)</strong></li>
+              <li>Weapon PTopaz = adds 1-40 lightning dmg (no MF!)</li>
+              <li>Shield PTopaz = +40% Lightning Resist (no MF)</li>
+              <li>4os helm with 4× PTopaz = +96% MF</li>
+            </ul>
+            <p class="item-tip">💡 Cheapest DIY MF. Cube 3× flawless topaz = 1 perfect. Use Hel rune to remove gems if you upgrade later.</p>
+          </div>
+
+          <div class="item-card tier-mid">
+            <div class="item-header"><h4>Rare "of Fortune" Jewelry</h4><span class="item-slot">Rings / Amulets / Boots</span></div>
+            <div class="item-req">Gamble at vendors</div>
+            <ul class="item-stats">
+              <li><strong>"of Chance" suffix = +5-9% MF</strong></li>
+              <li><strong>"of Fortune" suffix = +10-15% MF</strong></li>
+              <li><strong>"of Wealth" suffix = +16-25% MF</strong> (rare roll!)</li>
+              <li>Rings, amulets, and boots can all roll these</li>
+            </ul>
+            <p class="item-tip">💡 Gamble amulets/rings constantly. A rare ring with MF + FCR + resists beats most uniques for MF characters.</p>
+          </div>
+
+          <div class="item-card tier-mid">
+            <div class="item-header"><h4>MF Small Charms</h4><span class="item-slot">Inventory Charms</span></div>
+            <div class="item-req">Req Lvl varies · Small Charm</div>
+            <ul class="item-stats">
+              <li><strong>+5-7% MF per Small Charm</strong> ("of Fortune" suffix)</li>
+              <li>Stack ~30 SCs in inventory (below your belt)</li>
+              <li>10 SCs of MF = ~50-70% MF from charms alone</li>
+              <li>Grand Charms can roll +8-10% MF but take 3 slots</li>
+            </ul>
+            <p class="item-tip">💡 Just need to be carried, not equipped. Fill your inventory on your MF-only character.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ─────────────── ENDGAME MF ─────────────── -->
+      <div class="item-group" data-item-cat="end">
+        <h3 class="item-group-title">🥇 Endgame Magic Find (Hell Farming)</h3>
+        <p class="item-group-note">Max MF loadout for dedicated farming characters. Combined, these push you to <strong>500-800%+ MF</strong> — the "sweet spot" before diminishing returns become too severe (past 400% MF for uniques, each extra % gives less).</p>
+
+        <div class="items-grid">
+
+          <div class="item-card tier-end">
+            <div class="item-header"><h4>Harlequin Crest (Shako)</h4><span class="item-slot">Helm</span></div>
+            <div class="item-req">Req Lvl 62 · Unique Shako</div>
+            <ul class="item-stats">
+              <li><strong>+50% Magic Find</strong></li>
+              <li>+2 to All Skills</li>
+              <li>+2 to All Attributes</li>
+              <li>+1.5 Life &amp; Mana per Character Level</li>
+              <li>Damage Reduced by 10%</li>
+            </ul>
+            <p class="item-tip">💡 THE universal helm. +2 all skills + MF + huge life/mana. BiS for 90% of builds.</p>
+          </div>
+
+          <div class="item-card tier-end">
+            <div class="item-header"><h4>Wealth (Runeword)</h4><span class="item-slot">Armor</span></div>
+            <div class="item-req">Req Lvl 43 · Lem + Ko + Tir</div>
+            <ul class="item-stats">
+              <li><strong>+100% Magic Find</strong></li>
+              <li>+300% Extra Gold from Monsters (+75 from Lem = ~375%)</li>
+              <li>+10 to Dexterity</li>
+              <li>+2 to Mana After Each Kill</li>
+            </ul>
+            <p class="item-tip">💡 100% MF in the armor slot — biggest MF slot boost in the game outside Skullder's. Use on a low-req 3os armor for an MF alt.</p>
+          </div>
+
+          <div class="item-card tier-end">
+            <div class="item-header"><h4>Skullder's Ire (Ist)</h4><span class="item-slot">Armor</span></div>
+            <div class="item-req">Req Lvl 42 · Ist-Socketed</div>
+            <ul class="item-stats">
+              <li><strong>+99% MF (Clvl 99) + 25% Ist = 124% MF</strong></li>
+              <li>+1 to All Skills</li>
+              <li>+160-200% Enhanced Defense</li>
+              <li>Ethereal roll saves strength requirement</li>
+            </ul>
+            <p class="item-tip">💡 Best "MF + utility" armor. Wealth wins pure MF (100%), Skullder+Ist wins if you want +1 skills.</p>
+          </div>
+
+          <div class="item-card tier-end">
+            <div class="item-header"><h4>Chance Guards (Perfect)</h4><span class="item-slot">Gloves</span></div>
+            <div class="item-req">Req Lvl 15 · Unique · Perfect Roll</div>
+            <ul class="item-stats">
+              <li><strong>+40% Magic Find (max)</strong></li>
+              <li>+2 to Mana After Each Kill</li>
+              <li>25% Extra Gold from Monsters</li>
+              <li>Never replaced — same slot from early to endgame</li>
+            </ul>
+            <p class="item-tip">💡 One item that stays with you forever. Find a perfect 40% roll for the endgame set.</p>
+          </div>
+
+          <div class="item-card tier-end">
+            <div class="item-header"><h4>Nagelring × 2</h4><span class="item-slot">Rings</span></div>
+            <div class="item-req">Req Lvl 7 · Unique</div>
+            <ul class="item-stats">
+              <li><strong>+60% Magic Find (2× perfect 30%)</strong></li>
+              <li>+100-150 Attack Rating</li>
+              <li>+2-4 Mana After Each Kill</li>
+              <li>Attacker Takes Damage of 6</li>
+            </ul>
+            <p class="item-tip">💡 Sacrifice the SoJ / BK ring slot for pure MF. Only for dedicated MF characters — you lose +2 skills.</p>
+          </div>
+
+          <div class="item-card tier-end">
+            <div class="item-header"><h4>Ist Rune (Sockets)</h4><span class="item-slot">Rune</span></div>
+            <div class="item-req">Req Lvl 51 · Rune</div>
+            <ul class="item-stats">
+              <li><strong>+30% MF in weapons · +25% MF in armor/helm/shield</strong></li>
+              <li>Socket into any item with open sockets</li>
+              <li>Stackable with all other MF gear</li>
+              <li>Cube recipe: 3× Mal = 1× Ist</li>
+            </ul>
+            <p class="item-tip">💡 A 6os weapon with 6× Ist = +180% MF. Practical: 2-4 Ists in your farming weapon.</p>
+          </div>
+
+          <div class="item-card tier-end">
+            <div class="item-header"><h4>Wisp Projector</h4><span class="item-slot">Ring · Endgame MF</span></div>
+            <div class="item-req">Req Lvl 76 · Unique Ring</div>
+            <ul class="item-stats">
+              <li><strong>+10-20% Magic Find</strong></li>
+              <li>+10-20% Lightning Absorb</li>
+              <li>Chance to cast Oak Sage on striking</li>
+              <li>Chance to cast Heart of Wolverine on level-up</li>
+            </ul>
+            <p class="item-tip">💡 The only unique ring besides Nagelring with MF. Great in Travincal / Baal runs vs. lightning bosses.</p>
+          </div>
+
+          <div class="item-card tier-end">
+            <div class="item-header"><h4>Full MF Loadout Total</h4><span class="item-slot">Summary</span></div>
+            <div class="item-req">All slots combined</div>
+            <ul class="item-stats">
+              <li>Shako (50) + Wealth (100) + Chance (40) + WT (50) + 2× Nagel (60) + Wisp (20) + Gheed (40) = <strong>~360% MF</strong></li>
+              <li>Swap Wealth → Skullder's+Ist (124) for +1 skills: <strong>~384% MF</strong></li>
+              <li>Add weapon Ists (2-3× = 60-90%) or MF small charms (50-70%): <strong>~450-500% MF</strong></li>
+              <li>Diminishing returns hit hard past 300% MF for uniques/sets</li>
+            </ul>
+            <p class="item-tip">💡 MF sweet spot: 250-400% for balanced farming. Going past ~500% costs you damage/survivability for tiny gains.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ─────────────── POWERSPIKE UNIQUES ─────────────── -->
+      <div class="item-group" data-item-cat="spike">
+        <h3 class="item-group-title">⚡ Powerspike Uniques (by Class)</h3>
+        <p class="item-group-note">Build-defining "chase" items <strong>organized by which class wants them</strong>. Each card lists the specific <strong>builds</strong> (Zealot vs Hammerdin, WW Barb vs Frenzy, etc.), the item's <strong>role</strong>, and <strong>per-boss drop rarity</strong>. Most elite chase items come from <strong>Treasure Class 87</strong> (Hell Baal throne minions, Nihlathak, Cow King).</p>
+
+        <!-- ═════════ ⭐ UNIVERSAL ═════════ -->
+        <div class="ps-class-section">
+          <h4 class="ps-class-title">⭐ Universal (Any Build)</h4>
+          <p class="ps-class-note">BiS or near-BiS for nearly every character. Prioritize finding these first.</p>
+          <div class="items-grid">
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Harlequin Crest (Shako)</h4><span class="item-slot">Helm</span></div>
+              <div class="item-req">Req Lvl 62 · Unique Shako</div>
+              <div class="item-class">👥 <strong>Builds:</strong> Every class, every build</div>
+              <ul class="item-stats">
+                <li>+2 to All Skills · +2 All Attributes</li>
+                <li>+1.5 Life &amp; Mana per Clvl (huge!)</li>
+                <li>+50% Magic Find · Damage Reduced 10%</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Andariel (quest boost!)</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Baal / Pindleskin</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Trav Council</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 If you find ONE BiS item this ladder — pray it's Shako. Fits every build.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Stone of Jordan (SoJ)</h4><span class="item-slot">Ring</span></div>
+              <div class="item-req">Req Lvl 29 · Unique Ring</div>
+              <div class="item-class">👥 <strong>Builds:</strong> All casters (Sorc, Necro, Hammerdin, Trapsin), high-mana builds</div>
+              <ul class="item-stats">
+                <li><strong>+1 to All Skills</strong></li>
+                <li>+20 to Mana · Increase Max Mana 25%</li>
+                <li>Adds 1-12 Lightning Damage</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Andariel / Diablo / Baal</li>
+                  <li><span class="drop-rate rate-rare">RARE</span> Countess (Hell) as bonus loot</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 The legendary +1 skills ring. Old-school D2 currency. Wear one, pair with BK ring.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Bul-Kathos' Wedding Band</h4><span class="item-slot">Ring</span></div>
+              <div class="item-req">Req Lvl 58 · Unique Ring</div>
+              <div class="item-class">👥 <strong>Builds:</strong> All classes (melee prefers, casters use too)</div>
+              <ul class="item-stats">
+                <li><strong>+1 to All Skills</strong></li>
+                <li>+50 to Life · +3-5% Life Steal</li>
+                <li>+0.5 Life per Character Level</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Baal minions</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Nihlathak / Cow King</li>
+                  <li><span class="drop-rate rate-rare">RARE</span> Hell Mephisto</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 The other +1 skill ring. Pair with SoJ for +2 skills across both rings.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Mara's Kaleidoscope</h4><span class="item-slot">Amulet</span></div>
+              <div class="item-req">Req Lvl 67 · Unique Amulet</div>
+              <div class="item-class">👥 <strong>Builds:</strong> Every caster + most melee (all-res + skills is universal)</div>
+              <ul class="item-stats">
+                <li><strong>+2 to All Skills</strong></li>
+                <li>All Resistances +20-30</li>
+                <li>+5 to All Attributes</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Andariel (quest boost)</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Baal</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 +2 all skills + all res in ONE amulet. Every build wants this.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Enigma (Runeword)</h4><span class="item-slot">Armor · The Chase</span></div>
+              <div class="item-req">Req Lvl 65 · Jah + Ith + Ber</div>
+              <div class="item-class">👥 <strong>Builds:</strong> Every non-Sorc class (gives Teleport — game-changing)</div>
+              <ul class="item-stats">
+                <li><strong>Teleport as any class</strong> (Lvl 1 charges)</li>
+                <li>+2 to All Skills · +45% FRW</li>
+                <li>+0.75% Str per Char Level · DR 8%</li>
+                <li>+1% MF per Character Level</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Rune Sources (Jah + Ith + Ber):</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Countess Hell (Ith is common)</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Trav Council / Hell Baal for high runes</li>
+                  <li><span class="drop-rate rate-rare">RARE</span> Ber is the expensive rune (~40+ pul)</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Cube up: 3× Sur = Ber</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 The single most build-changing item in D2. Gives Teleport to non-Sorcs.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ═════════ 🧙 SORCERESS ═════════ -->
+        <div class="ps-class-section">
+          <h4 class="ps-class-title">🧙 Sorceress</h4>
+          <p class="ps-class-note">Cold, Lightning, and Fire specialists. Skill damage %, FCR, and enemy-res-reduction are king.</p>
+          <div class="items-grid">
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Death's Fathom</h4><span class="item-slot">Orb · Cold BiS</span></div>
+              <div class="item-req">Req Lvl 73 · Unique Dimensional Shard</div>
+              <div class="item-class">🧙 <strong>Builds:</strong> Blizzard Sorc, Frozen Orb, Meteorb (cold half)</div>
+              <ul class="item-stats">
+                <li>+3 to Sorceress Skill Levels</li>
+                <li><strong>+15-30% to Cold Skill Damage</strong></li>
+                <li>All Resistances +30-40 · +30% FCR</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-elite">TC87 EASY</span> Hell Baal minions</li>
+                  <li><span class="drop-rate rate-elite">TC87 MED</span> Hell Nihlathak</li>
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Cow King</li>
+                  <li><span class="drop-rate rate-none">NEVER</span> Hell Mephisto (TC 78 too low)</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 The Cold Sorc BiS weapon. Nothing comes close for Blizz/Orb damage.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>The Oculus</h4><span class="item-slot">Orb · MF Farmer</span></div>
+              <div class="item-req">Req Lvl 42 · Unique Swirling Crystal</div>
+              <div class="item-class">🧙 <strong>Builds:</strong> MF Sorc (all elements), leveling caster</div>
+              <ul class="item-stats">
+                <li>+3 to Sorceress Skill Levels</li>
+                <li><strong>+50% Magic Find</strong></li>
+                <li>+20% Faster Cast Rate · All Res +20</li>
+                <li>Level 1 Teleport (30 charges) · +5 Mana per Kill</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Andariel</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Baal / Trav Council</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 The MF Sorc's BiS. +3 skills + MF + FCR in one item. Cheap and common.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Griffon's Eye</h4><span class="item-slot">Helm · Lightning BiS</span></div>
+              <div class="item-req">Req Lvl 76 · Unique Diadem</div>
+              <div class="item-class">🧙 <strong>Builds:</strong> Lightning Sorc, Nova Sorc, Javazon, Lightning Trapsin</div>
+              <ul class="item-stats">
+                <li>+1 to All Skills</li>
+                <li><strong>-15-20% to Enemy Lightning Resistance</strong></li>
+                <li>+10-25% to Lightning Skill Damage</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Baal minions</li>
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Nihlathak</li>
+                  <li><span class="drop-rate rate-none">NEVER</span> Meph / Andy / Diablo (TC too low)</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Doubles Lightning damage. Trades Shako's utility for -Lit res. Ridiculously rare.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Lidless Wall</h4><span class="item-slot">Shield · Caster</span></div>
+              <div class="item-req">Req Lvl 41 · Unique Grim Shield</div>
+              <div class="item-class">🧙 <strong>Builds:</strong> Sorc (all specs), Druid (Wind/Elem), Trapsin, budget Necro</div>
+              <ul class="item-stats">
+                <li><strong>+1 to All Skills</strong></li>
+                <li>+20% Faster Cast Rate</li>
+                <li>+80-130% Enhanced Defense</li>
+                <li>+3-5 to Mana After Each Kill · +10 to Energy</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Andariel / Baal</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Pindleskin</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 +1 skills + 20% FCR unique shield. Critical breakpoint helper for Sorcs at 105 FCR.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ═════════ 💀 NECROMANCER ═════════ -->
+        <div class="ps-class-section">
+          <h4 class="ps-class-title">💀 Necromancer</h4>
+          <p class="ps-class-note">Summoners, Bone/Poison, and Curse-focused casters.</p>
+          <div class="items-grid">
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Homunculus</h4><span class="item-slot">Shield · Necro BiS</span></div>
+              <div class="item-req">Req Lvl 75 · Unique Hierophant Trophy</div>
+              <div class="item-class">💀 <strong>Builds:</strong> Summoner, Bone/Poison, Curse Necro (all specs)</div>
+              <ul class="item-stats">
+                <li><strong>+2 to Necromancer Skills</strong></li>
+                <li>+20% Faster Cast Rate</li>
+                <li>All Resistances +40-60</li>
+                <li>+50-100 Mana · Regen Mana 20%</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-elite">TC87 EASY</span> Hell Baal minions</li>
+                  <li><span class="drop-rate rate-elite">TC87 MED</span> Hell Nihlathak</li>
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Cow King</li>
+                  <li><span class="drop-rate rate-none">NEVER</span> Meph / Andy (TC 78 pool)</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Necro BiS shield. +2 skills, FCR, all res — checks every box.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ═════════ ⚖️ PALADIN ═════════ -->
+        <div class="ps-class-section">
+          <h4 class="ps-class-title">⚖️ Paladin</h4>
+          <p class="ps-class-note">Hammerdin (FCR caster), Zealot (physical melee), Smiter (uber killer), Auradin (physical aura tank).</p>
+          <div class="items-grid">
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Herald of Zakarum</h4><span class="item-slot">Shield · All Builds</span></div>
+              <div class="item-req">Req Lvl 42 · Unique Gilded Shield</div>
+              <div class="item-class">⚖️ <strong>Builds:</strong> Hammerdin, Zealot, Smiter — the go-to Paladin shield</div>
+              <ul class="item-stats">
+                <li><strong>+2 Paladin Skills</strong> · +2 Combat / +2 Offensive / +2 Defensive Auras</li>
+                <li>+75% ED · +150% Enhanced Defense</li>
+                <li>All Res +50 · +20 Str / +20 Vit</li>
+                <li>20% ICB · Cannot Be Frozen</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Trav Council (BEST HoZ farm)</li>
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Baal / Andariel</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Paladin BiS shield. +2 skills + +2 to relevant tree = effectively +4 to your build.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Grief (Runeword)</h4><span class="item-slot">Phase Blade · Zealot BiS</span></div>
+              <div class="item-req">Req Lvl 59 · Eth + Tir + Lo + Mal + Ral</div>
+              <div class="item-class">⚔️ <strong>Builds:</strong> Zealot Pally, WW/Frenzy Barb, Werewolf Druid, Kicksin</div>
+              <ul class="item-stats">
+                <li><strong>Adds 340-400 Damage</strong> (flat — massive!)</li>
+                <li>+30-40% Increased Attack Speed</li>
+                <li>+35% Damage to Demons</li>
+                <li>-20-25% to Enemy Poison Resistance</li>
+                <li>Ignore Target's Defense · +11 Life After Each Kill</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Rune Sources:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Countess Hell (Tir/Ral/Eth/Mal)</li>
+                  <li><span class="drop-rate rate-rare">RARE</span> Lo rune (Countess Hell only, low chance)</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Baal / Trav (Lo)</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 THE endgame physical melee weapon. Ignore Target's Defense = 95% hit rate. Phase Blade = fastest attack speed.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Exile (Runeword)</h4><span class="item-slot">Auric Shield · Paladin</span></div>
+              <div class="item-req">Req Lvl 57 · Vex + Ohm + Ist + Dol</div>
+              <div class="item-class">⚖️ <strong>Builds:</strong> Zealot / Smiter (Life Tap aura = infinite survival)</div>
+              <ul class="item-stats">
+                <li><strong>Level 13-16 Defiance Aura</strong> (huge defense buff)</li>
+                <li>+2 to Paladin Combat/Offensive Auras</li>
+                <li><strong>25% Chance to Cast Life Tap on Striking</strong></li>
+                <li>+15% MF · Freezes Target · +5 Cold Res</li>
+                <li>Regenerate Mana 10%</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Rune Sources:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Countess Hell (Ist + Dol)</li>
+                  <li><span class="drop-rate rate-rare">RARE</span> Hell Baal / Nihlathak (Vex + Ohm)</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Cube up: 3× Gul = Vex</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Life Tap on strike = infinite health for melee Paladins. Best HoZ alternative for tank builds.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Astreon's Iron Ward</h4><span class="item-slot">Caduceus · Smiter</span></div>
+              <div class="item-req">Req Lvl 66 · Unique Caduceus</div>
+              <div class="item-class">⚖️ <strong>Builds:</strong> Smiter Paladin (uber killer), tank Auradin</div>
+              <ul class="item-stats">
+                <li>+2 to Paladin Skills</li>
+                <li>+3 to Combat Skills · +5 to Sacrifice</li>
+                <li>+250-300% Enhanced Damage</li>
+                <li>+50% Damage to Demons</li>
+                <li>All Resistances +20 · +100 to Mana</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Baal minions</li>
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Nihlathak</li>
+                  <li><span class="drop-rate rate-none">NEVER</span> Meph / Andy / Diablo</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Alternative to Grief for Smiters — Smite uses +Skill damage, not weapon damage. Great for uber runs.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ═════════ 🐺 DRUID ═════════ -->
+        <div class="ps-class-section">
+          <h4 class="ps-class-title">🐺 Druid</h4>
+          <p class="ps-class-note">Wind (Tornado/Twister), Elemental (Fire), Summoner, Wolf/Bear shapeshifter.</p>
+          <div class="items-grid">
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Jalal's Mane</h4><span class="item-slot">Helm · Druid BiS</span></div>
+              <div class="item-req">Req Lvl 42 · Unique Totemic Mask</div>
+              <div class="item-class">🐺 <strong>Builds:</strong> Wind, Elemental, Summoner, Wolf, Bear — all Druid specs</div>
+              <ul class="item-stats">
+                <li><strong>+2 to Druid Skills</strong></li>
+                <li>+30% Faster Hit Recovery</li>
+                <li>+20 Strength · +20 Energy</li>
+                <li>All Resistances +30 · +5 to All Attributes</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Andariel</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Baal / Pindleskin</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Druid BiS helm. +2 skills, FHR, res, stats — all in one Druid-only class item.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ═════════ 🏹 AMAZON ═════════ -->
+        <div class="ps-class-section">
+          <h4 class="ps-class-title">🏹 Amazon</h4>
+          <p class="ps-class-note">Bowazon (Multi/Strafe/GA), Javazon (Lightning Fury), Spear (rare).</p>
+          <div class="items-grid">
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Windforce</h4><span class="item-slot">Bow · Bowazon BiS</span></div>
+              <div class="item-req">Req Lvl 73 · Unique Hydra Bow</div>
+              <div class="item-class">🏹 <strong>Builds:</strong> Multishot, Strafe, Guided Arrow Bowazon</div>
+              <ul class="item-stats">
+                <li>+250% Enhanced Damage</li>
+                <li>+20% Increased Attack Speed</li>
+                <li>6-8% Mana Stolen per Hit</li>
+                <li>Knockback · Massive base damage</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Baal minions</li>
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Nihlathak</li>
+                  <li><span class="drop-rate rate-none">NEVER</span> Meph / Andy / Diablo</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Classic Bowazon endgame bow. Only rivaled by Faith runeword.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Titan's Revenge</h4><span class="item-slot">Javelin · Javazon BiS</span></div>
+              <div class="item-req">Req Lvl 42 · Unique Ceremonial Javelin</div>
+              <div class="item-class">🏹 <strong>Builds:</strong> Lightning Fury Javazon (BiS thrown)</div>
+              <ul class="item-stats">
+                <li><strong>+2 to Amazon Skills</strong> · +2 Javelin &amp; Spear Skills</li>
+                <li>+30% Faster Run/Walk · +190% ED</li>
+                <li>+20 Strength · +25 Dexterity</li>
+                <li>Replenishes Quantity · +2 Light Radius</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-elite">TC87 EASY</span> Hell Baal minions</li>
+                  <li><span class="drop-rate rate-elite">TC87 MED</span> Hell Nihlathak</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Andariel (has javelin pool)</li>
+                  <li><span class="drop-rate rate-rare">RARE</span> Cow King</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Javazon BiS thrown weapon. Auto-refills javelins — never run out mid-fight.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Thundergod's Vigor</h4><span class="item-slot">Belt · Javazon BiS</span></div>
+              <div class="item-req">Req Lvl 47 · Unique War Belt</div>
+              <div class="item-class">🏹 <strong>Builds:</strong> Lightning Fury Javazon, lightning-based melee, HC lightning defense</div>
+              <ul class="item-stats">
+                <li>+160-200% Enhanced Defense</li>
+                <li>+20 Strength · +20 Vitality</li>
+                <li><strong>+3 to Lightning Fury / Lightning Strike</strong></li>
+                <li>Adds 1-50 Lightning Damage</li>
+                <li>+5% Max Lightning Res · +20% Lightning Absorb</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Baal / Andariel</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Pindleskin</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Javazon BiS belt (+3 to LF!). Also great for HC characters in lightning-heavy areas.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ═════════ ⚔️ PHYSICAL MELEE ═════════ -->
+        <div class="ps-class-section">
+          <h4 class="ps-class-title">⚔️ Physical Melee (Barb / Zealot / Werewolf / Frenzy)</h4>
+          <p class="ps-class-note">Shared BiS gear for all physical DPS builds: WW Barb, Frenzy Barb, Zealot Pally, Werewolf/Bear Druid, Kicksin.</p>
+          <div class="items-grid">
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Guillaume's Face</h4><span class="item-slot">Helm · CB/DS Melee</span></div>
+              <div class="item-req">Req Lvl 34 · Unique Winged Helm</div>
+              <div class="item-class">⚔️ <strong>Builds:</strong> Zealot, Smiter, WW/Frenzy Barb, Werewolf Druid</div>
+              <ul class="item-stats">
+                <li>+120-150% Enhanced Defense</li>
+                <li>+15% Increased Attack Speed</li>
+                <li><strong>35% Chance of Crushing Blow</strong> (huge vs. bosses!)</li>
+                <li><strong>30% Chance of Deadly Strike</strong></li>
+                <li>+15 to Strength</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Andariel / Baal</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Pindleskin</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 The MVP melee helm. Crushing Blow strips % HP from bosses — mandatory for uber killing.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Fortitude (Runeword)</h4><span class="item-slot">Armor · Physical DPS</span></div>
+              <div class="item-req">Req Lvl 59 · El + Sol + Dol + Lo</div>
+              <div class="item-class">⚔️ <strong>Builds:</strong> Zealot, WW/Frenzy Barb, Bowazon, Werewolf, Kicksin</div>
+              <ul class="item-stats">
+                <li><strong>+300% Enhanced Damage</strong> (unmatched!)</li>
+                <li>+25% Faster Cast Rate · +200% Enhanced Defense</li>
+                <li>All Resistances +25-30 · Damage Reduced 7%</li>
+                <li>20% Chance to Cast Chilling Armor when struck</li>
+                <li>+1 to Light Radius</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Rune Sources:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Countess Hell (El + Sol + Dol)</li>
+                  <li><span class="drop-rate rate-rare">RARE</span> Lo rune (Countess Hell + Baal/Trav)</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Cube up: 3× Sol = Um → ... → Lo</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 +300% ED is unmatched for physical DPS. Use in a 4-socket Archon Plate for lowest strength req.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Dracul's Grasp</h4><span class="item-slot">Gloves · Melee Survival</span></div>
+              <div class="item-req">Req Lvl 76 · Unique Vampirebone Gloves</div>
+              <div class="item-class">⚔️ <strong>Builds:</strong> ALL melee — Zealot, Barb, Werewolf, Kicksin, Smiter</div>
+              <ul class="item-stats">
+                <li>+90-120% Enhanced Defense</li>
+                <li><strong>25% Chance to Cast Level 10 Life Tap on Striking</strong></li>
+                <li>7-10% Life Stolen per Hit</li>
+                <li>Open Wounds 25% · +10-15 Strength</li>
+                <li>Prevent Monster Heal</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Baal minions</li>
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Nihlathak</li>
+                  <li><span class="drop-rate rate-none">NEVER</span> Meph / Andy (TC 78)</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Life Tap on strike = infinite HP for melee. Combined with Grief's damage = untouchable Zealot.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Verdungo's Hearty Cord</h4><span class="item-slot">Belt · Tank</span></div>
+              <div class="item-req">Req Lvl 63 · Unique Mithril Coil</div>
+              <div class="item-class">⚔️ <strong>Builds:</strong> All melee, HC characters, tanks — universal BiS belt</div>
+              <ul class="item-stats">
+                <li><strong>+10-15% Damage Reduced</strong></li>
+                <li>+30-40 to Vitality</li>
+                <li>Replenish Life +13</li>
+                <li>+10% Faster Hit Recovery</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Baal / Nihlathak</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Pindleskin</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Tank belt. % damage reduction is one of the strongest stats in D2 — mandatory for HC.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Gore Rider</h4><span class="item-slot">Boots · Melee BiS</span></div>
+              <div class="item-req">Req Lvl 47 · Unique War Boots</div>
+              <div class="item-class">⚔️ <strong>Builds:</strong> ALL physical melee — Zealot, Barb, Werewolf, Kicksin</div>
+              <ul class="item-stats">
+                <li>+160-200% Enhanced Defense · +30% FRW</li>
+                <li><strong>15% Chance of Crushing Blow</strong></li>
+                <li><strong>15% Chance of Deadly Strike</strong></li>
+                <li><strong>15% Chance of Open Wounds</strong></li>
+                <li>+20 Str · +10 Max Stamina</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Baal / Andariel</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Pindleskin</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 THE melee boots. CB + DS + OW trifecta = every hit hurts. No competition for physical builds.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Raven Frost</h4><span class="item-slot">Ring · Melee/Bowazon</span></div>
+              <div class="item-req">Req Lvl 45 · Unique Ring</div>
+              <div class="item-class">⚔️ <strong>Builds:</strong> All melee/bow (CBF is huge), any HC character</div>
+              <ul class="item-stats">
+                <li>+150-250 to Attack Rating</li>
+                <li>Adds 15-45 Cold Damage</li>
+                <li>+40 to Mana</li>
+                <li><strong>Cannot Be Frozen</strong> (frees your helm/ammy slot)</li>
+                <li>+15-20 Dexterity · +20% Cold Absorb</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Andariel / Baal</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Pindleskin</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 CBF ring means you don't need Rhyme shield or Raven's helm — frees BiS slots for other gear.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Highlord's Wrath</h4><span class="item-slot">Amulet · Physical</span></div>
+              <div class="item-req">Req Lvl 65 · Unique Amulet</div>
+              <div class="item-class">⚔️ <strong>Builds:</strong> Zealot, WW/Frenzy Barb, Bowazon, Assassin melee</div>
+              <ul class="item-stats">
+                <li>+1 to All Skills · +20% IAS</li>
+                <li><strong>+0.375% Deadly Strike per Char Level</strong> (~37% at 99)</li>
+                <li>Lightning Resist +35% · Adds 1-30 Lightning Damage</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Hell Mephisto</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Andariel / Baal</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Hell Pindleskin</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Physical melee/bowazon amulet of choice. Skills + IAS + Deadly Strike all in one.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>The Grandfather</h4><span class="item-slot">Sword · 2H Melee</span></div>
+              <div class="item-req">Req Lvl 81 · Unique Colossus Blade</div>
+              <div class="item-class">⚔️ <strong>Builds:</strong> BvC Barb, 2H Zealot, WW Barb (rare) — mythical chase</div>
+              <ul class="item-stats">
+                <li>+150-250% Enhanced Damage</li>
+                <li>+80 to Life · +20 to All Attributes</li>
+                <li>+50% Damage to Undead</li>
+                <li>Adds +1.25 Damage per Character Level</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Baal minions</li>
+                  <li><span class="drop-rate rate-rare">RARE</span> Hell Diablo</li>
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Nihlathak</li>
+                  <li><span class="drop-rate rate-none">NEVER</span> Meph (qlvl 81 &gt; Meph's TC)</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 Iconic 2H sword. Massive raw damage — legendary drop for Barb/Zealot builds.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ═════════ 🛡️ MERCENARY ═════════ -->
+        <div class="ps-class-section">
+          <h4 class="ps-class-title">🛡️ Mercenary Gear</h4>
+          <p class="ps-class-note">Endgame items for your Act 2 Prayer/Might/Holy Freeze merc (or Act 5 Barb).</p>
+          <div class="items-grid">
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Andariel's Visage</h4><span class="item-slot">Helm · Act 2 Merc</span></div>
+              <div class="item-req">Req Lvl 83 · Unique Demonhead</div>
+              <div class="item-class">🛡️ <strong>Wearer:</strong> Act 2 Mercenary (also good on melee player)</div>
+              <ul class="item-stats">
+                <li>+2 to All Skills · +20% IAS</li>
+                <li>8-10% Life Stolen per Hit</li>
+                <li>+25-30 Strength · Fire Res +50%</li>
+                <li><strong>Fire Resist -30% (drawback!)</strong></li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Baal minions (qlvl 83!)</li>
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Nihlathak</li>
+                  <li><span class="drop-rate rate-none">NEVER</span> Meph / Andy / Diablo / Pindle</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 BiS merc helm. Socket with Ral rune to negate the -30% fire res penalty.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ═════════ 🔮 CASTER SUPPORT ═════════ -->
+        <div class="ps-class-section">
+          <h4 class="ps-class-title">🔮 Shared Caster Gear</h4>
+          <p class="ps-class-note">FCR belts, budget shields, and universal caster items used across Sorc / Necro / Druid / Trapsin / Hammerdin.</p>
+          <div class="items-grid">
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Arachnid Mesh</h4><span class="item-slot">Belt · FCR BiS</span></div>
+              <div class="item-req">Req Lvl 80 · Unique Spiderweb Sash</div>
+              <div class="item-class">🔮 <strong>Builds:</strong> Hammerdin, Sorc, Necro, Trapsin, Wind Druid — every caster</div>
+              <ul class="item-stats">
+                <li>+1 to All Skills</li>
+                <li><strong>+20% Faster Cast Rate</strong></li>
+                <li>+90-120 to Mana · Slows Target 10%</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Farm Locations:</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Baal minions</li>
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Hell Nihlathak</li>
+                  <li><span class="drop-rate rate-elite">TC87 RARE</span> Cow King</li>
+                  <li><span class="drop-rate rate-none">NEVER</span> Meph / Andy / Diablo</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 The only 20% FCR belt. Casters can't hit high FCR breakpoints without it.</p>
+            </div>
+
+            <div class="item-card tier-spike">
+              <div class="item-header"><h4>Spirit (Shield Runeword)</h4><span class="item-slot">Shield · Budget Caster</span></div>
+              <div class="item-req">Req Lvl 25/30 · Tal + Thul + Ort + Amn</div>
+              <div class="item-class">🔮 <strong>Builds:</strong> Sorc, Paladin, Druid, Necro (any caster on budget)</div>
+              <ul class="item-stats">
+                <li><strong>+2 to All Skills</strong></li>
+                <li>+25-35% Faster Cast Rate</li>
+                <li>+55% Faster Hit Recovery</li>
+                <li>+89-112 to Mana · All Res +22-35</li>
+                <li>Cold Absorb 3-8 · Cannot Be Frozen (on Monarch)</li>
+              </ul>
+              <div class="item-drop">
+                <div class="drop-title">🎯 Rune Sources (Tal + Thul + Ort + Amn):</div>
+                <ul class="drop-list">
+                  <li><span class="drop-rate rate-easy">EASY</span> Countess (NM/Hell) drops all 4</li>
+                  <li><span class="drop-rate rate-easy">EASY</span> Any Hell champion / boss</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Larzuk quest for 4os Monarch base</li>
+                  <li><span class="drop-rate rate-medium">MEDIUM</span> Gamble Monarch shields (ilvl 54+)</li>
+                </ul>
+              </div>
+              <p class="item-tip">💡 THE budget caster shield. +2 skills + 35% FCR + all res for pennies. Every new caster crafts one.</p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </section>
 
@@ -3038,6 +4237,7 @@
         <a href="#acts"        data-page="acts">Acts</a>
         <a href="#bosses"      data-page="bosses">Bosses</a>
         <a href="#runewords"   data-page="runewords">Runewords</a>
+        <a href="#items"       data-page="items">Items</a>
         <a href="#cube"        data-page="cube">Cube</a>
         <a href="#breakpoints" data-page="breakpoints">Breakpoints</a>
         <a href="#tips"        data-page="tips">Tips</a>

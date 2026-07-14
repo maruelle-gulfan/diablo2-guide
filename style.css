@@ -1332,3 +1332,373 @@ ul { list-style: none; }
   .bosses-grid { grid-template-columns: 1fr; }
   .farm-grid { grid-template-columns: 1fr; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════
+   ITEMS SECTION
+   ═══════════════════════════════════════════════════════════ */
+.item-group {
+  margin-bottom: 3.5rem;
+}
+.item-group.hidden { display: none; }
+
+.item-group-title {
+  font-family: 'Georgia', serif;
+  font-size: 1.6rem;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--border);
+  letter-spacing: 0.03em;
+}
+
+.item-group-note {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+}
+.item-group-note strong { color: var(--gold-lt); }
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.item-card {
+  background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-card2) 100%);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--tier-color, var(--blood));
+  border-radius: var(--radius);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--trans), box-shadow var(--trans);
+  position: relative;
+  overflow: hidden;
+}
+.item-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 20px var(--tier-glow, var(--glow));
+}
+
+/* Tier colors — bronze / silver / gold / purple (like D2 rarity) */
+.item-card.tier-early { --tier-color: #b87333; --tier-glow: rgba(184,115,51,0.3); }  /* bronze */
+.item-card.tier-mid   { --tier-color: #c0c0c0; --tier-glow: rgba(192,192,192,0.3); } /* silver */
+.item-card.tier-end   { --tier-color: var(--gold); --tier-glow: rgba(212,175,55,0.35); } /* gold */
+.item-card.tier-spike { --tier-color: #b968d4; --tier-glow: rgba(185,104,212,0.4); } /* unique purple */
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.3rem;
+  border-bottom: 1px dashed rgba(180,100,40,0.15);
+  padding-bottom: 0.4rem;
+}
+.item-header h4 {
+  color: var(--tier-color);
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  font-family: 'Georgia', serif;
+  text-shadow: 0 0 8px var(--tier-glow);
+}
+.item-slot {
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.item-req {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: var(--ember);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.65rem;
+  text-transform: uppercase;
+}
+
+.item-stats {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.65;
+}
+.item-stats li {
+  padding: 0.15rem 0;
+  border-bottom: 1px solid rgba(180,100,40,0.06);
+}
+.item-stats li:last-child { border-bottom: none; }
+.item-stats strong { color: var(--gold-lt); }
+
+.item-tip {
+  margin-top: auto;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(180,100,40,0.15);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Powerspike cards get a subtle purple glow at top */
+.item-card.tier-spike::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #b968d4, transparent);
+}
+
+@media (max-width: 600px) {
+  .items-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ═══ Item class + drop-location rows (Powerspikes) ═══ */
+.item-class {
+  font-size: 0.78rem;
+  color: var(--text);
+  margin-bottom: 0.55rem;
+  padding: 0.3rem 0.55rem;
+  background: rgba(0,0,0,0.2);
+  border-left: 2px solid var(--tier-color, var(--gold));
+  border-radius: 3px;
+  letter-spacing: 0.02em;
+}
+.item-class strong {
+  color: var(--tier-color, var(--gold));
+  letter-spacing: 0.04em;
+}
+
+.item-drop {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.6rem;
+  padding: 0.45rem 0.55rem;
+  background: rgba(0,0,0,0.28);
+  border-radius: 3px;
+  border-left: 2px solid var(--ember);
+  line-height: 1.55;
+}
+.item-drop strong {
+  color: var(--ember);
+  letter-spacing: 0.04em;
+}
+
+
+/* ═══ Treasure Class table ═══ */
+.tc-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 2rem;
+  border-radius: var(--radius);
+}
+.tc-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  font-size: 0.88rem;
+  min-width: 720px;
+}
+.tc-table th,
+.tc-table td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border: 1px solid var(--border);
+  vertical-align: top;
+}
+.tc-table th {
+  background: rgba(0,0,0,0.4);
+  color: var(--gold);
+  font-family: 'Georgia', serif;
+  letter-spacing: 0.05em;
+  font-weight: normal;
+  font-size: 0.95rem;
+}
+.tc-table td:first-child {
+  font-family: 'Courier New', monospace;
+  color: var(--gold-lt);
+  white-space: nowrap;
+  font-weight: bold;
+}
+.tc-table tr.tc-highlight {
+  background: rgba(200,80,20,0.06);
+}
+.tc-table tr.tc-highlight td:first-child { color: var(--ember); }
+.tc-table tr.tc-elite {
+  background: rgba(185,104,212,0.08);
+}
+.tc-table tr.tc-elite td:first-child { color: #b968d4; }
+.tc-table tr.tc-elite td strong { color: #d4af37; }
+.tc-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-muted);
+  margin-left: 0.4rem;
+  letter-spacing: 0.05em;
+  font-weight: normal;
+}
+
+/* ═══ Boss drop reference cards ═══ */
+.drop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+.drop-card {
+  background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-card2) 100%);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 1.15rem 1.25rem;
+  transition: transform var(--trans), box-shadow var(--trans);
+  display: flex;
+  flex-direction: column;
+}
+.drop-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 20px rgba(212,175,55,0.25);
+}
+.drop-card h4 {
+  color: var(--gold);
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  margin-bottom: 0.45rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px dashed rgba(180,100,40,0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.drop-card .drop-act {
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: normal;
+}
+.drop-card .drop-loc {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: var(--ember);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.03em;
+}
+.drop-card .drop-tc {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 0.65rem;
+  padding: 0.3rem 0.5rem;
+  background: rgba(0,0,0,0.25);
+  border-radius: 3px;
+  border-left: 2px solid var(--gold);
+}
+.drop-card ul {
+  list-style: disc;
+  padding-left: 1.15rem;
+  margin: 0.25rem 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+.drop-card ul li { margin-bottom: 0.2rem; }
+.drop-card ul strong { color: var(--gold-lt); }
+.drop-card ul em { color: var(--text-muted); font-style: italic; }
+.drop-card .drop-tip {
+  margin-top: auto;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(180,100,40,0.15);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.5;
+}
+@media (max-width: 600px) {
+  .drop-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ═══ Powerspike drop-list with per-boss rarity ═══ */
+.item-drop .drop-title {
+  font-family: 'Georgia', serif;
+  color: var(--gold);
+  font-size: 0.78rem;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.02em;
+}
+.item-drop .drop-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+.item-drop .drop-list li {
+  padding: 0.2rem 0;
+  font-size: 0.75rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1.4;
+}
+.drop-rate {
+  display: inline-block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+  min-width: 68px;
+  text-align: center;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+.rate-easy   { background: rgba(78,155,90,0.22);  color: #7bd68a; border: 1px solid rgba(78,155,90,0.5); }
+.rate-medium { background: rgba(212,175,55,0.20); color: #e5c86e; border: 1px solid rgba(212,175,55,0.5); }
+.rate-rare   { background: rgba(200,127,63,0.22); color: #ffa96b; border: 1px solid rgba(200,127,63,0.5); }
+.rate-elite  { background: rgba(185,104,212,0.22); color: #d59bf0; border: 1px solid rgba(185,104,212,0.5); }
+.rate-none   { background: rgba(120,120,120,0.18); color: #888; border: 1px solid rgba(120,120,120,0.4); }
+
+/* ═══ Powerspike class-grouped sections ═══ */
+.ps-class-section {
+  margin-bottom: 3.5rem;
+  padding-top: 1.25rem;
+  border-top: 2px solid rgba(200, 80, 20, 0.22);
+}
+.ps-class-section:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+.ps-class-title {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 1.55rem;
+  color: #d59bf0;
+  margin: 0 0 0.4rem 0;
+  padding-left: 0.75rem;
+  border-left: 5px solid #b968d4;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 12px rgba(185, 104, 212, 0.4);
+}
+.ps-class-note {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin: 0 0 1.4rem 0;
+  padding-left: 1.1rem;
+  font-style: italic;
+  line-height: 1.5;
+}

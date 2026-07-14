@@ -140,6 +140,27 @@ cubeFilterBtns.forEach(btn => {
   });
 });
 
+/* ─── Items filter (by MF tier) ──────────────────────────── */
+const itemFilterBtns = document.querySelectorAll('.filter-btn[data-item-filter]');
+const itemGroups     = document.querySelectorAll('.item-group');
+
+itemFilterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    itemFilterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const filter = btn.dataset.itemFilter;
+
+    itemGroups.forEach(group => {
+      if (filter === 'all' || group.dataset.itemCat === filter) {
+        group.classList.remove('hidden');
+      } else {
+        group.classList.add('hidden');
+      }
+    });
+  });
+});
+
 /* ─── Scroll reveal ──────────────────────────────────────── */
 const revealElements = [
   ...document.querySelectorAll('.class-card'),
@@ -148,6 +169,7 @@ const revealElements = [
   ...document.querySelectorAll('.tip-card'),
   ...document.querySelectorAll('.build-card'),
   ...document.querySelectorAll('.cube-card'),
+  ...document.querySelectorAll('.item-card'),
 ];
 
 revealElements.forEach(el => el.classList.add('reveal'));
