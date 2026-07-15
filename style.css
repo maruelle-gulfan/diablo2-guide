@@ -154,7 +154,7 @@ ul { list-style: none; }
 .section { padding: 5rem 0; }
 .section-dark { background: var(--bg-mid); }
 
-.container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+.container { max-width: 90%; margin: 0 auto; padding: 0 1.5rem; }
 
 /* Wider container for Builds section — fits 3 cards side-by-side comfortably */
 #builds > .container { max-width: 90%; }
@@ -187,15 +187,15 @@ ul { list-style: none; }
 /* ─── Classes ───────────────────────────────────────────── */
 .classes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 .class-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1.5rem;
+  padding: 0.9rem;
   transition: transform var(--trans), box-shadow var(--trans), border-color var(--trans);
   cursor: default;
 }
@@ -207,20 +207,20 @@ ul { list-style: none; }
 
 .class-icon {
   position: relative;
-  font-size: 2.5rem;
-  margin-bottom: 0.75rem;
-  min-height: 2.5rem;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  min-height: 2rem;
 }
 .class-portrait {
   display: block;
   width: 100%;
   max-width: 100%;
-  aspect-ratio: 1 / 1;
+  height: 130px;
   object-fit: cover;
   object-position: center top;
-  border-radius: 8px;
-  border: 2px solid var(--accent, var(--gold));
-  box-shadow: 0 0 20px var(--accent-glow, rgba(212,175,55,0.35));
+  border-radius: 6px;
+  border: 1px solid var(--accent, var(--gold));
+  box-shadow: 0 0 12px var(--accent-glow, rgba(212,175,55,0.3));
   filter: brightness(0.95) contrast(1.05);
   transition: filter var(--trans), transform var(--trans), box-shadow var(--trans);
   background: linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.15));
@@ -228,55 +228,56 @@ ul { list-style: none; }
 .class-card:hover .class-portrait {
   filter: brightness(1.1) contrast(1.1);
   transform: scale(1.02);
-  box-shadow: 0 0 30px var(--accent-glow, rgba(212,175,55,0.55));
+  box-shadow: 0 0 20px var(--accent-glow, rgba(212,175,55,0.5));
 }
 .class-emoji {
-  display: none; /* Hidden by default — shown only if portrait fails to load */
-  font-size: 2.5rem;
+  display: none;
+  font-size: 2rem;
   line-height: 1;
 }
 .class-icon.no-image .class-emoji { display: inline-block; }
 .class-icon.no-image .class-portrait { display: none; }
 
 .class-card h3 {
-  font-size: 1.3rem;
+  font-size: 1.05rem;
   color: var(--gold);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.3rem;
 }
 
 .difficulty {
   display: inline-block;
-  padding: 0.15rem 0.6rem;
+  padding: 0.1rem 0.5rem;
   border-radius: 999px;
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   font-weight: bold;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 .difficulty.easy   { background: rgba(39,174,96,0.2);  color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
 .difficulty.medium { background: rgba(243,156,18,0.2); color: #f39c12; border: 1px solid rgba(243,156,18,0.3); }
 .difficulty.hard   { background: rgba(192,57,43,0.2);  color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
 
 .class-card > p {
-  font-size: 0.88rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
   color: var(--text-muted);
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
 }
 
 .class-skills {
-  font-size: 0.82rem;
-  margin-bottom: 1rem;
+  font-size: 0.72rem;
+  margin-bottom: 0.6rem;
 }
 .class-skills strong { color: var(--ember); }
-.class-skills li { color: var(--text-muted); padding: 0.1rem 0; padding-left: 0.8rem; position: relative; }
+.class-skills li { color: var(--text-muted); padding: 0.05rem 0; padding-left: 0.7rem; position: relative; }
 .class-skills li::before { content: '›'; position: absolute; left: 0; color: var(--fire); }
 
-.class-stats { display: flex; flex-direction: column; gap: 0.4rem; }
-.stat { display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; color: var(--text-muted); }
-.stat span { width: 65px; flex-shrink: 0; }
+.class-stats { display: flex; flex-direction: column; gap: 0.25rem; }
+.stat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.65rem; color: var(--text-muted); }
+.stat span { width: 52px; flex-shrink: 0; }
 .bar {
-  flex: 1; height: 5px;
+  flex: 1; height: 4px;
   background: rgba(255,255,255,0.08);
   border-radius: 999px; overflow: hidden;
 }
