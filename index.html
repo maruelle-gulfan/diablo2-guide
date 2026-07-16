@@ -18,11 +18,13 @@
       <li><a href="#mercs"       data-page="mercs">Mercs</a></li>
       <li><a href="#acts"        data-page="acts">Acts</a></li>
       <li><a href="#bosses"      data-page="bosses">Bosses</a></li>
+      <li><a href="#reference"   data-page="reference">📖 Ref</a></li>
       <li><a href="#runewords"   data-page="runewords">Runewords</a></li>
       <li><a href="#items"       data-page="items">Items</a></li>
       <li><a href="#cube"        data-page="cube">Cube</a></li>
       <li><a href="#breakpoints" data-page="breakpoints">Breakpoints</a></li>
       <li><a href="#calc"        data-page="calc">🧮 Calc</a></li>
+      <li><a href="#grail"       data-page="grail">🏆 Grail</a></li>
       <li><a href="#tips"        data-page="tips">Tips</a></li>
     </ul>
     <button class="nav-toggle" id="navToggle">☰</button>
@@ -44,10 +46,43 @@
   <section id="classes" class="section page-section">
     <div class="container">
       <h2 class="section-title">Choose Your Class</h2>
-      <p class="section-desc">Seven warriors stand against the darkness. Each brings unique power to the fight.</p>
-      <div class="classes-grid">
+      <p class="section-desc">Seven warriors stand against the darkness. Click a portrait to view details.</p>
 
-        <div class="class-card theme-amazon" data-class="amazon">
+      <!-- Class picker: 7 tabs -->
+      <div class="class-picker" role="tablist" aria-label="Class selector">
+        <button class="class-picker-btn theme-amazon" data-class-btn="amazon" role="tab" aria-selected="false">
+          <img src="images/classes/Amazon.png" alt="" loading="lazy">
+          <span>Amazon</span>
+        </button>
+        <button class="class-picker-btn theme-necromancer" data-class-btn="necromancer" role="tab" aria-selected="false">
+          <img src="images/classes/Necromancer.png" alt="" loading="lazy">
+          <span>Necromancer</span>
+        </button>
+        <button class="class-picker-btn theme-barbarian" data-class-btn="barbarian" role="tab" aria-selected="false">
+          <img src="images/classes/Barbarian.png" alt="" loading="lazy">
+          <span>Barbarian</span>
+        </button>
+        <button class="class-picker-btn theme-sorceress active" data-class-btn="sorceress" role="tab" aria-selected="true">
+          <img src="images/classes/Sorceress.png" alt="" loading="lazy">
+          <span>Sorceress</span>
+        </button>
+        <button class="class-picker-btn theme-paladin" data-class-btn="paladin" role="tab" aria-selected="false">
+          <img src="images/classes/Paladin.png" alt="" loading="lazy">
+          <span>Paladin</span>
+        </button>
+        <button class="class-picker-btn theme-druid" data-class-btn="druid" role="tab" aria-selected="false">
+          <img src="images/classes/Druid.png" alt="" loading="lazy">
+          <span>Druid</span>
+        </button>
+        <button class="class-picker-btn theme-assassin" data-class-btn="assassin" role="tab" aria-selected="false">
+          <img src="images/classes/Assassin.png" alt="" loading="lazy">
+          <span>Assassin</span>
+        </button>
+      </div>
+
+      <div class="classes-grid showcase">
+
+        <div class="class-card theme-amazon" data-class="amazon" hidden>
           <div class="class-icon">
             <img class="class-portrait" src="images/classes/Amazon.png" alt="Amazon" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('no-image')">
             <span class="class-emoji">🏹</span>
@@ -71,7 +106,7 @@
           <a href="#build-amazon" class="class-build-link">View Build →</a>
         </div>
 
-        <div class="class-card theme-necromancer" data-class="necromancer">
+        <div class="class-card theme-necromancer" data-class="necromancer" hidden>
           <div class="class-icon">
             <img class="class-portrait" src="images/classes/Necromancer.png" alt="Necromancer" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('no-image')">
             <span class="class-emoji">💀</span>
@@ -95,7 +130,7 @@
           <a href="#build-necromancer" class="class-build-link">View Build →</a>
         </div>
 
-        <div class="class-card theme-barbarian" data-class="barbarian">
+        <div class="class-card theme-barbarian" data-class="barbarian" hidden>
           <div class="class-icon">
             <img class="class-portrait" src="images/classes/Barbarian.png" alt="Barbarian" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('no-image')">
             <span class="class-emoji">⚔️</span>
@@ -143,7 +178,7 @@
           <a href="#build-sorceress" class="class-build-link">View Build →</a>
         </div>
 
-        <div class="class-card theme-paladin" data-class="paladin">
+        <div class="class-card theme-paladin" data-class="paladin" hidden>
           <div class="class-icon">
             <img class="class-portrait" src="images/classes/Paladin.png" alt="Paladin" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('no-image')">
             <span class="class-emoji">🛡️</span>
@@ -167,7 +202,7 @@
           <a href="#build-paladin" class="class-build-link">View Build →</a>
         </div>
 
-        <div class="class-card theme-druid" data-class="druid">
+        <div class="class-card theme-druid" data-class="druid" hidden>
           <div class="class-icon">
             <img class="class-portrait" src="images/classes/Druid.png" alt="Druid" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('no-image')">
             <span class="class-emoji">🌿</span>
@@ -191,7 +226,7 @@
           <a href="#build-druid" class="class-build-link">View Build →</a>
         </div>
 
-        <div class="class-card theme-assassin" data-class="assassin">
+        <div class="class-card theme-assassin" data-class="assassin" hidden>
           <div class="class-icon">
             <img class="class-portrait" src="images/classes/Assassin.png" alt="Assassin" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('no-image')">
             <span class="class-emoji">🗡️</span>
@@ -1057,7 +1092,7 @@
           </div>
           <div class="build-table">
             <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Jalal's Mane (+2 skills, +Summon) / Wolfhowl</span></div>
+            <div class="row"><span class="k">Helm</span><span class="v">Jalal's Mane (+2 skills, +Summon) / Ravenlore (+3 Ravens)</span></div>
             <div class="row"><span class="k">Weapon</span><span class="v">Beast Runeword (Fanaticism aura!) / Heart of the Oak</span></div>
             <div class="row"><span class="k">Shield</span><span class="v">Spirit Monarch / Rhyme (cannot be frozen)</span></div>
             <div class="row"><span class="k">Armor</span><span class="v">Enigma / Chains of Honor / Bramble</span></div>
@@ -1089,7 +1124,7 @@
           </div>
           <div class="build-table">
             <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Jalal's Mane / Wolfhowl (Alpha Feral Rage)</span></div>
+            <div class="row"><span class="k">Helm</span><span class="v">Jalal's Mane / Andariel's Visage (IAS + poison dmg)</span></div>
             <div class="row"><span class="k">Weapon</span><span class="v">Beast BA / Death's Web on switch (Poison +2)</span></div>
             <div class="row"><span class="k">Shield</span><span class="v">Stormshield / Homunculus</span></div>
             <div class="row"><span class="k">Armor</span><span class="v">Enigma / Bramble (Thorns + Poison bonus)</span></div>
@@ -4658,6 +4693,39 @@
     </div>
   </section>
 
+  <!-- GRAIL -->
+  <section id="grail" class="section page-section">
+    <div class="container">
+      <h2 class="section-title">🏆 Holy Grail Progress</h2>
+      <p class="section-desc">Track your unique-item hunt. Tick a box to mark a find — progress saves in your browser (localStorage). Same item across multiple lists stays synced.</p>
+
+      <div class="grail-header">
+        <div class="grail-progress-info">
+          <div class="grail-count-block">
+            <span class="grail-count-label">Collected</span>
+            <span class="grail-count"><span id="grailFound">0</span> / <span id="grailTotal">0</span></span>
+          </div>
+          <div class="grail-percent" id="grailPercent">0%</div>
+        </div>
+        <div class="grail-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="grailBar">
+          <div class="grail-fill" id="grailFill"></div>
+        </div>
+        <div class="grail-actions">
+          <div class="grail-filter" role="tablist" aria-label="Grail filter">
+            <button class="grail-filter-btn active" data-grail-filter="all" role="tab" aria-selected="true">All</button>
+            <button class="grail-filter-btn" data-grail-filter="found" role="tab" aria-selected="false">✅ Found</button>
+            <button class="grail-filter-btn" data-grail-filter="missing" role="tab" aria-selected="false">⬜ Missing</button>
+          </div>
+          <button class="grail-reset-btn" id="grailReset" title="Clear all progress (asks for confirm)">↻ Reset</button>
+        </div>
+      </div>
+
+      <!-- JS renders category sections here -->
+      <div id="grailCategories" class="grail-categories"></div>
+
+    </div>
+  </section>
+
   <!-- TIPS -->
   <section id="tips" class="section section-dark page-section">
     <div class="container">
@@ -5149,6 +5217,332 @@
     </div>
   </section>
 
+  <!-- REFERENCE (Immunities + LV85 Areas) -->
+  <section id="reference" class="section page-section">
+    <div class="container">
+      <h2 class="section-title">📖 Reference Sheets</h2>
+      <p class="section-desc">The two most-consulted lookup tables in the game — immunity counters and true level 85 Hell areas.</p>
+
+      <!-- ═══════ IMMUNITY CHEATSHEET ═══════ -->
+      <div class="ref-block">
+        <h3 class="ref-block-title">🛡️ Immunity Cheatsheet</h3>
+        <p class="ref-block-sub">Every immunity in Hell + how to counter it. Bring at least one alternate damage source or an immunity-breaker.</p>
+
+        <div class="immune-grid">
+          <!-- Physical Immune -->
+          <div class="immune-card immune-phys">
+            <div class="immune-header">
+              <span class="immune-icon">⚔️</span>
+              <div>
+                <h4>Physical Immune (PI)</h4>
+                <span class="immune-freq">Common in Hell — most ghosts, wraiths, some undead</span>
+              </div>
+            </div>
+            <div class="immune-body">
+              <p class="immune-label">Break with:</p>
+              <ul>
+                <li><strong>Amp Damage</strong> (Necro curse) — <em>always</em> breaks PI (-100% phys res)</li>
+                <li><strong>Decrepify</strong> (Necro) — -50% phys res + slow</li>
+                <li><strong>Crescent Moon</strong> weapon proc</li>
+              </ul>
+              <p class="immune-label">Or use elemental damage:</p>
+              <ul>
+                <li>Any Cold / Fire / Lightning / Poison / Magic weapon</li>
+                <li><strong>Merc with elemental weapon</strong> (Insight, Reaper's Toll)</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Fire Immune -->
+          <div class="immune-card immune-fire">
+            <div class="immune-header">
+              <span class="immune-icon">🔥</span>
+              <div>
+                <h4>Fire Immune (FI)</h4>
+                <span class="immune-freq">Very common — Ancient Tunnels, Act 5 imps, most demons</span>
+              </div>
+            </div>
+            <div class="immune-body">
+              <p class="immune-label">Break with:</p>
+              <ul>
+                <li><strong>Conviction</strong> aura (Infinity, Merc Might→Infinity switch)</li>
+                <li><strong>Lower Resist</strong> curse (Necro)</li>
+                <li><strong>-% Enemy Fire Res</strong> from Rainbow Facets</li>
+              </ul>
+              <p class="immune-label">Alt damage sources:</p>
+              <ul>
+                <li>Cold, Lightning, Physical, Poison</li>
+                <li>Sorc dual-tree (Fire + Cold) is strong here</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Cold Immune -->
+          <div class="immune-card immune-cold">
+            <div class="immune-header">
+              <span class="immune-icon">❄️</span>
+              <div>
+                <h4>Cold Immune (CI)</h4>
+                <span class="immune-freq">Common — WSK monsters, Act 5 barbs, most large demons</span>
+              </div>
+            </div>
+            <div class="immune-body">
+              <p class="immune-label">Break with:</p>
+              <ul>
+                <li><strong>Conviction</strong> aura (Infinity)</li>
+                <li><strong>Lower Resist</strong> curse</li>
+                <li><strong>-% Enemy Cold Res</strong> Facets</li>
+              </ul>
+              <p class="immune-label">Alt damage sources:</p>
+              <ul>
+                <li>Fire, Lightning, Physical, Poison</li>
+                <li>Blizzard Sorc: switch to Fire Ball backup skill</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Lightning Immune -->
+          <div class="immune-card immune-light">
+            <div class="immune-header">
+              <span class="immune-icon">⚡</span>
+              <div>
+                <h4>Lightning Immune (LI)</h4>
+                <span class="immune-freq">Notable: Hell Mephisto, Baal himself, Council members</span>
+              </div>
+            </div>
+            <div class="immune-body">
+              <p class="immune-label">Break with:</p>
+              <ul>
+                <li><strong>Conviction</strong> aura (Infinity is the classic LI-breaker)</li>
+                <li><strong>Lower Resist</strong> curse</li>
+                <li><strong>-% Enemy Light Res</strong> Facets</li>
+              </ul>
+              <p class="immune-label">Alt damage sources:</p>
+              <ul>
+                <li>Fire, Cold, Physical, Poison</li>
+                <li>Javazon: Lightning Fury has splash phys, but need alt</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Poison Immune -->
+          <div class="immune-card immune-poison">
+            <div class="immune-header">
+              <span class="immune-icon">☠️</span>
+              <div>
+                <h4>Poison Immune (PoI)</h4>
+                <span class="immune-freq">Common in Maggot Lair, Andariel's area, undead</span>
+              </div>
+            </div>
+            <div class="immune-body">
+              <p class="immune-label">Break with:</p>
+              <ul>
+                <li><strong>Lower Resist</strong> curse (only reliable break)</li>
+                <li>Conviction does <em>NOT</em> affect poison res</li>
+                <li>-% Enemy Poison Res Facets</li>
+              </ul>
+              <p class="immune-label">Alt damage sources:</p>
+              <ul>
+                <li>Physical, Cold, Fire, Lightning, Magic</li>
+                <li>Poison-focus builds (PNova Necro) MUST bring Lower Resist</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Magic Immune -->
+          <div class="immune-card immune-magic">
+            <div class="immune-header">
+              <span class="immune-icon">✨</span>
+              <div>
+                <h4>Magic Immune (MI)</h4>
+                <span class="immune-freq">Very rare — a handful of Oblivion Knights & Death Beetles</span>
+              </div>
+            </div>
+            <div class="immune-body">
+              <p class="immune-label">Break with:</p>
+              <ul>
+                <li><strong>No aura or curse breaks magic immune</strong></li>
+                <li>-% Enemy Magic Res is very rare</li>
+              </ul>
+              <p class="immune-label">Alt damage sources:</p>
+              <ul>
+                <li>Anything non-magic (physical + elemental)</li>
+                <li>Only Hammerdins and BoneMancers care about MI</li>
+                <li>Hammerdin fix: Redemption / merc kill</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Immunity math quick reference -->
+        <div class="ref-callout">
+          <h4>🧮 The Immunity Math (why "break" matters)</h4>
+          <ul>
+            <li>A monster is "immune" at <strong>100+% resist</strong> in a school</li>
+            <li>Aura/curse effects on immunes are reduced to <strong>1/5 effectiveness</strong></li>
+            <li>Conviction (level 15 on Infinity): -125% base → <strong>-25% vs immunes</strong></li>
+            <li>Lower Resist (level ~15 slvl on wand): -60% base → <strong>-12% vs immunes</strong></li>
+            <li>Amp Damage: -100% base → <strong>-20% vs Physical Immunes</strong> (always breaks 100% PI down to 80%)</li>
+            <li>Stacked: Conviction + Lower Resist + Facets can break monsters with up to ~130% res</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ═══════ LEVEL 85 AREAS ═══════ -->
+      <div class="ref-block">
+        <h3 class="ref-block-title">📍 True Level 85 Areas (Hell)</h3>
+        <p class="ref-block-sub">These are the only zones where every monster is mlvl 85 — meaning full access to the <strong>TC 87 elite loot pool</strong> (Griffon's, Windforce, Death's Fathom, etc.). Farm here for the best drops-per-run outside of quest-boosted bosses.</p>
+
+        <div class="lv85-grid">
+          <!-- Act 1 -->
+          <div class="lv85-act">
+            <h4 class="lv85-act-name">Act 1</h4>
+            <div class="lv85-card">
+              <div class="lv85-header">
+                <h5>The Pit</h5>
+                <span class="lv85-tier">S-Tier</span>
+              </div>
+              <p class="lv85-route">📍 Black Marsh WP → Tamoe Highland → Monastery Gate area (Pit entrance)</p>
+              <p class="lv85-desc">Two-floor dungeon. Level 2 is the true LV85 zone. Dense packs, no immunities you can't work around. <strong>The classic MFer's cave.</strong></p>
+              <p class="lv85-drops"><strong>Notable:</strong> Griffon's Eye, Windforce, Death's Fathom, all facets, high runes</p>
+            </div>
+          </div>
+
+          <!-- Act 2 -->
+          <div class="lv85-act">
+            <h4 class="lv85-act-name">Act 2</h4>
+            <div class="lv85-card">
+              <div class="lv85-header">
+                <h5>Ancient Tunnels</h5>
+                <span class="lv85-tier">S-Tier</span>
+              </div>
+              <p class="lv85-route">📍 Lost City WP → look for trapdoor in Lost City</p>
+              <p class="lv85-desc"><strong>The caster's paradise.</strong> Small map, dense packs, only fire immunes to worry about. Signature drop: Death's Fathom.</p>
+              <p class="lv85-drops"><strong>Notable:</strong> Death's Fathom, all elite uniques, all facets, Windforce, Griffon's</p>
+            </div>
+            <div class="lv85-card">
+              <div class="lv85-header">
+                <h5>Maggot Lair Level 3</h5>
+                <span class="lv85-tier">D-Tier</span>
+              </div>
+              <p class="lv85-route">📍 Far Oasis WP → Maggot Lair (all 3 levels)</p>
+              <p class="lv85-desc">⚠️ <strong>Avoid.</strong> Narrow tunnels, 90% Poison Immune enemies (maggots). Only relevant if you have Lower Resist. Duriel access route only.</p>
+              <p class="lv85-drops"><strong>Notable:</strong> Same TC87 pool but massively slowed by immunes/tight corridors</p>
+            </div>
+          </div>
+
+          <!-- Act 3 -->
+          <div class="lv85-act">
+            <h4 class="lv85-act-name">Act 3</h4>
+            <div class="lv85-card">
+              <div class="lv85-header">
+                <h5>Ruined Fane / Disused Reliquary</h5>
+                <span class="lv85-tier">B-Tier</span>
+              </div>
+              <p class="lv85-route">📍 Kurast Bazaar / Upper Kurast area → look for temple entrances</p>
+              <p class="lv85-desc">Small hidden temple dungeons. Fewer players know about these. Good bonus rooms to hit on the way to Meph.</p>
+              <p class="lv85-drops"><strong>Notable:</strong> Full TC87 access, faster than Meph-only runs if teleporting</p>
+            </div>
+            <div class="lv85-card">
+              <div class="lv85-header">
+                <h5>Forgotten Temple / Ruined Temple</h5>
+                <span class="lv85-tier">B-Tier</span>
+              </div>
+              <p class="lv85-route">📍 Kurast Bazaar side rooms</p>
+              <p class="lv85-desc">Same tier as Ruined Fane. Random spawn locations in the Kurast Bazaar map. Skip if not adjacent to Meph route.</p>
+              <p class="lv85-drops"><strong>Notable:</strong> All TC87 elite drops, high rune chance</p>
+            </div>
+          </div>
+
+          <!-- Act 4 -->
+          <div class="lv85-act">
+            <h4 class="lv85-act-name">Act 4</h4>
+            <div class="lv85-card">
+              <div class="lv85-header">
+                <h5>River of Flame</h5>
+                <span class="lv85-tier">A-Tier</span>
+              </div>
+              <p class="lv85-route">📍 River of Flame WP (directly)</p>
+              <p class="lv85-desc">Long corridor to Chaos Sanctuary. Doom Knights + Venom Lords. Great XP + drops combined with a Chaos run.</p>
+              <p class="lv85-drops"><strong>Notable:</strong> All TC87 uniques, XP from mlvl 85 packs</p>
+            </div>
+            <div class="lv85-card">
+              <div class="lv85-header">
+                <h5>Chaos Sanctuary</h5>
+                <span class="lv85-tier">S-Tier</span>
+              </div>
+              <p class="lv85-route">📍 River of Flame WP → end of RoF corridor</p>
+              <p class="lv85-desc"><strong>Best XP zone in the game</strong> (75-95). Plus Diablo at the end. 3 seals with mini-bosses (Vizier, De Seis, Infector).</p>
+              <p class="lv85-drops"><strong>Notable:</strong> TC87 pool + Diablo's TC84 drops + massive XP</p>
+            </div>
+          </div>
+
+          <!-- Act 5 -->
+          <div class="lv85-act lv85-act-wide">
+            <h4 class="lv85-act-name">Act 5 — The Elite Hunting Grounds</h4>
+            <div class="lv85-card">
+              <div class="lv85-header">
+                <h5>Worldstone Keep Lvl 2 & 3</h5>
+                <span class="lv85-tier">S-Tier</span>
+              </div>
+              <p class="lv85-route">📍 Worldstone Keep Lvl 2 WP</p>
+              <p class="lv85-desc">Direct route to Baal. Filled with mlvl 85 packs. Great for both farming and XP on the way to Throne.</p>
+              <p class="lv85-drops"><strong>Notable:</strong> All TC87 drops, run these before Baal for extra rolls</p>
+            </div>
+            <div class="lv85-card">
+              <div class="lv85-header">
+                <h5>Throne of Destruction</h5>
+                <span class="lv85-tier">S-Tier</span>
+              </div>
+              <p class="lv85-route">📍 Top of WSK Lvl 3 → up stairs</p>
+              <p class="lv85-desc"><strong>THE endgame XP zone (95-99).</strong> Five waves. Wave 5 (Lister the Tormentor pack) is prime elite drop territory.</p>
+              <p class="lv85-drops"><strong>Notable:</strong> All TC87, high rune chance, guaranteed Baal quest drop</p>
+            </div>
+            <div class="lv85-card">
+              <div class="lv85-header">
+                <h5>Halls of Anguish / Pain / Vaught</h5>
+                <span class="lv85-tier">S-Tier</span>
+              </div>
+              <p class="lv85-route">📍 Crystalline Passage WP → Halls path</p>
+              <p class="lv85-desc">Nihlathak's dungeon complex. All 3 halls are LV85. Nihlathak himself is <strong>quest-boosted TC87</strong>. Watch for Corpse Explosion.</p>
+              <p class="lv85-drops"><strong>Notable:</strong> Full elite pool + Key of Destruction for ubers</p>
+            </div>
+          </div>
+
+          <!-- Cow Level -->
+          <div class="lv85-act">
+            <h4 class="lv85-act-name">Secret Cow Level</h4>
+            <div class="lv85-card">
+              <div class="lv85-header">
+                <h5>Moo Moo Farm</h5>
+                <span class="lv85-tier">A-Tier</span>
+              </div>
+              <p class="lv85-route">📍 Cube: Tome of TP + Wirt's Leg (must beat that difficulty first)</p>
+              <p class="lv85-desc">Massive open field. Cows are mlvl 81 (below 85) but <strong>Cow King is TC87</strong>. Huge XP + rune farming from cow packs. Careful: killing the King closes the level FOREVER on that character.</p>
+              <p class="lv85-drops"><strong>Notable:</strong> Cow King has full TC87 pool, cows drop tons of runes</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Farming route comparison -->
+        <div class="ref-callout">
+          <h4>🎯 Best Farming Loop by Priority</h4>
+          <ol class="lv85-priority">
+            <li><strong>Pindle</strong> (5-sec kill, quest-boosted TC87) — best drops-per-hour, period</li>
+            <li><strong>Ancient Tunnels</strong> (30-60 sec) — best for facets & Death's Fathom</li>
+            <li><strong>Hell Mephisto</strong> (~20 sec with moat trick) — highest volume, mid-tier + some elite</li>
+            <li><strong>Chaos Sanctuary + Diablo</strong> — best XP:loot ratio combined</li>
+            <li><strong>Baal Waves</strong> (2-3 min) — best for late-game XP + guaranteed rune</li>
+            <li><strong>Nihlathak</strong> — highest TC87 concentration per kill, but dangerous</li>
+            <li><strong>Cow Level</strong> — rune farming + XP combo</li>
+            <li><strong>The Pit</strong> — the underrated old-school MFer's paradise</li>
+          </ol>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
@@ -5159,11 +5553,13 @@
         <a href="#mercs"       data-page="mercs">Mercs</a>
         <a href="#acts"        data-page="acts">Acts</a>
         <a href="#bosses"      data-page="bosses">Bosses</a>
+        <a href="#reference"   data-page="reference">Reference</a>
         <a href="#runewords"   data-page="runewords">Runewords</a>
         <a href="#items"       data-page="items">Items</a>
         <a href="#cube"        data-page="cube">Cube</a>
         <a href="#breakpoints" data-page="breakpoints">Breakpoints</a>
         <a href="#calc"        data-page="calc">Calc</a>
+        <a href="#grail"       data-page="grail">Grail</a>
         <a href="#tips"        data-page="tips">Tips</a>
       </div>
       <p class="footer-copy">Stay awhile and listen.</p>

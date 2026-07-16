@@ -544,13 +544,13 @@ const bossDropData = {
     ],
     tc: "mlvl 75 · TC 84 · Quest drop = biased (boosted roll)",
     drops: [
-      { text: "<strong>Shako</strong>, Mara's Kaleidoscope, SoJ, Bul-Kathos, HoZ" },
-      { text: "Oculus, Vipermagi, Wizardspike" },
-      { text: "Jalal's Mane, Highlord's Wrath, Verdungo's Hearty Cord" },
-      { text: "Titan's Revenge, Death's Fathom (rare)" },
-      { text: "Andariel's Visage (rare — needs a TC 87 roll)", elite: true }
+      { text: "<strong>Shako</strong> (qlvl 62), Mara's Kaleidoscope (67), SoJ, Bul-Kathos, HoZ" },
+      { text: "Oculus, Vipermagi, Wizardspike, Skullder's Ire, Lidless Wall" },
+      { text: "Jalal's Mane, Highlord's Wrath (65), Verdungo's (63)" },
+      { text: "Magefist, Chance Guards, Frostburn, Waterwalk, String of Ears" },
+      { text: "Cannot drop: Titan's Revenge, Death's Fathom, Andariel's Visage, Arachnid Mesh (all qlvl 79+, above her mlvl 75 cap)", warn: true }
     ],
-    tip: "💡 Best \"single-boss\" farm for a fresh character. Quest drop is biased — save one fresh quest per difficulty for a shot at endgame gear."
+    tip: "💡 Best \"single-boss\" farm for a fresh character. Quest drop is biased — save one fresh quest per difficulty for a shot at endgame gear. She caps at qlvl 75, so no true elites here — go Meph/Baal for those."
   },
   duriel: {
     name: "Duriel — Act 2",
@@ -567,7 +567,15 @@ const bossDropData = {
       "Merc will likely die instantly — resurrect and re-summon in TP if needed.",
       "Ranged / caster builds have a much easier time than melee."
     ],
-    tip: "💡 Not a farm target — his drops are mediocre. Just get past him and move on to Act 3."
+    tc: "mlvl 88 · TC 78 · Similar pool to Mephisto",
+    drops: [
+      { text: "<strong>Shako, Mara's, SoJ, Bul-Kathos, HoZ</strong>" },
+      { text: "Oculus, Vipermagi, Skullder's Ire, Lidless Wall" },
+      { text: "<strong>Arachnid Mesh, Andariel's Visage, Titan's Revenge</strong> (qlvl 83-87 possible)", elite: true },
+      { text: "Highlord's Wrath, Verdungo's, Nightwing's Veil (rare)" },
+      { text: "Cannot drop: Griffon's Eye, Windforce, Death's Fathom, Death's Web, Tyrael's, Crown of Ages, Mang Song's", warn: true }
+    ],
+    tip: "💡 Drops are actually solid (similar to Meph) but the ORIFICE grind (rebuff, TP, run in) makes him a poor farm target compared to Meph or Pindle. Only worth killing on the way past."
   },
   mephisto: {
     name: "Mephisto — Act 3",
@@ -586,12 +594,14 @@ const bossDropData = {
     tc: "mlvl 87 · TC 78 · Highest volume farm in the game",
     drops: [
       { text: "<strong>Shako, Mara's, SoJ, Bul-Kathos, HoZ</strong>" },
-      { text: "Oculus, Jalal's Mane, Lidless Wall" },
-      { text: "Wizardspike, Wisp Projector" },
-      { text: "Highlord's Wrath, full Trang-Oul's set, most mid-elite uniques" },
-      { text: "Cannot drop TC 87 (no Griffon's / Windforce / Death's Fathom here)" }
+      { text: "Oculus, Vipermagi, Skullder's Ire, Lidless Wall" },
+      { text: "Wizardspike, Wisp Projector, Nightwing's Veil (rare)" },
+      { text: "<strong>Arachnid Mesh, Andariel's Visage</strong> — borderline qlvl 87 but confirmed drops", elite: true },
+      { text: "<strong>Titan's Revenge</strong> (qlvl 85), Jalal's Mane, Stormshield, Reaper's Toll" },
+      { text: "Highlord's Wrath, Verdungo's, full Trang-Oul's set, most mid-elite uniques" },
+      { text: "Cannot drop: Griffon's Eye, Windforce, Death's Fathom, Death's Web, Tyrael's Might, Crown of Ages, Mang Song's (true elite pool)", warn: true }
     ],
-    tip: "💡 THE king of MF farming. Fast, safe, huge item volume. Use the classic \"moat trick\" (kite him across the bridge — his AI won't cross)."
+    tip: "💡 THE king of MF farming. Fast, safe, huge item volume. Arachnid + Andariel's Visage are rare-but-real drops here — most other TC87 elites require Baal/Nihlathak/Diablo."
   },
   diablo: {
     name: "Diablo — Act 4",
@@ -610,10 +620,10 @@ const bossDropData = {
     tc: "mlvl 94 · TC 84 · Higher pool than Mephisto",
     drops: [
       { text: "All Mephisto drops PLUS:" },
-      { text: "Grandfather (needs ilvl 81+, so Hell only)" },
-      { text: "Nord's Tenderizer, Doombringer, Fleshripper" },
-      { text: "Better ilvl on affixes = higher rare-item potential" },
-      { text: "Cannot drop TC 87 elite pool" }
+      { text: "<strong>Grandfather</strong> (qlvl 81), Nord's Tenderizer, Fleshripper, Doombringer" },
+      { text: "Metalgrid (qlvl 81), Astreon's Iron Ward, Steelrend, Boneflame" },
+      { text: "Better ilvl on affixes = higher rare-item potential (elite bases roll better mods)" },
+      { text: "Cannot drop: Griffon's Eye, Windforce, Death's Fathom, Death's Web, Tyrael's, Crown of Ages, Mang Song's (true TC 87 pool)", warn: true }
     ],
     tip: "💡 Slower than Meph but higher-quality drops. Do a full Chaos clear for the seal bosses + Diablo combo — great XP and loot combined."
   },
@@ -720,10 +730,11 @@ const bossDropData = {
     ],
     tc: "Guaranteed rune drop · Hell drops up to Ist",
     drops: [
-      { text: "<strong>Rune drops:</strong> Ral → Ist (Hell); Sol → Ko (Nightmare)" },
-      { text: "Perfect gems, keys (Terror Key for ubers)" },
-      { text: "Low-tier uniques as bonus loot" },
-      { text: "Extremely fast run (~30 seconds each)" }
+      { text: "<strong>Runes:</strong> Normal El→Ral · Nightmare El→Io · Hell El→Ist" },
+      { text: "Guaranteed rune drop every kill from Nightmare onward" },
+      { text: "Perfect gems, Key of Terror (needed for ubers)" },
+      { text: "Low-tier uniques as bonus loot (mostly filler here)" },
+      { text: "Extremely fast run (~30 seconds each with teleport)" }
     ],
     tip: "💡 The ONLY rune-focused farm in the game. Run 200+ times for high runes. Bring some MF gear too — she still drops small uniques."
   },
@@ -740,9 +751,9 @@ const bossDropData = {
     tc: "3 councilmen packs · Fast HoZ + gold farm",
     drops: [
       { text: "<strong>Herald of Zakarum</strong> (their signature drop)" },
-      { text: "Massive gold piles (they carry huge gold)" },
-      { text: "Mid-tier uniques + set items" },
-      { text: "Great for early rune drops from the champion packs" }
+      { text: "Massive gold piles (they carry huge gold stacks)" },
+      { text: "Mid-tier uniques + set items — they're mlvl 88 in Hell so drop pool is deep" },
+      { text: "Runes possible but not efficient here — Countess is far better for runes" }
     ],
     tip: "💡 Best HoZ farm in the game. Also amazing as a gold-run for Gheed's Fortune discount and repair costs."
   },
@@ -756,14 +767,15 @@ const bossDropData = {
       "~5 second kill with any decent build. New game → repeat.",
       "100+ runs per hour is easily possible."
     ],
-    tc: "mlvl 86 · TC 84 · ~5-second kill",
+    tc: "mlvl 86 · TC 87 pool (quest-boosted!) · ~5-second kill",
     drops: [
-      { text: "Shako, Mara's, SoJ, Bul-Kathos, HoZ" },
-      { text: "Highlord's Wrath, Verdungo's, Grandfather (rare)" },
-      { text: "Most non-TC-87 elite uniques" },
+      { text: "<strong>Shako, Mara's, SoJ, Bul-Kathos, HoZ</strong>" },
+      { text: "Highlord's Wrath, Verdungo's, Grandfather (qlvl 81)" },
+      { text: "<strong>Yes — CAN drop TC 87 elites:</strong> Griffon's Eye, Windforce, Death's Fathom, Arachnid, Andy's Visage, Titan's, Homunculus, Tyrael's Might", elite: true },
+      { text: "Quest-boosted like Nihlathak — same elite pool access", elite: true },
       { text: "Fastest single-target boss run in the entire game" }
     ],
-    tip: "💡 The speedrun MF king. Kill Pindle → new game → repeat. Best drops-per-hour ratio in the game for high-MF characters."
+    tip: "💡 The speedrun MF king. Kill Pindle → new game → repeat. Because he's quest-boosted TC 87, he can drop EVERY chase unique in the game — not just mid-tier. Best drops-per-hour ratio in the game for high-MF characters."
   },
   cowking: {
     name: "Cow King",
@@ -920,6 +932,40 @@ function applyTipsFilter(filter) {
 tipsFilterBtns.forEach(btn => {
   btn.addEventListener('click', () => applyTipsFilter(btn.dataset.tipsFilter));
 });
+
+/* ─── Class Picker (tab switcher) ──────────────────────── */
+(function () {
+  const pickerBtns = document.querySelectorAll('.class-picker-btn[data-class-btn]');
+  const classCards = document.querySelectorAll('.class-card[data-class]');
+  if (!pickerBtns.length || !classCards.length) return;
+
+  // Wrap right-column content in .class-body so flex layout can stack it
+  classCards.forEach(card => {
+    if (card.querySelector(':scope > .class-body')) return; // idempotent
+    const icon = card.querySelector(':scope > .class-icon');
+    const body = document.createElement('div');
+    body.className = 'class-body';
+    Array.from(card.children).forEach(child => {
+      if (child !== icon) body.appendChild(child);
+    });
+    card.appendChild(body);
+  });
+
+  function selectClass(key) {
+    pickerBtns.forEach(btn => {
+      const on = btn.dataset.classBtn === key;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    classCards.forEach(card => {
+      card.hidden = card.dataset.class !== key;
+    });
+  }
+
+  pickerBtns.forEach(btn => {
+    btn.addEventListener('click', () => selectClass(btn.dataset.classBtn));
+  });
+})();
 
 /* ─── MF + FCR Loadout Calculator ─────────────────────── */
 (function () {
@@ -1321,5 +1367,399 @@ tipsFilterBtns.forEach(btn => {
   classSelect.addEventListener('change', recalculate);
   presetBtns.forEach(btn => btn.addEventListener('click', () => applyPreset(btn.dataset.preset)));
   recalculate();
+})();
+
+
+/* ─── Holy Grail Tracker ────────────────────────────────── */
+(function () {
+  const STORAGE_KEY = 'd2grail_v1';
+
+  // Items initially marked found per user's list
+  const INITIAL_FOUND = new Set([
+    'shako', 'arachnid', 'vipermagi', 'lidless', 'magefist', 'war-trav',
+    'tal-belt', 'herald', 'jalals', 'titans', 'shaftstop', 'bul-kathos',
+    'eschutas', 'marrowwalk', 'chance-guards', 'duriels', 'guardian-angel'
+  ]);
+
+  // Category data: same ID can appear in multiple categories (JS syncs state)
+  const CATEGORIES = [
+    {
+      title: '⭐ S-Tier — Jackpot Drops',
+      sub: 'The rarest, most valuable finds in the game.',
+      items: [
+        { id: 'deaths-fathom', name: "Death's Fathom",       loc: 'Ancient Tunnels, Baal, Diablo' },
+        { id: 'griffons',      name: "Griffon's Eye",         loc: 'Baal, Diablo' },
+        { id: 'deaths-web',    name: "Death's Web",           loc: 'Baal, Pit' },
+        { id: 'tyraels',       name: "Tyrael's Might",        loc: 'Baal, Level 85 Areas' },
+        { id: 'crown-ages',    name: 'Crown of Ages',         loc: 'Baal' },
+        { id: 'mang-songs',    name: "Mang Song's Lesson",    loc: 'Baal' },
+        { id: 'windforce',     name: 'Windforce',             loc: 'Baal, Diablo' },
+        { id: 'nightwings',    name: "Nightwing's Veil",      loc: 'Mephisto, Diablo' },
+        { id: 'soj',           name: 'Stone of Jordan',       loc: 'Nightmare Andariel' },
+        { id: 'mara',          name: "Mara's Kaleidoscope",   loc: 'Mephisto' },
+        { id: 'facet-cold',    name: 'Rainbow Facet (5/-5 Cold)', loc: 'Mephisto, Diablo' }
+      ]
+    },
+    {
+      title: '🔥 Excellent Items',
+      sub: 'Top-tier gear that anchors most endgame builds.',
+      items: [
+        { id: 'sandstorm',    name: 'Sandstorm Trek',        loc: 'Mephisto, Pit' },
+        { id: 'draculs',      name: "Dracul's Grasp",         loc: 'Mephisto' },
+        { id: 'andariels',    name: "Andariel's Visage",      loc: 'Nihlathak, Baal' },
+        { id: 'vgaze',        name: 'Vampire Gaze',           loc: 'Mephisto, Pindleskin' },
+        { id: 'verdungos',    name: "Verdungo's Hearty Cord", loc: 'Mephisto, Baal' },
+        { id: 'gore-rider',   name: 'Gore Rider',             loc: 'Baal, Nihlathak' },
+        { id: 'raven-frost',  name: 'Raven Frost',            loc: 'Mephisto, Countess' },
+        { id: 'wisp',         name: 'Wisp Projector',         loc: 'Diablo, Baal' },
+        { id: 'metalgrid',    name: 'Metalgrid',              loc: 'Baal' },
+        { id: 'highlords',    name: "Highlord's Wrath",       loc: 'Mephisto, Baal' },
+        { id: 'reapers',      name: "Reaper's Toll",          loc: 'Countess, Travincal (runes)' },
+        { id: 'stormshield',  name: 'Stormshield',            loc: 'Mephisto, Baal' }
+      ]
+    },
+    {
+      title: '❄️ Sorceress Collection',
+      sub: 'Best-in-slot for cold/fire/lightning sorc builds.',
+      items: [
+        { id: 'shako',         name: 'Harlequin Crest' },
+        { id: 'arachnid',      name: 'Arachnid Mesh' },
+        { id: 'vipermagi',     name: 'Skin of the Vipermagi' },
+        { id: 'magefist',      name: 'Magefist' },
+        { id: 'war-trav',      name: 'War Traveler' },
+        { id: 'eschutas',      name: "Eschuta's Temper" },
+        { id: 'lidless',       name: 'Lidless Wall' },
+        { id: 'deaths-fathom', name: "Death's Fathom" },
+        { id: 'nightwings',    name: "Nightwing's Veil" },
+        { id: 'tal-armor',     name: "Tal Rasha's Guardianship (Armor)" },
+        { id: 'tal-ammy',      name: "Tal Rasha's Adjudication (Amulet)" },
+        { id: 'tal-belt',      name: "Tal Rasha's Fine-Spun Cloth (Belt)" },
+        { id: 'tal-orb',       name: "Tal Rasha's Lidless Eye (Orb)" },
+        { id: 'ormus',         name: "Ormus' Robes" },
+        { id: 'snowclash',     name: 'Snowclash' },
+        { id: 'frostburn',     name: 'Frostburn' }
+      ]
+    },
+    {
+      title: '🔨 Hammerdin Collection',
+      sub: 'The classic FCR hammerdin loadout.',
+      items: [
+        { id: 'herald',       name: 'Herald of Zakarum' },
+        { id: 'shako',        name: 'Harlequin Crest' },
+        { id: 'arachnid',     name: 'Arachnid Mesh' },
+        { id: 'mara',         name: "Mara's Kaleidoscope" },
+        { id: 'soj',          name: 'Stone of Jordan' },
+        { id: 'raven-frost',  name: 'Raven Frost' },
+        { id: 'sandstorm',    name: 'Sandstorm Trek' }
+      ]
+    },
+    {
+      title: '🐺 Summon Druid Collection',
+      sub: 'Wolves/bear + summoner staples.',
+      items: [
+        { id: 'jalals',       name: "Jalal's Mane" },
+        { id: 'ravenlore',    name: 'Ravenlore' },
+        { id: 'sandstorm',    name: 'Sandstorm Trek' },
+        { id: 'verdungos',    name: "Verdungo's Hearty Cord" },
+        { id: 'mara',         name: "Mara's Kaleidoscope" },
+        { id: 'raven-frost',  name: 'Raven Frost' }
+      ]
+    },
+    {
+      title: '🏹 Amazon Collection',
+      sub: 'Bow/javelin core gear.',
+      items: [
+        { id: 'titans',       name: "Titan's Revenge" },
+        { id: 'thunderstroke',name: 'Thunderstroke' },
+        { id: 'razortail',    name: 'Razortail' },
+        { id: 'griffons',     name: "Griffon's Eye" }
+      ]
+    },
+    {
+      title: '🛡️ Mercenary Collection',
+      sub: 'A2 might merc staples.',
+      items: [
+        { id: 'shaftstop',    name: 'Shaftstop' },
+        { id: 'andariels',    name: "Andariel's Visage" },
+        { id: 'vgaze',        name: 'Vampire Gaze' },
+        { id: 'reapers',      name: "Reaper's Toll" },
+        { id: 'stealskull',   name: 'Stealskull' }
+      ]
+    },
+    {
+      title: '💍 Rings & Amulets',
+      sub: 'Neck & finger uniques.',
+      items: [
+        { id: 'bul-kathos',   name: "Bul-Kathos' Wedding Band" },
+        { id: 'soj',          name: 'Stone of Jordan' },
+        { id: 'mara',         name: "Mara's Kaleidoscope" },
+        { id: 'raven-frost',  name: 'Raven Frost' },
+        { id: 'wisp',         name: 'Wisp Projector' },
+        { id: 'highlords',    name: "Highlord's Wrath" },
+        { id: 'metalgrid',    name: 'Metalgrid' },
+        { id: 'cats-eye',     name: "The Cat's Eye" },
+        { id: 'atmas-scarab', name: "Atma's Scarab" },
+        { id: 'manald',       name: 'Manald Heal' },
+        { id: 'nagelring',    name: 'Nagelring' },
+        { id: 'rising-sun',   name: 'The Rising Sun' }
+      ]
+    },
+    {
+      title: '⚔️ Weapons Grail',
+      sub: 'Iconic weapons every hunter chases.',
+      items: [
+        { id: 'oculus',        name: 'The Oculus',              loc: 'Mephisto, Baal (Sorc orb)' },
+        { id: 'wizardspike',   name: 'Wizardspike',             loc: 'Mephisto, Baal (caster dagger)' },
+        { id: 'azurewrath',    name: 'Azurewrath',              loc: 'Hell Cows, Baal' },
+        { id: 'lightsabre',    name: 'Lightsabre',              loc: 'Mephisto, Baal' },
+        { id: 'grandfather',   name: 'The Grandfather',         loc: 'Baal, Diablo' },
+        { id: 'doombringer',   name: 'Doombringer',             loc: 'Baal, Diablo' },
+        { id: 'baranars',      name: "Baranar's Star",          loc: 'Nihlathak, Baal' },
+        { id: 'buriza',        name: 'Buriza-Do Kyanon',        loc: 'Mephisto, Pindle' },
+        { id: 'bonehew',       name: 'Bonehew',                 loc: 'Baal, Diablo' },
+        { id: 'messerschmidts',name: "Messerschmidt's Reaver",  loc: 'Baal, Diablo' },
+        { id: 'ribcracker',    name: 'Ribcracker',              loc: 'Mephisto, Baal (staff)' },
+        { id: 'gull',          name: 'Gull Dagger',             loc: 'Normal Countess (MF starter)' },
+        { id: 'hellslayer',    name: 'Hellslayer',              loc: 'Baal, Diablo' },
+        { id: 'astreons',      name: "Astreon's Iron Ward",     loc: 'Baal, Diablo' }
+      ]
+    },
+    {
+      title: '🛡️ Body Armor & Shield Grail',
+      sub: 'Torso and off-hand staples.',
+      items: [
+        { id: 'shaftstop',     name: 'Shaftstop',             loc: 'Mephisto' },
+        { id: 'duriels',       name: "Duriel's Shell",        loc: 'Duriel, Baal' },
+        { id: 'guardian-angel',name: 'Guardian Angel',        loc: 'Mephisto, Baal' },
+        { id: 'skullders',     name: "Skullder's Ire",        loc: 'Mephisto, Baal' },
+        { id: 'que-hegans',    name: "Que-Hegan's Wisdom",    loc: 'Mephisto, Baal (caster armor)' },
+        { id: 'gladiators',    name: "Gladiator's Bane",      loc: 'Baal, Diablo' },
+        { id: 'templars',      name: "Templar's Might",       loc: 'Baal, Diablo' },
+        { id: 'atmas-wail',    name: "Atma's Wail",           loc: 'Mephisto, Baal' },
+        { id: 'corpsemourn',   name: 'Corpsemourn',           loc: 'Mephisto, Baal' },
+        { id: 'black-hades',   name: 'Black Hades',           loc: 'Baal, Diablo' },
+        { id: 'homunculus',    name: 'Homunculus',            loc: 'Mephisto, Baal (Necro shield)' },
+        { id: 'moser',         name: "Moser's Blessed Circle",loc: 'Countess, Mephisto' },
+        { id: 'gerkes',        name: "Gerke's Sanctuary",     loc: 'Mephisto, Baal' },
+        { id: 'spirit-ward',   name: 'Spirit Ward',           loc: 'Baal, Diablo' },
+        { id: 'alma-negra',    name: 'Alma Negra',            loc: 'Baal (Pala shield)' }
+      ]
+    },
+    {
+      title: '⛑️ Helms Grail',
+      sub: 'Top-tier helms across classes.',
+      items: [
+        { id: 'veil-steel',  name: 'Veil of Steel',      loc: 'Baal, Diablo' },
+        { id: 'steelshade',  name: 'Steelshade',         loc: 'Baal, Diablo' },
+        { id: 'giant-skull', name: 'Giant Skull',        loc: 'Baal, Diablo' },
+        { id: 'rockstopper', name: 'Rockstopper',        loc: 'Mephisto, Baal' },
+        { id: 'blackhorns',  name: "Blackhorn's Face",   loc: 'Mephisto, Baal' },
+        { id: 'kira',        name: "Kira's Guardian",    loc: 'Baal, Diablo' },
+        { id: 'arreats',     name: "Arreat's Face",      loc: 'Baal (Barb helm)' },
+        { id: 'wolfhowl',    name: 'Wolfhowl',           loc: 'Baal (Barb helm — grants Druid skills)' },
+        { id: 'cerebus',     name: 'Cerebus',            loc: 'Mephisto (Druid pelt)' }
+      ]
+    },
+    {
+      title: '👢 Belts, Boots & Gloves Grail',
+      sub: 'The final tier of accessory chase items.',
+      items: [
+        { id: 'tgods',          name: "Thundergod's Vigor", loc: 'Baal, Diablo' },
+        { id: 'string-ears',    name: 'String of Ears',     loc: 'Mephisto, Baal' },
+        { id: 'goldwrap',       name: 'Goldwrap',           loc: 'Any (great MF belt)' },
+        { id: 'nosferatus',     name: "Nosferatu's Coil",   loc: 'Mephisto, Baal' },
+        { id: 'marrowwalk',     name: 'Marrowwalk',         loc: 'Baal, Nihlathak' },
+        { id: 'water-walk',     name: 'Water Walk',         loc: 'Mephisto, Baal' },
+        { id: 'shadow-dancer',  name: 'Shadow Dancer',      loc: 'Baal, Diablo' },
+        { id: 'aldurs-advance', name: "Aldur's Advance",    loc: 'Baal, Diablo (Druid set)' },
+        { id: 'chance-guards',  name: 'Chance Guards',      loc: 'Any (MF gloves)' },
+        { id: 'steelrend',      name: 'Steelrend',          loc: 'Baal, Diablo' },
+        { id: 'soul-drainer',   name: 'Soul Drainer',       loc: 'Mephisto, Baal' },
+        { id: 'lava-gout',      name: 'Lava Gout',          loc: 'Mephisto, Baal' }
+      ]
+    }
+  ];
+
+  // Farming routes (also show checkboxes, synced by ID)
+  const ROUTES = [
+    {
+      title: '🎯 Hell Mephisto ⭐⭐⭐⭐⭐',
+      desc: 'Fastest single-boss MF run. Runs still owe you:',
+      items: ['mara','sandstorm','andariels','draculs','vgaze','reapers','raven-frost','tal-armor','tal-ammy','nightwings']
+    },
+    {
+      title: '🎯 Nightmare Andariel ⭐⭐⭐⭐⭐',
+      desc: 'The exclusive SoJ farm — nowhere else.',
+      items: ['soj']
+    },
+    {
+      title: '🎯 Ancient Tunnels ⭐⭐⭐⭐⭐',
+      desc: 'True level 85 area. All facets + top-tier caster gear.',
+      items: ['deaths-fathom','griffons','deaths-web','tyraels','facet-cold']
+    },
+    {
+      title: '🎯 Baal / Worldstone Keep ⭐⭐⭐⭐⭐',
+      desc: 'End-game trophy hunting — every rare unique.',
+      items: ['crown-ages','mang-songs','tyraels','windforce','deaths-fathom','griffons']
+    },
+    {
+      title: '🏅 Wishlist — Next 10 to find',
+      desc: 'The dream picks. Focus your runs here.',
+      items: ['soj','mara','sandstorm','andariels','reapers','nightwings','deaths-fathom','griffons','facet-cold','tyraels']
+    }
+  ];
+
+  // Load saved state
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return new Set(JSON.parse(raw));
+    } catch (e) {}
+    // First visit: pre-populate with user's found list
+    return new Set(INITIAL_FOUND);
+  }
+
+  function saveState(set) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set)));
+    } catch (e) {}
+  }
+
+  const found = loadState();
+
+  // Build unique-item registry for total count
+  function collectUniqueIds() {
+    const s = new Set();
+    CATEGORIES.forEach(c => c.items.forEach(it => s.add(it.id)));
+    return s;
+  }
+  const UNIQUE_IDS = collectUniqueIds();
+  const GRAIL_TOTAL = 100; // Fixed target — "Top 100 Grail" goal
+
+  // Render DOM
+  const catRoot = document.getElementById('grailCategories');
+  if (!catRoot) return;
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
+  function makeItem(item) {
+    const isFound = found.has(item.id);
+    const loc = item.loc ? `<span class="grail-loc">${esc(item.loc)}</span>` : '';
+    return `<li><label class="grail-item${isFound?' found':''}" data-id="${esc(item.id)}">
+      <input type="checkbox" data-grail="${esc(item.id)}"${isFound?' checked':''}>
+      <span class="grail-name">${esc(item.name)}</span>
+      ${loc}
+    </label></li>`;
+  }
+
+  function makeCategory(cat, isRoute) {
+    const total = cat.items.length;
+    const foundCount = cat.items.filter(it => found.has(it.id || it)).length;
+    const items = cat.items.map(it => typeof it === 'string' ? { id: it, name: lookupName(it) } : it);
+    const list = items.map(makeItem).join('');
+    return `<section class="grail-category${isRoute?' route':''}" data-category>
+      <h3>${esc(cat.title)}
+        <span class="grail-category-count"><span class="cat-found">${foundCount}</span> / ${total}</span>
+      </h3>
+      ${cat.sub ? `<p class="grail-category-sub">${esc(cat.sub)}</p>` : ''}
+      ${cat.desc ? `<p class="grail-route-desc">${esc(cat.desc)}</p>` : ''}
+      <ul class="grail-list">${list}</ul>
+    </section>`;
+  }
+
+  // Item name lookup (for routes that only supply IDs)
+  const NAME_MAP = {};
+  CATEGORIES.forEach(c => c.items.forEach(it => { NAME_MAP[it.id] = it.name; }));
+  function lookupName(id) { return NAME_MAP[id] || id; }
+
+  // Render everything
+  catRoot.innerHTML =
+    CATEGORIES.map(c => makeCategory(c, false)).join('') +
+    ROUTES.map(c => makeCategory(c, true)).join('');
+
+  // Progress bar refs
+  const foundEl   = document.getElementById('grailFound');
+  const totalEl   = document.getElementById('grailTotal');
+  const percentEl = document.getElementById('grailPercent');
+  const fillEl    = document.getElementById('grailFill');
+  const barEl     = document.getElementById('grailBar');
+
+  totalEl.textContent = GRAIL_TOTAL;
+
+  function updateProgress() {
+    const foundCount = Array.from(UNIQUE_IDS).filter(id => found.has(id)).length;
+    const total = GRAIL_TOTAL;
+    const pct = total ? Math.round((foundCount / total) * 100) : 0;
+    foundEl.textContent = foundCount;
+    percentEl.textContent = pct + '%';
+    fillEl.style.width = pct + '%';
+    barEl.setAttribute('aria-valuenow', pct);
+
+    // Update per-category counts
+    document.querySelectorAll('.grail-category').forEach(catEl => {
+      const items = catEl.querySelectorAll('.grail-item');
+      const catFound = Array.from(items).filter(i => i.classList.contains('found')).length;
+      const cnt = catEl.querySelector('.cat-found');
+      if (cnt) cnt.textContent = catFound;
+      catEl.classList.toggle('empty', items.length > 0 && catFound === items.length && catRoot.classList.contains('filter-missing'));
+    });
+  }
+
+  // Sync all checkboxes with same ID
+  function toggleItem(id, isChecked) {
+    if (isChecked) found.add(id); else found.delete(id);
+    saveState(found);
+    document.querySelectorAll(`.grail-item[data-id="${CSS.escape(id)}"]`).forEach(el => {
+      el.classList.toggle('found', isChecked);
+      const cb = el.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = isChecked;
+    });
+    updateProgress();
+  }
+
+  // Click delegation
+  catRoot.addEventListener('change', e => {
+    const cb = e.target.closest('input[type="checkbox"][data-grail]');
+    if (!cb) return;
+    toggleItem(cb.dataset.grail, cb.checked);
+  });
+
+  // Filter buttons
+  const filterBtns = document.querySelectorAll('.grail-filter-btn');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.grailFilter;
+      filterBtns.forEach(b => {
+        const on = b === btn;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      catRoot.classList.remove('filter-found', 'filter-missing');
+      if (f === 'found')   catRoot.classList.add('filter-found');
+      if (f === 'missing') catRoot.classList.add('filter-missing');
+    });
+  });
+
+  // Reset button
+  const resetBtn = document.getElementById('grailReset');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (!confirm('Clear ALL grail progress? This cannot be undone.')) return;
+      found.clear();
+      saveState(found);
+      document.querySelectorAll('.grail-item').forEach(el => {
+        el.classList.remove('found');
+        const cb = el.querySelector('input[type="checkbox"]');
+        if (cb) cb.checked = false;
+      });
+      updateProgress();
+    });
+  }
+
+  updateProgress();
 })();
 
