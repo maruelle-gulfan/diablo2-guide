@@ -1374,269 +1374,437 @@ tipsFilterBtns.forEach(btn => {
 (function () {
   const STORAGE_KEY = 'd2grail_v1';
 
-  // Items initially marked found per user's list
+  // Items initially marked found (from user's existing list — kept for backward compat)
   const INITIAL_FOUND = new Set([
     'shako', 'arachnid', 'vipermagi', 'lidless', 'magefist', 'war-trav',
     'tal-belt', 'herald', 'jalals', 'titans', 'shaftstop', 'bul-kathos',
     'eschutas', 'marrowwalk', 'chance-guards', 'duriels', 'guardian-angel'
   ]);
 
-  // Category data: same ID can appear in multiple categories (JS syncs state)
-  const CATEGORIES = [
-    {
-      title: '⭐ S-Tier — Jackpot Drops',
-      sub: 'The rarest, most valuable finds in the game.',
-      items: [
-        { id: 'deaths-fathom', name: "Death's Fathom",       loc: 'Ancient Tunnels, Baal, Diablo' },
-        { id: 'griffons',      name: "Griffon's Eye",         loc: 'Baal, Diablo' },
-        { id: 'deaths-web',    name: "Death's Web",           loc: 'Baal, Pit' },
-        { id: 'tyraels',       name: "Tyrael's Might",        loc: 'Baal, Level 85 Areas' },
-        { id: 'crown-ages',    name: 'Crown of Ages',         loc: 'Baal' },
-        { id: 'mang-songs',    name: "Mang Song's Lesson",    loc: 'Baal' },
-        { id: 'windforce',     name: 'Windforce',             loc: 'Baal, Diablo' },
-        { id: 'nightwings',    name: "Nightwing's Veil",      loc: 'Mephisto, Diablo' },
-        { id: 'soj',           name: 'Stone of Jordan',       loc: 'Nightmare Andariel' },
-        { id: 'mara',          name: "Mara's Kaleidoscope",   loc: 'Mephisto' },
-        { id: 'facet-cold',    name: 'Rainbow Facet (5/-5 Cold)', loc: 'Mephisto, Diablo' }
-      ]
-    },
-    {
-      title: '🔥 Excellent Items',
-      sub: 'Top-tier gear that anchors most endgame builds.',
-      items: [
-        { id: 'sandstorm',    name: 'Sandstorm Trek',        loc: 'Mephisto, Pit' },
-        { id: 'draculs',      name: "Dracul's Grasp",         loc: 'Mephisto' },
-        { id: 'andariels',    name: "Andariel's Visage",      loc: 'Nihlathak, Baal' },
-        { id: 'vgaze',        name: 'Vampire Gaze',           loc: 'Mephisto, Pindleskin' },
-        { id: 'verdungos',    name: "Verdungo's Hearty Cord", loc: 'Mephisto, Baal' },
-        { id: 'gore-rider',   name: 'Gore Rider',             loc: 'Baal, Nihlathak' },
-        { id: 'raven-frost',  name: 'Raven Frost',            loc: 'Mephisto, Countess' },
-        { id: 'wisp',         name: 'Wisp Projector',         loc: 'Diablo, Baal' },
-        { id: 'metalgrid',    name: 'Metalgrid',              loc: 'Baal' },
-        { id: 'highlords',    name: "Highlord's Wrath",       loc: 'Mephisto, Baal' },
-        { id: 'reapers',      name: "Reaper's Toll",          loc: 'Countess, Travincal (runes)' },
-        { id: 'stormshield',  name: 'Stormshield',            loc: 'Mephisto, Baal' }
-      ]
-    },
-    {
-      title: '❄️ Sorceress Collection',
-      sub: 'Best-in-slot for cold/fire/lightning sorc builds.',
-      items: [
-        { id: 'shako',         name: 'Harlequin Crest' },
-        { id: 'arachnid',      name: 'Arachnid Mesh' },
-        { id: 'vipermagi',     name: 'Skin of the Vipermagi' },
-        { id: 'magefist',      name: 'Magefist' },
-        { id: 'war-trav',      name: 'War Traveler' },
-        { id: 'eschutas',      name: "Eschuta's Temper" },
-        { id: 'lidless',       name: 'Lidless Wall' },
-        { id: 'deaths-fathom', name: "Death's Fathom" },
-        { id: 'nightwings',    name: "Nightwing's Veil" },
-        { id: 'tal-armor',     name: "Tal Rasha's Guardianship (Armor)" },
-        { id: 'tal-ammy',      name: "Tal Rasha's Adjudication (Amulet)" },
-        { id: 'tal-belt',      name: "Tal Rasha's Fine-Spun Cloth (Belt)" },
-        { id: 'tal-orb',       name: "Tal Rasha's Lidless Eye (Orb)" },
-        { id: 'ormus',         name: "Ormus' Robes" },
-        { id: 'snowclash',     name: 'Snowclash' },
-        { id: 'frostburn',     name: 'Frostburn' }
-      ]
-    },
-    {
-      title: '🔨 Hammerdin Collection',
-      sub: 'The classic FCR hammerdin loadout.',
-      items: [
-        { id: 'herald',       name: 'Herald of Zakarum' },
-        { id: 'shako',        name: 'Harlequin Crest' },
-        { id: 'arachnid',     name: 'Arachnid Mesh' },
-        { id: 'mara',         name: "Mara's Kaleidoscope" },
-        { id: 'soj',          name: 'Stone of Jordan' },
-        { id: 'raven-frost',  name: 'Raven Frost' },
-        { id: 'sandstorm',    name: 'Sandstorm Trek' }
-      ]
-    },
-    {
-      title: '🐺 Summon Druid Collection',
-      sub: 'Wolves/bear + summoner staples.',
-      items: [
-        { id: 'jalals',       name: "Jalal's Mane" },
-        { id: 'ravenlore',    name: 'Ravenlore' },
-        { id: 'sandstorm',    name: 'Sandstorm Trek' },
-        { id: 'verdungos',    name: "Verdungo's Hearty Cord" },
-        { id: 'mara',         name: "Mara's Kaleidoscope" },
-        { id: 'raven-frost',  name: 'Raven Frost' }
-      ]
-    },
-    {
-      title: '🏹 Amazon Collection',
-      sub: 'Bow/javelin core gear.',
-      items: [
-        { id: 'titans',       name: "Titan's Revenge" },
-        { id: 'thunderstroke',name: 'Thunderstroke' },
-        { id: 'razortail',    name: 'Razortail' },
-        { id: 'griffons',     name: "Griffon's Eye" }
-      ]
-    },
-    {
-      title: '🛡️ Mercenary Collection',
-      sub: 'A2 might merc staples.',
-      items: [
-        { id: 'shaftstop',    name: 'Shaftstop' },
-        { id: 'andariels',    name: "Andariel's Visage" },
-        { id: 'vgaze',        name: 'Vampire Gaze' },
-        { id: 'reapers',      name: "Reaper's Toll" },
-        { id: 'stealskull',   name: 'Stealskull' }
-      ]
-    },
-    {
-      title: '💍 Rings & Amulets',
-      sub: 'Neck & finger uniques.',
-      items: [
-        { id: 'bul-kathos',   name: "Bul-Kathos' Wedding Band" },
-        { id: 'soj',          name: 'Stone of Jordan' },
-        { id: 'mara',         name: "Mara's Kaleidoscope" },
-        { id: 'raven-frost',  name: 'Raven Frost' },
-        { id: 'wisp',         name: 'Wisp Projector' },
-        { id: 'highlords',    name: "Highlord's Wrath" },
-        { id: 'metalgrid',    name: 'Metalgrid' },
-        { id: 'cats-eye',     name: "The Cat's Eye" },
-        { id: 'atmas-scarab', name: "Atma's Scarab" },
-        { id: 'manald',       name: 'Manald Heal' },
-        { id: 'nagelring',    name: 'Nagelring' },
-        { id: 'rising-sun',   name: 'The Rising Sun' }
-      ]
-    },
-    {
-      title: '⚔️ Weapons Grail',
-      sub: 'Iconic weapons every hunter chases.',
-      items: [
-        { id: 'oculus',        name: 'The Oculus',              loc: 'Mephisto, Baal (Sorc orb)' },
-        { id: 'wizardspike',   name: 'Wizardspike',             loc: 'Mephisto, Baal (caster dagger)' },
-        { id: 'azurewrath',    name: 'Azurewrath',              loc: 'Hell Cows, Baal' },
-        { id: 'lightsabre',    name: 'Lightsabre',              loc: 'Mephisto, Baal' },
-        { id: 'grandfather',   name: 'The Grandfather',         loc: 'Baal, Diablo' },
-        { id: 'doombringer',   name: 'Doombringer',             loc: 'Baal, Diablo' },
-        { id: 'baranars',      name: "Baranar's Star",          loc: 'Nihlathak, Baal' },
-        { id: 'buriza',        name: 'Buriza-Do Kyanon',        loc: 'Mephisto, Pindle' },
-        { id: 'bonehew',       name: 'Bonehew',                 loc: 'Baal, Diablo' },
-        { id: 'messerschmidts',name: "Messerschmidt's Reaver",  loc: 'Baal, Diablo' },
-        { id: 'ribcracker',    name: 'Ribcracker',              loc: 'Mephisto, Baal (staff)' },
-        { id: 'gull',          name: 'Gull Dagger',             loc: 'Normal Countess (MF starter)' },
-        { id: 'hellslayer',    name: 'Hellslayer',              loc: 'Baal, Diablo' },
-        { id: 'astreons',      name: "Astreon's Iron Ward",     loc: 'Baal, Diablo' }
-      ]
-    },
-    {
-      title: '🛡️ Body Armor & Shield Grail',
-      sub: 'Torso and off-hand staples.',
-      items: [
-        { id: 'shaftstop',     name: 'Shaftstop',             loc: 'Mephisto' },
-        { id: 'duriels',       name: "Duriel's Shell",        loc: 'Duriel, Baal' },
-        { id: 'guardian-angel',name: 'Guardian Angel',        loc: 'Mephisto, Baal' },
-        { id: 'skullders',     name: "Skullder's Ire",        loc: 'Mephisto, Baal' },
-        { id: 'que-hegans',    name: "Que-Hegan's Wisdom",    loc: 'Mephisto, Baal (caster armor)' },
-        { id: 'gladiators',    name: "Gladiator's Bane",      loc: 'Baal, Diablo' },
-        { id: 'templars',      name: "Templar's Might",       loc: 'Baal, Diablo' },
-        { id: 'atmas-wail',    name: "Atma's Wail",           loc: 'Mephisto, Baal' },
-        { id: 'corpsemourn',   name: 'Corpsemourn',           loc: 'Mephisto, Baal' },
-        { id: 'black-hades',   name: 'Black Hades',           loc: 'Baal, Diablo' },
-        { id: 'homunculus',    name: 'Homunculus',            loc: 'Mephisto, Baal (Necro shield)' },
-        { id: 'moser',         name: "Moser's Blessed Circle",loc: 'Countess, Mephisto' },
-        { id: 'gerkes',        name: "Gerke's Sanctuary",     loc: 'Mephisto, Baal' },
-        { id: 'spirit-ward',   name: 'Spirit Ward',           loc: 'Baal, Diablo' },
-        { id: 'alma-negra',    name: 'Alma Negra',            loc: 'Baal (Pala shield)' }
-      ]
-    },
-    {
-      title: '⛑️ Helms Grail',
-      sub: 'Top-tier helms across classes.',
-      items: [
-        { id: 'veil-steel',  name: 'Veil of Steel',      loc: 'Baal, Diablo' },
-        { id: 'steelshade',  name: 'Steelshade',         loc: 'Baal, Diablo' },
-        { id: 'giant-skull', name: 'Giant Skull',        loc: 'Baal, Diablo' },
-        { id: 'rockstopper', name: 'Rockstopper',        loc: 'Mephisto, Baal' },
-        { id: 'blackhorns',  name: "Blackhorn's Face",   loc: 'Mephisto, Baal' },
-        { id: 'kira',        name: "Kira's Guardian",    loc: 'Baal, Diablo' },
-        { id: 'arreats',     name: "Arreat's Face",      loc: 'Baal (Barb helm)' },
-        { id: 'wolfhowl',    name: 'Wolfhowl',           loc: 'Baal (Barb helm — grants Druid skills)' },
-        { id: 'cerebus',     name: 'Cerebus',            loc: 'Mephisto (Druid pelt)' }
-      ]
-    },
-    {
-      title: '👢 Belts, Boots & Gloves Grail',
-      sub: 'The final tier of accessory chase items.',
-      items: [
-        { id: 'tgods',          name: "Thundergod's Vigor", loc: 'Baal, Diablo' },
-        { id: 'string-ears',    name: 'String of Ears',     loc: 'Mephisto, Baal' },
-        { id: 'goldwrap',       name: 'Goldwrap',           loc: 'Any (great MF belt)' },
-        { id: 'nosferatus',     name: "Nosferatu's Coil",   loc: 'Mephisto, Baal' },
-        { id: 'marrowwalk',     name: 'Marrowwalk',         loc: 'Baal, Nihlathak' },
-        { id: 'water-walk',     name: 'Water Walk',         loc: 'Mephisto, Baal' },
-        { id: 'shadow-dancer',  name: 'Shadow Dancer',      loc: 'Baal, Diablo' },
-        { id: 'aldurs-advance', name: "Aldur's Advance",    loc: 'Baal, Diablo (Druid set)' },
-        { id: 'chance-guards',  name: 'Chance Guards',      loc: 'Any (MF gloves)' },
-        { id: 'steelrend',      name: 'Steelrend',          loc: 'Baal, Diablo' },
-        { id: 'soul-drainer',   name: 'Soul Drainer',       loc: 'Mephisto, Baal' },
-        { id: 'lava-gout',      name: 'Lava Gout',          loc: 'Mephisto, Baal' }
-      ]
-    }
+  /* ═══════════════════ MASTER ITEM REGISTRY ══════════════════════
+     One source of truth for every unique tracked in the grail.
+     Fields:
+       id         — stable checkbox / storage key
+       name       — display name
+       slot       — helm|body|shield|belt|boots|gloves|ring|amulet|weapon|
+                    orb|wand|scepter|pelt|barbhelm|palashield|necroshield|
+                    jav|amabow|amaspear|jewel|charm
+       tier       — s | excellent | solid | budget | junk
+       classItem  — (optional) only usable by: amazon|necro|sorc|pala|barb|druid|sin
+       boss       — array of famous farm targets that drop it
+     ══════════════════════════════════════════════════════════════ */
+  const ITEMS = [
+    // ─── HELMS (universal) ──────────────────────────────
+    { id:'shako',        name:"Harlequin Crest (Shako)",  slot:'helm', tier:'s',         boss:['mephisto','diablo','baal'] },
+    { id:'kira',         name:"Kira's Guardian",          slot:'helm', tier:'s',         boss:['baal','diablo'] },
+    { id:'nightwings',   name:"Nightwing's Veil",         slot:'helm', tier:'s',         boss:['mephisto','diablo','baal'] },
+    { id:'griffons',     name:"Griffon's Eye",            slot:'helm', tier:'s',         boss:['baal','diablo','pit'] },
+    { id:'crown-ages',   name:"Crown of Ages",            slot:'helm', tier:'s',         boss:['baal'] },
+    { id:'andariels',    name:"Andariel's Visage",        slot:'helm', tier:'excellent', boss:['baal','nihlathak','pindle'] },
+    { id:'vgaze',        name:"Vampire Gaze",             slot:'helm', tier:'excellent', boss:['mephisto','pindle'] },
+    { id:'giant-skull',  name:"Giant Skull",              slot:'helm', tier:'solid',     boss:['baal','diablo'] },
+    { id:'veil-steel',   name:"Veil of Steel",            slot:'helm', tier:'solid',     boss:['baal','diablo'] },
+    { id:'steelshade',   name:"Steelshade",               slot:'helm', tier:'solid',     boss:['baal','diablo'] },
+    { id:'blackhorns',   name:"Blackhorn's Face",         slot:'helm', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'rockstopper',  name:"Rockstopper",              slot:'helm', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'crown-thieves',name:"Crown of Thieves",         slot:'helm', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'stealskull',   name:"Stealskull",               slot:'helm', tier:'solid',     boss:['countess','mephisto'] },
+    { id:'peasant-crown',name:"Peasant Crown",            slot:'helm', tier:'budget',    boss:['countess','pindle'] },
+    { id:'tarnhelm',     name:"Tarnhelm",                 slot:'helm', tier:'budget',    boss:['countess','pindle'] },
+    { id:'undead-crown', name:"Undead Crown",             slot:'helm', tier:'budget',    boss:['countess'] },
+    { id:'face-horror',  name:"The Face of Horror",       slot:'helm', tier:'junk',      boss:['countess'] },
+    { id:'wormskull',    name:"Wormskull",                slot:'helm', tier:'junk',      boss:['countess'] },
+    { id:'howltusk',     name:"Howltusk",                 slot:'helm', tier:'budget',    boss:['countess','pindle'] },
+    { id:'duskdeep',     name:"Duskdeep",                 slot:'helm', tier:'junk',      boss:['countess'] },
+    { id:'coif-glory',   name:"Coif of Glory",            slot:'helm', tier:'junk',      boss:['countess'] },
+    { id:'darksight',    name:"Darksight Helm",           slot:'helm', tier:'budget',    boss:['mephisto','pindle'] },
+
+    // ─── BARBARIAN PRIMAL HELMS ─────────────────────────
+    { id:'arreats',      name:"Arreat's Face",            slot:'barbhelm', tier:'s',        classItem:'barb', boss:['baal'] },
+    { id:'wolfhowl',     name:"Wolfhowl",                 slot:'barbhelm', tier:'s',        classItem:'barb', boss:['baal'] },
+    { id:'halaberds',    name:"Halaberd's Reign",         slot:'barbhelm', tier:'solid',    classItem:'barb', boss:['baal'] },
+    { id:'demonhorn',    name:"Demonhorn's Edge",         slot:'barbhelm', tier:'solid',    classItem:'barb', boss:['baal','diablo'] },
+    { id:'valk-wing',    name:"Valkyrie Wing",            slot:'barbhelm', tier:'solid',    classItem:'barb', boss:['mephisto','baal'] },
+
+    // ─── DRUID PELTS ────────────────────────────────────
+    { id:'jalals',       name:"Jalal's Mane",             slot:'pelt', tier:'s',           classItem:'druid', boss:['baal','diablo'] },
+    { id:'ravenlore',    name:"Ravenlore",                slot:'pelt', tier:'excellent',   classItem:'druid', boss:['baal','diablo'] },
+    { id:'cerebus',      name:"Cerebus",                  slot:'pelt', tier:'solid',       classItem:'druid', boss:['mephisto','baal'] },
+    { id:'spirit-keeper',name:"Spirit Keeper",            slot:'pelt', tier:'solid',       classItem:'druid', boss:['baal'] },
+    { id:'wolfhead',     name:"Wolfhead",                 slot:'pelt', tier:'budget',      classItem:'druid', boss:['countess','pindle'] },
+
+    // ─── BODY ARMOR ─────────────────────────────────────
+    { id:'tyraels',      name:"Tyrael's Might",           slot:'body', tier:'s',         boss:['baal','uber'] },
+    { id:'shaftstop',    name:"Shaftstop",                slot:'body', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'duriels',      name:"Duriel's Shell",           slot:'body', tier:'excellent', boss:['duriel','baal'] },
+    { id:'guardian-angel',name:"Guardian Angel",          slot:'body', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'skullders',    name:"Skullder's Ire",           slot:'body', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'que-hegans',   name:"Que-Hegan's Wisdom",       slot:'body', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'gladiators',   name:"Gladiator's Bane",         slot:'body', tier:'excellent', boss:['baal','diablo'] },
+    { id:'templars',     name:"Templar's Might",          slot:'body', tier:'solid',     boss:['baal','diablo'] },
+    { id:'atmas-wail',   name:"Atma's Wail",              slot:'body', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'corpsemourn',  name:"Corpsemourn",              slot:'body', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'black-hades',  name:"Black Hades",              slot:'body', tier:'solid',     boss:['baal','diablo'] },
+    { id:'ormus',        name:"Ormus' Robes",             slot:'body', tier:'excellent', boss:['baal','diablo'] },
+    { id:'vipermagi',    name:"Skin of the Vipermagi",    slot:'body', tier:'solid',     boss:['mephisto','pindle'] },
+    { id:'iron-pelt',    name:"Iron Pelt",                slot:'body', tier:'budget',    boss:['pindle','mephisto'] },
+    { id:'toothrow',     name:"Toothrow",                 slot:'body', tier:'budget',    boss:['mephisto','pindle'] },
+    { id:'arkaine',      name:"Arkaine's Valor",          slot:'body', tier:'excellent', boss:['baal','diablo'] },
+    { id:'leviathan',    name:"Leviathan",                slot:'body', tier:'solid',     boss:['baal','diablo'] },
+    { id:'steel-carapace',name:"Steel Carapace",          slot:'body', tier:'solid',     boss:['baal','diablo'] },
+    { id:'rattlecage',   name:"Rattlecage",               slot:'body', tier:'budget',    boss:['countess','mephisto'] },
+    { id:'goldskin',     name:"Goldskin",                 slot:'body', tier:'budget',    boss:['mephisto','pindle'] },
+    { id:'silks',        name:"Silks of the Victor",      slot:'body', tier:'budget',    boss:['mephisto','pindle'] },
+    { id:'twitchthroe',  name:"Twitchthroe",              slot:'body', tier:'junk',      boss:['countess'] },
+    { id:'boneflesh',    name:"Boneflesh",                slot:'body', tier:'junk',      boss:['countess'] },
+    { id:'rockfleece',   name:"Rockfleece",               slot:'body', tier:'budget',    boss:['countess','pindle'] },
+    { id:'iceblink',     name:"Iceblink",                 slot:'body', tier:'budget',    boss:['countess','pindle'] },
+    { id:'hawkmail',     name:"Hawkmail",                 slot:'body', tier:'junk',      boss:['countess'] },
+    { id:'darkglow',     name:"Darkglow",                 slot:'body', tier:'junk',      boss:['countess'] },
+    { id:'venom-ward',   name:"Venom Ward",               slot:'body', tier:'junk',      boss:['countess'] },
+    { id:'tal-armor',    name:"Tal Rasha's Guardianship", slot:'body', tier:'excellent', boss:['mephisto','baal'] },
+
+    // ─── SHIELDS (universal) ────────────────────────────
+    { id:'stormshield',  name:"Stormshield",              slot:'shield', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'lidless',      name:"Lidless Wall",             slot:'shield', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'gerkes',       name:"Gerke's Sanctuary",        slot:'shield', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'moser',        name:"Moser's Blessed Circle",   slot:'shield', tier:'solid',     boss:['countess','mephisto'] },
+    { id:'spirit-ward',  name:"Spirit Ward",              slot:'shield', tier:'solid',     boss:['baal','diablo'] },
+    { id:'blackoak',     name:"Blackoak Shield",          slot:'shield', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'radaments-sphere',name:"Radament's Sphere",     slot:'shield', tier:'budget',    boss:['mephisto','pindle'] },
+    { id:'headhunter',   name:"Head Hunter's Glory",      slot:'shield', tier:'solid',     boss:['baal','diablo'] },
+    { id:'visceratuant', name:"Visceratuant",             slot:'shield', tier:'budget',    boss:['countess','pindle'] },
+    { id:'stormguild',   name:"Stormguild",               slot:'shield', tier:'budget',    boss:['countess','pindle'] },
+    { id:'steelclash',   name:"Steelclash",               slot:'shield', tier:'budget',    boss:['countess','pindle'] },
+    { id:'wall-eyeless', name:"Wall of the Eyeless",      slot:'shield', tier:'junk',      boss:['countess'] },
+
+    // ─── PALADIN SHIELDS ────────────────────────────────
+    { id:'herald',       name:"Herald of Zakarum",        slot:'palashield', tier:'excellent', classItem:'pala', boss:['mephisto','baal'] },
+    { id:'alma-negra',   name:"Alma Negra",               slot:'palashield', tier:'solid',     classItem:'pala', boss:['baal'] },
+    { id:'dragonscale',  name:"Dragonscale",              slot:'palashield', tier:'solid',     classItem:'pala', boss:['baal'] },
+
+    // ─── NECRO SHRUNKEN HEADS ───────────────────────────
+    { id:'homunculus',   name:"Homunculus",               slot:'necroshield', tier:'solid',     classItem:'necro', boss:['mephisto','baal'] },
+    { id:'boneflame',    name:"Boneflame",                slot:'necroshield', tier:'solid',     classItem:'necro', boss:['baal'] },
+    { id:'darkforce',    name:"Darkforce Spawn",          slot:'necroshield', tier:'solid',     classItem:'necro', boss:['baal','diablo'] },
+    { id:'umbral-disk',  name:"Umbral Disk",              slot:'necroshield', tier:'budget',    classItem:'necro', boss:['mephisto','pindle'] },
+
+    // ─── BELTS ──────────────────────────────────────────
+    { id:'arachnid',     name:"Arachnid Mesh",            slot:'belt', tier:'s',         boss:['mephisto','baal'] },
+    { id:'verdungos',    name:"Verdungo's Hearty Cord",   slot:'belt', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'tgods',        name:"Thundergod's Vigor",       slot:'belt', tier:'excellent', boss:['baal','diablo'] },
+    { id:'string-ears',  name:"String of Ears",           slot:'belt', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'nosferatus',   name:"Nosferatu's Coil",         slot:'belt', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'goldwrap',     name:"Goldwrap",                 slot:'belt', tier:'solid',     boss:['countess','pindle'] },
+    { id:'razortail',    name:"Razortail",                slot:'belt', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'snowclash',    name:"Snowclash",                slot:'belt', tier:'solid',     boss:['baal','diablo'] },
+    { id:'gloom-trap',   name:"Gloom's Trap",             slot:'belt', tier:'budget',    boss:['mephisto','pindle'] },
+    { id:'bladebuckle',  name:"Bladebuckle",              slot:'belt', tier:'budget',    boss:['mephisto','pindle'] },
+    { id:'lenymo',       name:"Lenymo",                   slot:'belt', tier:'junk',      boss:['countess'] },
+    { id:'snakecord',    name:"Snakecord",                slot:'belt', tier:'junk',      boss:['countess'] },
+    { id:'nightsmoke',   name:"Nightsmoke",               slot:'belt', tier:'budget',    boss:['countess','pindle'] },
+    { id:'tal-belt',     name:"Tal Rasha's Fine-Spun Cloth", slot:'belt', tier:'excellent', boss:['mephisto','baal'] },
+
+    // ─── BOOTS ──────────────────────────────────────────
+    { id:'war-trav',     name:"War Traveler",             slot:'boots', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'sandstorm',    name:"Sandstorm Trek",           slot:'boots', tier:'excellent', boss:['mephisto','pit'] },
+    { id:'gore-rider',   name:"Gore Rider",               slot:'boots', tier:'excellent', boss:['baal','nihlathak'] },
+    { id:'shadow-dancer',name:"Shadow Dancer",            slot:'boots', tier:'solid',     boss:['baal','diablo'] },
+    { id:'marrowwalk',   name:"Marrowwalk",               slot:'boots', tier:'solid',     boss:['baal','nihlathak'] },
+    { id:'water-walk',   name:"Water Walk",               slot:'boots', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'silkweave',    name:"Silkweave",                slot:'boots', tier:'budget',    boss:['mephisto','pindle'] },
+    { id:'inferno-stride',name:"Infernostride",           slot:'boots', tier:'solid',     boss:['mephisto','pindle'] },
+    { id:'goblin-toe',   name:"Goblin Toe",               slot:'boots', tier:'budget',    boss:['countess','pindle'] },
+    { id:'tearhaunch',   name:"Tearhaunch",               slot:'boots', tier:'budget',    boss:['countess'] },
+    { id:'hotspur',      name:"Hotspur",                  slot:'boots', tier:'junk',      boss:['countess'] },
+    { id:'gorefoot',     name:"Gorefoot",                 slot:'boots', tier:'junk',      boss:['countess'] },
+    { id:'treads-cthon', name:"Treads of Cthon",          slot:'boots', tier:'junk',      boss:['countess'] },
+    { id:'aldurs-advance',name:"Aldur's Advance",         slot:'boots', tier:'solid',     boss:['baal','diablo'] },
+
+    // ─── GLOVES ─────────────────────────────────────────
+    { id:'draculs',      name:"Dracul's Grasp",           slot:'gloves', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'steelrend',    name:"Steelrend",                slot:'gloves', tier:'excellent', boss:['baal','diablo'] },
+    { id:'soul-drainer', name:"Soul Drainer",             slot:'gloves', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'lava-gout',    name:"Lava Gout",                slot:'gloves', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'magefist',     name:"Magefist",                 slot:'gloves', tier:'solid',     boss:['countess','mephisto'] },
+    { id:'frostburn',    name:"Frostburn",                slot:'gloves', tier:'solid',     boss:['mephisto','pindle'] },
+    { id:'chance-guards',name:"Chance Guards",            slot:'gloves', tier:'solid',     boss:['countess','pindle'] },
+    { id:'venom-grip',   name:"Venom Grip",               slot:'gloves', tier:'budget',    boss:['countess','pindle'] },
+    { id:'gravepalm',    name:"Gravepalm",                slot:'gloves', tier:'budget',    boss:['mephisto','pindle'] },
+    { id:'ghoulhide',    name:"Ghoulhide",                slot:'gloves', tier:'budget',    boss:['mephisto','pindle'] },
+    { id:'hellmouth',    name:"Hellmouth",                slot:'gloves', tier:'solid',     boss:['baal','diablo'] },
+    { id:'bloodfist',    name:"Bloodfist",                slot:'gloves', tier:'budget',    boss:['countess','pindle'] },
+    { id:'hand-broc',    name:"The Hand of Broc",         slot:'gloves', tier:'junk',      boss:['countess'] },
+
+    // ─── RINGS ──────────────────────────────────────────
+    { id:'soj',          name:"Stone of Jordan",          slot:'ring', tier:'s',         boss:['nm-anda','baal','diablo'] },
+    { id:'bul-kathos',   name:"Bul-Kathos' Wedding Band", slot:'ring', tier:'s',         boss:['baal','diablo'] },
+    { id:'raven-frost',  name:"Raven Frost",              slot:'ring', tier:'excellent', boss:['countess','mephisto'] },
+    { id:'wisp',         name:"Wisp Projector",           slot:'ring', tier:'excellent', boss:['diablo','baal'] },
+    { id:'nagelring',    name:"Nagelring",                slot:'ring', tier:'solid',     boss:['countess','pindle'] },
+    { id:'manald',       name:"Manald Heal",              slot:'ring', tier:'solid',     boss:['countess','pindle'] },
+    { id:'dwarf-star',   name:"Dwarf Star",               slot:'ring', tier:'solid',     boss:['countess','pindle'] },
+    { id:'nature-peace', name:"Nature's Peace",           slot:'ring', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'carrion-wind', name:"Carrion Wind",             slot:'ring', tier:'solid',     boss:['mephisto','baal'] },
+
+    // ─── AMULETS ────────────────────────────────────────
+    { id:'mara',         name:"Mara's Kaleidoscope",      slot:'amulet', tier:'s',         boss:['mephisto','baal'] },
+    { id:'highlords',    name:"Highlord's Wrath",         slot:'amulet', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'metalgrid',    name:"Metalgrid",                slot:'amulet', tier:'excellent', boss:['baal'] },
+    { id:'atmas-scarab', name:"Atma's Scarab",            slot:'amulet', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'cats-eye',     name:"The Cat's Eye",            slot:'amulet', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'rising-sun',   name:"The Rising Sun",           slot:'amulet', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'seraph-hymn',  name:"Seraph's Hymn",            slot:'amulet', tier:'solid',     boss:['baal','diablo'] },
+    { id:'eye-etlich',   name:"The Eye of Etlich",        slot:'amulet', tier:'budget',    boss:['countess','pindle'] },
+    { id:'mahim-oak',    name:"The Mahim-Oak Curio",      slot:'amulet', tier:'budget',    boss:['countess','pindle'] },
+    { id:'nokozan',      name:"Nokozan Relic",            slot:'amulet', tier:'junk',      boss:['countess'] },
+    { id:'saracens',     name:"Saracen's Chance",         slot:'amulet', tier:'budget',    boss:['countess','pindle'] },
+    { id:'tal-ammy',     name:"Tal Rasha's Adjudication", slot:'amulet', tier:'excellent', boss:['mephisto','baal'] },
+
+    // ─── SORCERESS ORBS ─────────────────────────────────
+    { id:'oculus',       name:"The Oculus",               slot:'orb', tier:'solid',       classItem:'sorc', boss:['mephisto','baal'] },
+    { id:'eschutas',     name:"Eschuta's Temper",         slot:'orb', tier:'excellent',   classItem:'sorc', boss:['baal','diablo'] },
+    { id:'deaths-fathom',name:"Death's Fathom",           slot:'orb', tier:'s',           classItem:'sorc', boss:['pit','baal','diablo'] },
+    { id:'tal-orb',      name:"Tal Rasha's Lidless Eye",  slot:'orb', tier:'excellent',   classItem:'sorc', boss:['mephisto','baal'] },
+
+    // ─── NECROMANCER WANDS ──────────────────────────────
+    { id:'deaths-web',   name:"Death's Web",              slot:'wand', tier:'s',           classItem:'necro', boss:['baal','pit'] },
+    { id:'boneshade',    name:"Boneshade",                slot:'wand', tier:'excellent',   classItem:'necro', boss:['baal','diablo'] },
+    { id:'blackhand',    name:"Blackhand Key",            slot:'wand', tier:'solid',       classItem:'necro', boss:['mephisto','baal'] },
+    { id:'suicide-branch',name:"Suicide Branch",          slot:'wand', tier:'solid',       classItem:'necro', boss:['countess','mephisto'] },
+    { id:'arm-leoric',   name:"Arm of King Leoric",       slot:'wand', tier:'budget',      classItem:'necro', boss:['countess','mephisto'] },
+    { id:'ume-lament',   name:"Ume's Lament",             slot:'wand', tier:'budget',      classItem:'necro', boss:['countess'] },
+    { id:'gravenspine',  name:"Gravenspine",              slot:'wand', tier:'budget',      classItem:'necro', boss:['countess','pindle'] },
+    { id:'torch-iro',    name:"Torch of Iro",             slot:'wand', tier:'junk',        classItem:'necro', boss:['countess'] },
+    { id:'maelstrom',    name:"Maelstrom",                slot:'wand', tier:'junk',        classItem:'necro', boss:['countess'] },
+    { id:'carin-shard',  name:"Carin Shard",              slot:'wand', tier:'junk',        classItem:'necro', boss:['countess'] },
+
+    // ─── PALADIN SCEPTERS ───────────────────────────────
+    { id:'astreons',     name:"Astreon's Iron Ward",      slot:'scepter', tier:'excellent',classItem:'pala', boss:['baal','diablo'] },
+    { id:'heavens-light',name:"Heaven's Light",           slot:'scepter', tier:'solid',    classItem:'pala', boss:['baal','diablo'] },
+    { id:'hand-bl',      name:"The Hand of Blessed Light",slot:'scepter', tier:'solid',    classItem:'pala', boss:['baal','diablo'] },
+    { id:'redeemer',     name:"The Redeemer",             slot:'scepter', tier:'solid',    classItem:'pala', boss:['baal','diablo'] },
+    { id:'stormeye',     name:"Stormeye",                 slot:'scepter', tier:'solid',    classItem:'pala', boss:['mephisto','baal'] },
+    { id:'fetid-sprinkler',name:"The Fetid Sprinkler",    slot:'scepter', tier:'solid',    classItem:'pala', boss:['mephisto','baal'] },
+    { id:'zakarum-hand', name:"Zakarum's Hand",           slot:'scepter', tier:'solid',    classItem:'pala', boss:['mephisto','baal'] },
+    { id:'knell-striker',name:"Knell Striker",            slot:'scepter', tier:'budget',   classItem:'pala', boss:['countess','pindle'] },
+    { id:'rusthandle',   name:"Rusthandle",               slot:'scepter', tier:'budget',   classItem:'pala', boss:['countess','pindle'] },
+
+    // ─── AMAZON JAVELINS / BOWS / SPEARS ────────────────
+    { id:'titans',       name:"Titan's Revenge",          slot:'jav', tier:'s',            classItem:'amazon', boss:['mephisto','baal'] },
+    { id:'thunderstroke',name:"Thunderstroke",            slot:'jav', tier:'excellent',    classItem:'amazon', boss:['baal','diablo'] },
+    { id:'stoneraven',   name:"Stoneraven",               slot:'jav', tier:'solid',        classItem:'amazon', boss:['baal','diablo'] },
+    { id:'demon-arch',   name:"Demon's Arch",             slot:'jav', tier:'solid',        classItem:'amazon', boss:['baal','diablo'] },
+    { id:'impaler',      name:"The Impaler",              slot:'jav', tier:'budget',       classItem:'amazon', boss:['pindle','mephisto'] },
+    { id:'lycander-aim', name:"Lycander's Aim",           slot:'amabow', tier:'solid',     classItem:'amazon', boss:['mephisto','baal'] },
+    { id:'lycander-flank',name:"Lycander's Flank",        slot:'amaspear', tier:'solid',   classItem:'amazon', boss:['mephisto','baal'] },
+    { id:'eaglehorn',    name:"Eaglehorn",                slot:'amabow', tier:'s',         classItem:'amazon', boss:['baal','diablo'] },
+    { id:'kuko',         name:"Kuko Shakaku",             slot:'amabow', tier:'solid',     classItem:'amazon', boss:['mephisto','baal'] },
+    { id:'skystrike',    name:"Skystrike",                slot:'amabow', tier:'budget',    classItem:'amazon', boss:['countess','mephisto'] },
+    { id:'witchwild',    name:"Witchwild String",         slot:'amabow', tier:'solid',     classItem:'amazon', boss:['mephisto','baal'] },
+    { id:'magewrath',    name:"Magewrath",                slot:'amabow', tier:'solid',     classItem:'amazon', boss:['mephisto','baal'] },
+    { id:'goldstrike',   name:"Goldstrike Arch",          slot:'amabow', tier:'solid',     classItem:'amazon', boss:['baal','diablo'] },
+    { id:'endlesshail',  name:"Endlesshail",              slot:'amabow', tier:'budget',    classItem:'amazon', boss:['countess','pindle'] },
+    { id:'riphook',      name:"Riphook",                  slot:'amabow', tier:'junk',      classItem:'amazon', boss:['countess'] },
+    { id:'cliffkiller',  name:"Cliffkiller",              slot:'amabow', tier:'budget',    classItem:'amazon', boss:['countess','pindle'] },
+    { id:'blastbark',    name:"Blastbark",                slot:'amabow', tier:'junk',      classItem:'amazon', boss:['countess'] },
+
+    // ─── ASSASSIN KATARS ────────────────────────────────
+    { id:'bartucs',      name:"Bartuc's Cut-Throat",      slot:'weapon', tier:'excellent', classItem:'sin', boss:['baal','diablo'] },
+    { id:'jade-talon',   name:"Jade Talon",               slot:'weapon', tier:'solid',     classItem:'sin', boss:['baal','diablo'] },
+    { id:'firelizard',   name:"Firelizard's Talons",      slot:'weapon', tier:'solid',     classItem:'sin', boss:['baal','diablo'] },
+    { id:'shadowkiller', name:"Shadow Killer",            slot:'weapon', tier:'solid',     classItem:'sin', boss:['baal','diablo'] },
+    { id:'chaos-talon',  name:"Chaos Talon",              slot:'weapon', tier:'solid',     classItem:'sin', boss:['baal','diablo'] },
+
+    // ─── UNIVERSAL WEAPONS (melee/caster) ───────────────
+    { id:'grandfather',  name:"The Grandfather",          slot:'weapon', tier:'s',         boss:['baal','diablo'] },
+    { id:'doombringer',  name:"Doombringer",              slot:'weapon', tier:'excellent', boss:['baal','diablo'] },
+    { id:'messerschmidts',name:"Messerschmidt's Reaver",  slot:'weapon', tier:'solid',     boss:['baal','diablo'] },
+    { id:'baranars',     name:"Baranar's Star",           slot:'weapon', tier:'solid',     boss:['nihlathak','baal'] },
+    { id:'hellslayer',   name:"Hellslayer",               slot:'weapon', tier:'solid',     boss:['baal','diablo'] },
+    { id:'azurewrath',   name:"Azurewrath",               slot:'weapon', tier:'excellent', boss:['cows','baal'] },
+    { id:'lightsabre',   name:"Lightsabre",               slot:'weapon', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'mang-songs',   name:"Mang Song's Lesson",       slot:'weapon', tier:'s',         classItem:'sorc', boss:['baal'] },
+    { id:'ribcracker',   name:"Ribcracker",               slot:'weapon', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'bonehew',      name:"Bonehew",                  slot:'weapon', tier:'solid',     boss:['baal','diablo','cows'] },
+    { id:'wizardspike',  name:"Wizardspike",              slot:'weapon', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'gull',         name:"Gull Dagger",              slot:'weapon', tier:'solid',     boss:['countess'] },
+    { id:'reapers',      name:"Reaper's Toll",            slot:'weapon', tier:'excellent', boss:['countess','baal'] },
+    { id:'bloodletter',  name:"Bloodletter",              slot:'weapon', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'stormspire',   name:"Stormspire",               slot:'weapon', tier:'solid',     boss:['baal','diablo'] },
+    { id:'ethereal-edge',name:"Ethereal Edge",            slot:'weapon', tier:'solid',     boss:['baal','diablo'] },
+    { id:'flamebellow',  name:"Flamebellow",              slot:'weapon', tier:'solid',     boss:['baal','diablo'] },
+    { id:'earthshifter', name:"Earth Shifter",            slot:'weapon', tier:'excellent', boss:['baal','diablo'] },
+    { id:'stormlash',    name:"Stormlash",                slot:'weapon', tier:'solid',     boss:['baal','diablo'] },
+    { id:'schaefers',    name:"Schaefer's Hammer",        slot:'weapon', tier:'excellent', boss:['baal','diablo'] },
+    { id:'butchers-pupil',name:"The Butcher's Pupil",     slot:'weapon', tier:'budget',    boss:['countess','mephisto'] },
+    { id:'buriza',       name:"Buriza-Do Kyanon",         slot:'weapon', tier:'solid',     boss:['mephisto','pindle'] },
+    { id:'hone-sundan',  name:"Hone Sundan",              slot:'weapon', tier:'solid',     boss:['countess','mephisto'] },
+    { id:'widowmaker',   name:"Widowmaker",               slot:'weapon', tier:'solid',     boss:['baal','diablo'] },
+    { id:'windforce',    name:"Windforce",                slot:'weapon', tier:'s',         boss:['baal','diablo'] },
+    { id:'crainte-vomir',name:"Crainte Vomir",            slot:'weapon', tier:'budget',    boss:['mephisto','pindle'] },
+    { id:'headstriker',  name:"Headstriker",              slot:'weapon', tier:'budget',    boss:['countess','mephisto'] },
+    { id:'blackbog-sharp',name:"Blackbog's Sharp",        slot:'weapon', tier:'budget',    boss:['countess','pindle'] },
+    { id:'suwayyah',     name:"Jade Talon",               slot:'weapon', tier:'solid',     classItem:'sin', boss:['baal','diablo'], skip:true }, // dupe placeholder — filtered out
+
+    // ─── RAINBOW FACETS ─────────────────────────────────
+    { id:'facet-cold',   name:"Rainbow Facet — Cold",     slot:'jewel', tier:'s', boss:['pit','baal','diablo'] },
+    { id:'facet-fire',   name:"Rainbow Facet — Fire",     slot:'jewel', tier:'s', boss:['pit','baal','diablo'] },
+    { id:'facet-light',  name:"Rainbow Facet — Lightning",slot:'jewel', tier:'s', boss:['pit','baal','diablo'] },
+    { id:'facet-poison', name:"Rainbow Facet — Poison",   slot:'jewel', tier:'s', boss:['pit','baal','diablo'] },
+
+    // ─── CHARMS ─────────────────────────────────────────
+    { id:'anni',         name:"Annihilus (Unique SC)",    slot:'charm', tier:'s',         boss:['uber'] },
+    { id:'torch',        name:"Hellfire Torch (LC)",      slot:'charm', tier:'s',         boss:['uber'] },
+    { id:'gheeds',       name:"Gheed's Fortune (GC)",     slot:'charm', tier:'excellent', boss:['countess','mephisto'] },
+  ].filter(it => !it.skip);
+
+  const NAME_BY_ID = Object.fromEntries(ITEMS.map(i => [i.id, i.name]));
+  const ITEM_BY_ID = Object.fromEntries(ITEMS.map(i => [i.id, i]));
+  const UNIQUE_IDS = new Set(ITEMS.map(i => i.id));
+
+  /* ═══════════════════ VIEW DEFINITIONS ═══════════════════ */
+
+  // View: By Tier
+  const TIER_CATEGORIES = [
+    { id:'tier-s',      view:'tier', title:'⭐ S-Tier — Jackpot Drops',
+      sub:'The rarest, most valuable finds in the game.',
+      items: ITEMS.filter(i => i.tier === 's').map(i => i.id) },
+    { id:'tier-exc',    view:'tier', title:'🔥 Excellent Items',
+      sub:'Top-tier gear that anchors most endgame builds.',
+      items: ITEMS.filter(i => i.tier === 'excellent').map(i => i.id) },
+    { id:'tier-solid',  view:'tier', title:'✅ Solid Uniques',
+      sub:'Reliable role-players — worth picking up.',
+      items: ITEMS.filter(i => i.tier === 'solid').map(i => i.id) },
+    { id:'tier-budget', view:'tier', title:'💰 Budget & Starter Uniques',
+      sub:'Cheap or low-ilvl uniques — great early progression.',
+      items: ITEMS.filter(i => i.tier === 'budget').map(i => i.id) },
+    { id:'tier-junk',   view:'tier', title:'🗑️ Grail Fillers',
+      sub:'Low-level, mostly worthless — still needed for a complete grail.',
+      items: ITEMS.filter(i => i.tier === 'junk').map(i => i.id) },
   ];
 
-  // Farming routes (also show checkboxes, synced by ID)
-  const ROUTES = [
-    {
-      title: '🎯 Hell Mephisto ⭐⭐⭐⭐⭐',
-      desc: 'Fastest single-boss MF run. Runs still owe you:',
-      items: ['mara','sandstorm','andariels','draculs','vgaze','reapers','raven-frost','tal-armor','tal-ammy','nightwings']
-    },
-    {
-      title: '🎯 Nightmare Andariel ⭐⭐⭐⭐⭐',
-      desc: 'The exclusive SoJ farm — nowhere else.',
-      items: ['soj']
-    },
-    {
-      title: '🎯 Ancient Tunnels ⭐⭐⭐⭐⭐',
-      desc: 'True level 85 area. All facets + top-tier caster gear.',
-      items: ['deaths-fathom','griffons','deaths-web','tyraels','facet-cold']
-    },
-    {
-      title: '🎯 Baal / Worldstone Keep ⭐⭐⭐⭐⭐',
-      desc: 'End-game trophy hunting — every rare unique.',
-      items: ['crown-ages','mang-songs','tyraels','windforce','deaths-fathom','griffons']
-    },
-    {
-      title: '🏅 Wishlist — Next 10 to find',
-      desc: 'The dream picks. Focus your runs here.',
-      items: ['soj','mara','sandstorm','andariels','reapers','nightwings','deaths-fathom','griffons','facet-cold','tyraels']
-    }
+  // View: By Slot
+  const SLOT_META = {
+    helm:'⛑️ Helms',           body:'🛡️ Body Armor',       shield:'🛡️ Shields',
+    belt:'👗 Belts',            boots:'👢 Boots',            gloves:'🧤 Gloves',
+    ring:'💍 Rings',            amulet:'📿 Amulets',
+    weapon:'⚔️ Weapons',        orb:'🔮 Sorc Orbs',          wand:'🩸 Necro Wands',
+    scepter:'🛡️ Paladin Scepters', pelt:'🌿 Druid Pelts',     barbhelm:'🐺 Barb Helms',
+    jav:'⚡ Ama Javelins',       amabow:'🏹 Ama Bows',        amaspear:'🔱 Ama Spears',
+    palashield:'🛡️ Paladin Shields', necroshield:'💀 Necro Shields',
+    jewel:'💎 Jewels (Facets)', charm:'🍀 Charms'
+  };
+  const SLOT_ORDER = ['helm','body','shield','belt','boots','gloves','ring','amulet','weapon','orb','wand','scepter','pelt','barbhelm','jav','amabow','amaspear','palashield','necroshield','jewel','charm'];
+  const SLOT_CATEGORIES = SLOT_ORDER.map(slot => ({
+    id:'slot-'+slot, view:'slot', title:SLOT_META[slot],
+    items: ITEMS.filter(i => i.slot === slot).map(i => i.id)
+  })).filter(c => c.items.length);
+
+  // View: By Class (class-specific + universal)
+  const CLASS_META = {
+    all:    { title:'👥 Universal Uniques (All Classes)',  sub:'Wearable by any character — the core of every build.' },
+    amazon: { title:'🏹 Amazon-Only Uniques',              sub:'Amazon bows, spears, and javelins.' },
+    necro:  { title:'💀 Necromancer-Only Uniques',         sub:'Wands and shrunken-head shields.' },
+    sorc:   { title:'🔥 Sorceress-Only Uniques',           sub:'Sorc orbs — pure +skills nukes.' },
+    pala:   { title:'🛡️ Paladin-Only Uniques',             sub:'Scepters (+aura/skills) and paladin shields.' },
+    barb:   { title:'⚔️ Barbarian-Only Uniques',           sub:'Primal helms (barbarian tribal helms).' },
+    druid:  { title:'🌿 Druid-Only Uniques',               sub:'Druid pelts (+shapeshifting / summoning skills).' },
+    sin:    { title:'🗡️ Assassin-Only Uniques',            sub:'Katar-family claw weapons.' }
+  };
+  const CLASS_ORDER = ['all','amazon','necro','sorc','pala','barb','druid','sin'];
+  const CLASS_CATEGORIES = CLASS_ORDER.map(c => ({
+    id:'class-'+c, view:'class', title:CLASS_META[c].title, sub:CLASS_META[c].sub,
+    items: ITEMS.filter(i => c === 'all' ? !i.classItem : i.classItem === c).map(i => i.id)
+  }));
+
+  // View: By Boss (famous farm targets)
+  const BOSSES = [
+    { id:'countess',  boss:'countess',
+      title:'👑 The Countess — Hell (Forgotten Tower Lvl 5)',
+      sub:'Rune drop specialist. Also drops all low-ilvl uniques (Gull, Manald, Nagelring, Stealskull, etc.). Fast 30s runs.' },
+    { id:'andariel',  boss:'nm-anda',
+      title:'👹 Nightmare Andariel — Quest Drop',
+      sub:'THE ONLY reliable Stone of Jordan farm off-Baal. Bugged quest drop has SoJ in its TC.' },
+    { id:'duriel',    boss:'duriel',
+      title:'🐛 Duriel — Any Difficulty (Tomb of Tal Rasha)',
+      sub:"Famous for Duriel's Shell. Guaranteed rare/unique on first kill per difficulty." },
+    { id:'mephisto',  boss:'mephisto',
+      title:'⚡ Mephisto — Hell (Durance of Hate Lvl 3)',
+      sub:'THE MF king. Easiest boss-per-run. Drops nearly every mid-to-high-tier unique.' },
+    { id:'pindle',    boss:'pindle',
+      title:"🧟 Pindleskin — Hell (Nihlathak's Temple)",
+      sub:'1-screen run. Kill within 30 seconds. High density of mid-tier unique drops.' },
+    { id:'nihlathak', boss:'nihlathak',
+      title:'❄️ Nihlathak — Hell (Halls of Vaught)',
+      sub:'Corpse Explosion nightmare, but consistently drops Gore Rider / Marrowwalk / Baranar\'s Star.' },
+    { id:'diablo',    boss:'diablo',
+      title:'🔥 Diablo — Hell (Chaos Sanctuary)',
+      sub:"Endgame chase-item boss. Grandfather, Windforce, Griffon's, Doombringer — all high-ilvl uniques." },
+    { id:'baal',      boss:'baal',
+      title:'👑 Baal — Hell (Throne of Destruction)',
+      sub:'Highest-ilvl boss in the game. Drops every unique. The endgame trophy farm.' },
+    { id:'pit',       boss:'pit',
+      title:'💀 The Pit / Ancient Tunnels — Hell (Level 85 Areas)',
+      sub:"Rainbow Facets, Death's Web, Death's Fathom, Griffon's Eye. Only true LV85 outdoor zones." },
+    { id:'cows',      boss:'cows',
+      title:'🐄 Cow Level — Hell (Secret Cow Level)',
+      sub:'Insane density. Azurewrath, Bonehew, and bulk rune drops.' },
+    { id:'uber',      boss:'uber',
+      title:'🔴 Uber Tristram — Pandemonium Event',
+      sub:"Diablo Clone & Pandemonium bosses — the ONLY source of Annihilus, Hellfire Torch, and Tyrael's Might." },
+  ];
+  const BOSS_CATEGORIES = BOSSES.map(b => ({
+    id:'boss-'+b.id, view:'boss', title:b.title, sub:b.sub,
+    items: ITEMS.filter(i => (i.boss||[]).includes(b.boss)).map(i => i.id)
+  })).filter(c => c.items.length);
+
+  // View: Routes (farming wishlists)
+  const ROUTE_CATEGORIES = [
+    { id:'route-meph', view:'route', title:'🎯 Hell Mephisto Run ⭐⭐⭐⭐⭐',
+      sub:'Fastest single-boss MF loop. Still owes you these prizes:',
+      items: ['mara','sandstorm','andariels','draculs','vgaze','reapers','raven-frost','tal-belt','tal-ammy','nightwings','lidless','oculus','wizardspike','skullders','shaftstop'] },
+    { id:'route-nma',  view:'route', title:'🎯 Nightmare Andariel — SoJ Hunt ⭐⭐⭐⭐⭐',
+      sub:'The exclusive Stone of Jordan farm — nowhere else outside Baal.',
+      items: ['soj'] },
+    { id:'route-at',   view:'route', title:'🎯 Ancient Tunnels / Pit ⭐⭐⭐⭐⭐',
+      sub:'True level-85 area. All facets + top-tier caster gear.',
+      items: ['deaths-fathom','griffons','deaths-web','tyraels','facet-cold','facet-fire','facet-light','facet-poison'] },
+    { id:'route-baal', view:'route', title:'🎯 Baal / Worldstone Keep ⭐⭐⭐⭐⭐',
+      sub:'End-game trophy hunting — every rare unique.',
+      items: ['crown-ages','mang-songs','tyraels','windforce','deaths-fathom','griffons','grandfather','doombringer','arreats','wolfhowl','earthshifter','schaefers'] },
+    { id:'route-uber', view:'route', title:'🎯 Uber Tristram Prep',
+      sub:'Kill the 3 uber bosses — earn Annihilus + Hellfire Torch.',
+      items: ['anni','torch','tyraels'] },
+    { id:'route-wishlist', view:'route', title:'🏅 Wishlist — Next 10 to Find',
+      sub:'Your dream picks. Focus your runs here.',
+      items: ['soj','mara','sandstorm','andariels','reapers','nightwings','deaths-fathom','griffons','facet-cold','tyraels'] },
   ];
 
-  // Load saved state
+  const ALL_CATEGORIES = [
+    ...TIER_CATEGORIES,
+    ...BOSS_CATEGORIES,
+    ...CLASS_CATEGORIES,
+    ...SLOT_CATEGORIES,
+    ...ROUTE_CATEGORIES,
+  ];
+
+  // ═══ Persistence ═══
   function loadState() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) return new Set(JSON.parse(raw));
     } catch (e) {}
-    // First visit: pre-populate with user's found list
     return new Set(INITIAL_FOUND);
   }
-
   function saveState(set) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set)));
-    } catch (e) {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set))); } catch (e) {}
   }
-
   const found = loadState();
 
-  // Build unique-item registry for total count
-  function collectUniqueIds() {
-    const s = new Set();
-    CATEGORIES.forEach(c => c.items.forEach(it => s.add(it.id)));
-    return s;
-  }
-  const UNIQUE_IDS = collectUniqueIds();
-  const GRAIL_TOTAL = 100; // Fixed target — "Top 100 Grail" goal
+  const GRAIL_TOTAL = UNIQUE_IDS.size;
 
-  // Render DOM
+  // ═══ DOM ═══
   const catRoot = document.getElementById('grailCategories');
   if (!catRoot) return;
 
@@ -1646,48 +1814,41 @@ tipsFilterBtns.forEach(btn => {
     }[c]));
   }
 
-  function makeItem(item) {
-    const isFound = found.has(item.id);
-    const loc = item.loc ? `<span class="grail-loc">${esc(item.loc)}</span>` : '';
-    return `<li><label class="grail-item${isFound?' found':''}" data-id="${esc(item.id)}">
-      <input type="checkbox" data-grail="${esc(item.id)}"${isFound?' checked':''}>
-      <span class="grail-name">${esc(item.name)}</span>
-      ${loc}
+  function makeItem(id) {
+    const it = ITEM_BY_ID[id];
+    if (!it) return '';
+    const isFound = found.has(id);
+    return `<li><label class="grail-item${isFound?' found':''}" data-id="${esc(id)}">
+      <input type="checkbox" data-grail="${esc(id)}"${isFound?' checked':''}>
+      <span class="grail-name">${esc(it.name)}</span>
     </label></li>`;
   }
 
-  function makeCategory(cat, isRoute) {
+  function makeCategory(cat) {
     const total = cat.items.length;
-    const foundCount = cat.items.filter(it => found.has(it.id || it)).length;
-    const items = cat.items.map(it => typeof it === 'string' ? { id: it, name: lookupName(it) } : it);
-    const list = items.map(makeItem).join('');
-    return `<section class="grail-category${isRoute?' route':''}" data-category>
-      <h3>${esc(cat.title)}
+    const foundCount = cat.items.filter(id => found.has(id)).length;
+    const list = cat.items.map(makeItem).join('');
+    return `<details class="grail-category" data-view="${esc(cat.view)}" data-cat-id="${esc(cat.id)}">
+      <summary>
+        <span class="grail-summary-title">${esc(cat.title)}</span>
         <span class="grail-category-count"><span class="cat-found">${foundCount}</span> / ${total}</span>
-      </h3>
-      ${cat.sub ? `<p class="grail-category-sub">${esc(cat.sub)}</p>` : ''}
-      ${cat.desc ? `<p class="grail-route-desc">${esc(cat.desc)}</p>` : ''}
-      <ul class="grail-list">${list}</ul>
-    </section>`;
+      </summary>
+      <div class="grail-body">
+        ${cat.sub ? `<p class="grail-category-sub">${esc(cat.sub)}</p>` : ''}
+        <ul class="grail-list">${list}</ul>
+      </div>
+    </details>`;
   }
 
-  // Item name lookup (for routes that only supply IDs)
-  const NAME_MAP = {};
-  CATEGORIES.forEach(c => c.items.forEach(it => { NAME_MAP[it.id] = it.name; }));
-  function lookupName(id) { return NAME_MAP[id] || id; }
+  // Render
+  catRoot.innerHTML = ALL_CATEGORIES.map(makeCategory).join('');
 
-  // Render everything
-  catRoot.innerHTML =
-    CATEGORIES.map(c => makeCategory(c, false)).join('') +
-    ROUTES.map(c => makeCategory(c, true)).join('');
-
-  // Progress bar refs
+  // Progress refs
   const foundEl   = document.getElementById('grailFound');
   const totalEl   = document.getElementById('grailTotal');
   const percentEl = document.getElementById('grailPercent');
   const fillEl    = document.getElementById('grailFill');
   const barEl     = document.getElementById('grailBar');
-
   totalEl.textContent = GRAIL_TOTAL;
 
   function updateProgress() {
@@ -1699,17 +1860,16 @@ tipsFilterBtns.forEach(btn => {
     fillEl.style.width = pct + '%';
     barEl.setAttribute('aria-valuenow', pct);
 
-    // Update per-category counts
+    // Per-category counts
     document.querySelectorAll('.grail-category').forEach(catEl => {
       const items = catEl.querySelectorAll('.grail-item');
       const catFound = Array.from(items).filter(i => i.classList.contains('found')).length;
       const cnt = catEl.querySelector('.cat-found');
       if (cnt) cnt.textContent = catFound;
-      catEl.classList.toggle('empty', items.length > 0 && catFound === items.length && catRoot.classList.contains('filter-missing'));
     });
   }
 
-  // Sync all checkboxes with same ID
+  // Sync all checkboxes with same ID (item can appear in multiple views)
   function toggleItem(id, isChecked) {
     if (isChecked) found.add(id); else found.delete(id);
     saveState(found);
@@ -1721,14 +1881,13 @@ tipsFilterBtns.forEach(btn => {
     updateProgress();
   }
 
-  // Click delegation
   catRoot.addEventListener('change', e => {
     const cb = e.target.closest('input[type="checkbox"][data-grail]');
     if (!cb) return;
     toggleItem(cb.dataset.grail, cb.checked);
   });
 
-  // Filter buttons
+  // Found / Missing filter
   const filterBtns = document.querySelectorAll('.grail-filter-btn');
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1738,13 +1897,41 @@ tipsFilterBtns.forEach(btn => {
         b.classList.toggle('active', on);
         b.setAttribute('aria-selected', on ? 'true' : 'false');
       });
-      catRoot.classList.remove('filter-found', 'filter-missing');
+      catRoot.classList.remove('filter-found','filter-missing');
       if (f === 'found')   catRoot.classList.add('filter-found');
       if (f === 'missing') catRoot.classList.add('filter-missing');
     });
   });
 
-  // Reset button
+  // View switcher (Tier / Boss / Class / Slot / Route / All)
+  const viewBtns = document.querySelectorAll('.grail-view-btn');
+  function setView(view) {
+    viewBtns.forEach(b => {
+      const on = b.dataset.grailView === view;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    document.querySelectorAll('.grail-category').forEach(el => {
+      const match = view === 'all' || el.dataset.view === view;
+      el.style.display = match ? '' : 'none';
+    });
+  }
+  viewBtns.forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.grailView)));
+  setView('tier');   // default landing view
+
+  // Expand / Collapse all (only affects currently-visible categories)
+  const expandBtn   = document.getElementById('grailExpand');
+  const collapseBtn = document.getElementById('grailCollapse');
+  if (expandBtn) expandBtn.addEventListener('click', () => {
+    document.querySelectorAll('.grail-category').forEach(d => {
+      if (d.style.display !== 'none') d.open = true;
+    });
+  });
+  if (collapseBtn) collapseBtn.addEventListener('click', () => {
+    document.querySelectorAll('.grail-category').forEach(d => { d.open = false; });
+  });
+
+  // Reset
   const resetBtn = document.getElementById('grailReset');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
@@ -1762,4 +1949,5 @@ tipsFilterBtns.forEach(btn => {
 
   updateProgress();
 })();
+
 
