@@ -1,6 +1,58 @@
 /* ─── Reset & Base ─────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/*
+  ══════════════════════════════════════════════════════════════
+   Diablo II authentic typography stack
+  ══════════════════════════════════════════════════════════════
+   Recommended stack (matches the original D2 interface):
+     • Titles   → Exocet Heavy   (Blizzard's D2 logo font)
+     • Body/UI  → AvQest         (the in-game item-text font)
+     • Buttons  → Cinzel         (falls back nicely if AvQest is too stylized)
+
+   These are commercial / freeware fonts NOT hosted on Google Fonts.
+   To activate the full authentic look:
+     1. Create a /fonts/ folder next to this stylesheet
+     2. Drop the .woff2 (or .otf/.ttf) files in — filenames below
+     3. The @font-face blocks below will pick them up automatically
+     4. No other changes needed — the CSS variables cascade site-wide
+
+   Until you install them, the site falls back to Cinzel (loaded from
+   Google Fonts in index.html) and Georgia — still looks correct,
+   just not pixel-identical to the game.
+  ══════════════════════════════════════════════════════════════
+*/
+
+@font-face {
+  font-family: 'Exocet';
+  src: url('fonts/Exocet-Heavy.woff2') format('woff2'),
+       url('fonts/Exocet-Heavy.otf')   format('opentype'),
+       url('fonts/Exocet-Heavy.ttf')   format('truetype');
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'AvQest';
+  src: url('fonts/AvQest.woff2') format('woff2'),
+       url('fonts/AvQest.otf')   format('opentype'),
+       url('fonts/AvQest.ttf')   format('truetype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Morpheus';
+  src: url('fonts/Morpheus.woff2') format('woff2'),
+       url('fonts/Morpheus.otf')   format('opentype'),
+       url('fonts/Morpheus.ttf')   format('truetype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --blood:    #8b0000;
   --fire:     #c0392b;
@@ -17,12 +69,25 @@
   --glow:     rgba(200, 60, 20, 0.4);
   --radius:   8px;
   --trans:    0.25s ease;
+
+  /* ── Font stacks (in order of preference) ──
+     Titles: Exocet Heavy (D2 logo font) → Cinzel → Trajan Pro → Georgia
+     Body:   AvQest (D2 item-text font)  → MedievalSharp (Google Fonts) → Cinzel → Georgia
+     UI/Buttons: Cinzel → Morpheus → Cinzel Decorative → serif
+     Item names: MedievalSharp → AvQest → Cinzel  (Grief, Enigma, Shako, etc.)
+  */
+  --font-display:       'Exocet', 'Cinzel', 'Trajan Pro', 'Georgia', serif;
+  --font-display-fancy: 'Exocet', 'Cinzel Decorative', 'Cinzel', 'Georgia', serif;
+  --font-body:          'AvQest', 'MedievalSharp', 'Cinzel', 'Georgia', 'Times New Roman', serif;
+  --font-ui:            'Cinzel', 'Morpheus', 'Cinzel Decorative', 'Georgia', serif;
+  --font-item:          'MedievalSharp', 'AvQest', 'Cinzel', 'Georgia', serif;
 }
+
 
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: var(--font-body);
   background-color: var(--bg-dark);
   color: var(--text);
   line-height: 1.65;
@@ -50,10 +115,12 @@ ul { list-style: none; }
 }
 
 .nav-logo {
+  font-family: var(--font-display);
   font-size: 1.15rem;
-  font-weight: bold;
+  font-weight: 700;
   color: var(--gold);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   text-shadow: 0 0 12px var(--ember);
 }
 
@@ -61,6 +128,7 @@ ul { list-style: none; }
   display: flex; gap: 2rem;
 }
 .nav-links li a {
+  font-family: var(--font-ui);
   font-size: 0.9rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -103,6 +171,7 @@ ul { list-style: none; }
 }
 
 .hero-subtitle {
+  font-family: var(--font-display);
   font-size: 1rem;
   letter-spacing: 0.4em;
   text-transform: uppercase;
@@ -111,6 +180,7 @@ ul { list-style: none; }
 }
 
 .hero-title {
+  font-family: var(--font-display-fancy);
   font-size: clamp(3.5rem, 12vw, 7rem);
   font-weight: 900;
   letter-spacing: 0.12em;
@@ -137,6 +207,7 @@ ul { list-style: none; }
   color: var(--gold-lt);
   border: 1px solid var(--gold);
   border-radius: var(--radius);
+  font-family: var(--font-ui);
   font-size: 0.9rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -160,10 +231,13 @@ ul { list-style: none; }
 #builds > .container { max-width: 90%; }
 
 .section-title {
+  font-family: var(--font-display);
   font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 900;
+  text-transform: uppercase;
   color: var(--gold);
   text-align: center;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   margin-bottom: 0.6rem;
   text-shadow: 0 0 20px rgba(200, 130, 20, 0.4);
 }
@@ -340,7 +414,11 @@ ul { list-style: none; }
 .class-body > * { margin: 0; }
 
 .class-card h3 {
+  font-family: var(--font-display);
   font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: var(--gold);
   margin: 0;
   line-height: 1.1;
@@ -463,6 +541,7 @@ ul { list-style: none; }
   border: 1px solid var(--border);
   border-radius: 999px;
   color: var(--text-muted);
+  font-family: var(--font-ui);
   font-size: 0.82rem;
   letter-spacing: 0.06em;
   cursor: pointer;
@@ -495,7 +574,7 @@ ul { list-style: none; }
 .rw-card.hidden { display: none; }
 
 .rw-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.75rem; }
-.rw-header h3 { color: var(--gold); font-size: 1.05rem; }
+.rw-header h3 { font-family: var(--font-item); color: var(--gold); font-size: 1.2rem; letter-spacing: 0.03em; }
 
 .rw-type {
   font-size: 0.7rem;
@@ -750,10 +829,12 @@ ul { list-style: none; }
   flex-shrink: 0;
 }
 .build-header h3 {
-  font-family: 'Georgia', serif;
+  font-family: var(--font-display);
   color: var(--accent);
   font-size: 1rem;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   text-shadow: 0 0 15px var(--accent-glow);
   margin-bottom: 0.15rem;
   line-height: 1.25;
@@ -779,9 +860,10 @@ ul { list-style: none; }
   border-top: 1px dashed rgba(255,255,255,0.08);
   border-bottom: 1px dashed rgba(255,255,255,0.08);
   color: var(--accent);
-  font-size: 0.62rem;
-  font-weight: bold;
-  letter-spacing: 0.2em;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
   text-align: center;
 }
 .build-section:first-child { border-top: none; margin-top: 0; }
@@ -850,10 +932,12 @@ ul { list-style: none; }
 
 .class-group-title {
   grid-column: 1 / -1;   /* span the full grid row */
-  font-family: 'Georgia', serif;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
   font-size: 1.5rem;
   color: var(--accent);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   padding: 0.6rem 1rem;
   margin-bottom: 0.5rem;
   text-shadow: 0 0 15px var(--accent-glow);
@@ -2415,7 +2499,7 @@ body.modal-open {
   border: 1px solid var(--border);
   border-radius: 999px;
   color: var(--text-muted);
-  font-family: inherit;
+  font-family: var(--font-ui);
   font-size: 0.88rem;
   font-weight: 500;
   cursor: pointer;
@@ -3519,4 +3603,819 @@ body.modal-open {
   .lv85-grid { grid-template-columns: 1fr; }
   .lv85-header { flex-wrap: wrap; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   D2 Character Window (Interactive Build Viewer)
+   Pixel-authentic recreation of Diablo II's paperdoll & stats UI
+   ═══════════════════════════════════════════════════════════════ */
+
+.d2-viewer-wrap {
+  max-width: 1000px;
+  margin: 0 auto 3rem;
+  padding: 1.25rem;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(80,50,20,0.4) 0%, transparent 60%),
+    linear-gradient(180deg, #1a120a 0%, #0e0806 100%);
+  border: 3px double #6b4a1e;
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.8) inset,
+    0 4px 25px rgba(0,0,0,0.7),
+    0 0 60px rgba(180,80,20,0.15);
+}
+
+.d2-viewer-header {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 1rem; flex-wrap: wrap;
+  padding-bottom: 0.9rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(180,130,60,0.3);
+}
+
+.d2-viewer-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold-lt);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(200,140,40,0.5);
+}
+
+.d2-viewer-picker {
+  display: flex; align-items: center; gap: 0.55rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.d2-viewer-picker label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+
+#d2-build-select,
+#d2-class-select {
+  background: #1a0e0a;
+  color: var(--gold-lt);
+  border: 1px solid #6b4a1e;
+  padding: 0.35rem 0.7rem;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  border-radius: 3px;
+  cursor: pointer;
+  min-width: 160px;
+}
+#d2-build-select { min-width: 200px; }
+#d2-build-select:focus,
+#d2-class-select:focus { outline: 1px solid var(--gold); }
+#d2-build-select option:disabled,
+#d2-class-select option:disabled { color: #665040; font-style: italic; }
+
+/* ─── The stone window (two columns) ────────────────────── */
+.d2-window {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(340px, 1.05fr);
+  gap: 1.1rem;
+  padding: 1rem;
+  background:
+    /* Stone slab texture — subtle noise via layered gradients */
+    radial-gradient(ellipse at 20% 20%, rgba(60,45,30,0.35) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 70%, rgba(50,40,25,0.3) 0%, transparent 45%),
+    linear-gradient(135deg, #2a2018 0%, #1a1410 50%, #221812 100%);
+  border: 2px solid #3d2c18;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 0 1px #6b4a1e,
+    inset 0 0 40px rgba(0,0,0,0.6);
+}
+
+/* ─── LEFT: Stats side ──────────────────────────────────── */
+.d2-stats-side {
+  display: flex; flex-direction: column;
+  gap: 0.55rem;
+}
+
+.d2-cell {
+  display: flex; flex-direction: column;
+  padding: 0.35rem 0.6rem;
+  background:
+    linear-gradient(180deg, #0a0705 0%, #100a08 50%, #0a0705 100%);
+  border: 1px solid #4a3520;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 1px 0 rgba(180,130,60,0.15),
+    inset 0 -1px 0 rgba(0,0,0,0.6);
+  min-width: 0;
+}
+.d2-cell-label {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #a08862;
+  line-height: 1;
+  margin-bottom: 0.2rem;
+}
+.d2-cell-val {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--gold-lt);
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.d2-cell-buildname {
+  color: #fff8dc;
+  text-shadow: 0 0 8px rgba(255,220,120,0.4);
+}
+
+.d2-nameplate-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 0.4rem;
+}
+
+/* Tier row — 3 cells side-by-side (Tier | Role | Content), matches the old level-row layout */
+.d2-tier-row {
+  display: grid;
+  grid-template-columns: 1.15fr 1.05fr 1.1fr;
+  gap: 0.4rem;
+}
+.d2-tier-val {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  line-height: 1;
+}
+.d2-tier-letter {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid;
+  border-radius: 2px;
+  line-height: 1;
+}
+.d2-tier-letter[data-tier="S"] {
+  color: #ffd97a; border-color: #8a6428;
+  background: rgba(200,160,74,0.15);
+  box-shadow: 0 0 8px rgba(255,217,122,0.35), inset 0 0 5px rgba(200,160,74,0.3);
+  text-shadow: 0 0 6px rgba(255,217,122,0.7);
+}
+.d2-tier-letter[data-tier="A"] {
+  color: #e0a040; border-color: #6a4a1c;
+  background: rgba(224,160,64,0.12);
+  text-shadow: 0 0 5px rgba(224,160,64,0.4);
+}
+.d2-tier-letter[data-tier="B"] {
+  color: #b89870; border-color: #5a4028;
+  background: rgba(184,152,112,0.1);
+}
+.d2-tier-letter[data-tier="C"] {
+  color: #8a7050; border-color: #4a3520;
+  background: rgba(138,112,80,0.08);
+}
+.d2-tier-letter[data-tier="D"] {
+  color: #6a5540; border-color: #3a2c1c;
+  background: rgba(106,85,64,0.06);
+}
+.d2-tier-stars {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: #ffd97a;
+  text-shadow: 0 0 5px rgba(200,160,74,0.45);
+  line-height: 1;
+  white-space: nowrap;
+}
+.d2-tier-stars .empty { color: #4a3520; text-shadow: none; opacity: 0.6; }
+.d2-tag-val {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.85rem;
+  color: #ffd97a;
+  text-shadow: 0 0 6px rgba(200,160,74,0.4);
+  white-space: normal;      /* allow two-word tags like "UBER KILLER" to wrap */
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.15;
+}
+
+/* Primary attribute rows */
+.d2-attr-block {
+  display: flex; flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.2rem;
+}
+
+.d2-attr-row {
+  display: grid;
+  grid-template-columns: 78px 52px 1fr;
+  gap: 0.35rem;
+  align-items: stretch;
+}
+
+.d2-attr-name {
+  display: flex; align-items: center;
+  padding: 0.3rem 0.55rem;
+  background: linear-gradient(180deg, #100a08, #0a0705);
+  border: 1px solid #4a3520;
+  border-radius: 2px;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: #d4b878;
+  text-transform: none;
+  letter-spacing: 0.03em;
+}
+.d2-attr-val {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0.3rem 0.4rem;
+  background: linear-gradient(180deg, #050302, #0a0605);
+  border: 1px solid #3a2a18;
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #6ec6ff;   /* D2's iconic blue stat number */
+  text-shadow: 0 0 6px rgba(80,160,255,0.4);
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.7);
+}
+.d2-attr-side {
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 0.15rem;
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(180deg, #100a08, #0a0705);
+  border: 1px solid #4a3520;
+  border-radius: 2px;
+  font-size: 0.68rem;
+  line-height: 1.15;
+  min-width: 0;
+}
+.d2-attr-side-split {
+  padding: 0.2rem 0.5rem;
+}
+.d2-attr-side-split > div {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 0.4rem;
+}
+.d2-side-lbl {
+  font-family: var(--font-body);
+  color: #a08862;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.6rem;
+}
+.d2-side-val {
+  font-family: var(--font-display);
+  color: var(--gold-lt);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+.d2-side-blue {
+  color: #6ec6ff;
+  text-shadow: 0 0 4px rgba(80,160,255,0.3);
+}
+.d2-attr-spacer .d2-attr-name,
+.d2-attr-spacer .d2-attr-val {
+  visibility: hidden;
+}
+
+/* ─── Inventory / Charms + Skill Allocation blocks ─── */
+.d2-block-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  color: var(--gold-lt);
+  margin: 0.55rem 0 0.35rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #4a3520;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.d2-charm-list,
+.d2-skill-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.d2-charm-item,
+.d2-skill-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.55rem;
+  background: linear-gradient(180deg, #100a08, #0a0705);
+  border: 1px solid #4a3520;
+  border-radius: 2px;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  line-height: 1.25;
+  color: #d4b878;
+}
+
+/* Charm row — name (colored by quality) + short stat line */
+.d2-charm-item {
+  grid-template-columns: 1fr;
+  gap: 0.15rem;
+}
+.d2-charm-name {
+  font-family: var(--font-item);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+.d2-charm-stats {
+  font-size: 0.7rem;
+  color: #a08858;
+  font-style: italic;
+}
+/* Quality tinting for charms — reuses D2 colors */
+.d2-charm-item.q-unique   .d2-charm-name { color: #c8a04a; }
+.d2-charm-item.q-set      .d2-charm-name { color: #4ac84a; }
+.d2-charm-item.q-magic    .d2-charm-name { color: #6a6aff; }
+.d2-charm-item.q-rare     .d2-charm-name { color: #ffff64; }
+.d2-charm-item.q-runeword .d2-charm-name { color: #c8a04a; }
+
+.d2-charm-item.q-unique   { border-color: #6a4a1c; }
+.d2-charm-item.q-set      { border-color: #2c6c2c; }
+.d2-charm-item.q-magic    { border-color: #38388a; }
+
+/* Skill row — name on left, level pill on right */
+.d2-skill-name {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: #d4b878;
+}
+.d2-skill-tree {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  color: #7a5c38;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 1px;
+}
+.d2-skill-lvl {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.85rem;
+  padding: 0.05rem 0.5rem;
+  min-width: 34px;
+  text-align: center;
+  border-radius: 2px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid #4a3520;
+}
+/* Emphasis tiers on the level pill */
+.d2-skill-item.max .d2-skill-lvl     { color: #ffd97a; border-color: #8a6428; box-shadow: inset 0 0 6px rgba(200,160,74,0.35); }
+.d2-skill-item.max .d2-skill-name    { color: var(--gold-lt); }
+.d2-skill-item.high .d2-skill-lvl    { color: #c8a04a; border-color: #6a4a1c; }
+.d2-skill-item.prereq .d2-skill-lvl  { color: #7a5c38; }
+.d2-skill-item.prereq .d2-skill-name { color: #a08858; }
+
+/* ─── Sidebar trigger buttons (open Charms / Skills modals) ─── */
+.d2-info-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+}
+.d2-info-btn {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0.15rem;
+  padding: 0.55rem 0.4rem;
+  background: linear-gradient(180deg, #1a120a 0%, #0a0705 100%);
+  border: 1px solid #4a3520;
+  border-radius: 3px;
+  color: #d4b878;
+  font-family: var(--font-display);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: inset 0 1px 0 rgba(180,130,60,0.15), inset 0 0 10px rgba(0,0,0,0.6);
+}
+.d2-info-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold-lt);
+  box-shadow: inset 0 0 12px rgba(200,140,40,0.3), 0 0 10px rgba(200,140,40,0.4);
+  transform: translateY(-1px);
+}
+.d2-info-btn:focus-visible {
+  outline: 2px solid var(--gold-lt);
+  outline-offset: 2px;
+}
+.d2-info-btn-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--gold);
+}
+.d2-info-btn-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: center;
+  line-height: 1.15;
+}
+.d2-info-btn-hint {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  color: #7a5c38;
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+
+/* Wider tooltip for the info modals (charms/skills lists benefit from more room) */
+.d2-info-tooltip {
+  max-width: 460px;
+}
+.d2-info-tooltip .d2-charm-list,
+.d2-info-tooltip .d2-skill-list {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.d2-viewer-hint {
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  background: rgba(200,140,40,0.08);
+  border-left: 2px solid var(--gold);
+  border-radius: 2px;
+  font-size: 0.72rem;
+  color: #b89870;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* ─── RIGHT: Paperdoll ──────────────────────────────────── */
+.d2-paperdoll {
+  display: flex; flex-direction: column;
+  gap: 0.5rem;
+}
+
+.d2-tabs {
+  display: flex; gap: 0.3rem;
+  padding-bottom: 0.25rem;
+}
+.d2-tab {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 32px; padding: 0.2rem 0.55rem;
+  background: linear-gradient(180deg, #1a120a, #0a0705);
+  border: 1px solid #4a3520;
+  border-radius: 3px 3px 0 0;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: #806040;
+  letter-spacing: 0.1em;
+}
+.d2-tab.active {
+  color: var(--gold-lt);
+  border-color: #7a5628;
+  background: linear-gradient(180deg, #2a1c10, #1a1008);
+  box-shadow: inset 0 1px 0 rgba(255,200,100,0.12);
+}
+
+/* Paperdoll grid — mimics D2 paperdoll (image reference)
+   8 columns × 6 rows. Weapon/Shield frame the sides,
+   Helm+Armor stack in the middle, Amulet sits top-right of helm,
+   and the bottom row is Gloves • Ring1 • Belt(wide) • Ring2 • Boots. */
+.d2-paperdoll-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 44px);
+  grid-template-rows: repeat(6, 46px);
+  gap: 5px;
+  justify-content: center;
+  padding: 0.65rem;
+  background:
+    radial-gradient(ellipse at center, rgba(30,20,15,0.6) 0%, rgba(10,5,3,0.9) 100%);
+  border: 1px solid #3d2c18;
+  border-radius: 3px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.7);
+}
+
+.d2-slot {
+  position: relative;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2px;
+  padding: 3px;
+  background: linear-gradient(135deg, #0a0605 0%, #14100c 50%, #0a0605 100%);
+  border: 1px solid #4a3520;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 10px rgba(0,0,0,0.8),
+    inset 0 1px 0 rgba(180,130,60,0.15);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: #7a5c38;
+  font-family: var(--font-display);
+  overflow: hidden;
+}
+.d2-slot:hover {
+  border-color: var(--gold);
+  box-shadow:
+    inset 0 0 15px rgba(200,140,40,0.35),
+    0 0 12px rgba(200,140,40,0.5);
+  color: var(--gold-lt);
+  transform: translateY(-1px);
+}
+.d2-slot:focus-visible {
+  outline: 2px solid var(--gold-lt);
+  outline-offset: 1px;
+}
+.d2-slot.empty {
+  cursor: default; opacity: 0.55;
+}
+.d2-slot.empty:hover {
+  border-color: #4a3520; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); transform: none;
+  color: #5a4028;
+}
+
+.d2-slot-marker {
+  font-size: 1.1rem;
+  line-height: 1;
+  opacity: 0.55;
+  filter: sepia(0.5) hue-rotate(-20deg) saturate(0.8);
+}
+
+/* Permanent slot label: shows "Weapon" / "Helm" / "Shield" etc. */
+.d2-slot-label {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: inherit;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Bigger label + marker for the larger slots (weapon, helm, shield, armor, gloves, boots, belt) */
+.d2-slot-weapon .d2-slot-marker,
+.d2-slot-shield .d2-slot-marker { font-size: 2.2rem; }
+.d2-slot-helm   .d2-slot-marker,
+.d2-slot-armor  .d2-slot-marker,
+.d2-slot-gloves .d2-slot-marker,
+.d2-slot-boots  .d2-slot-marker { font-size: 1.7rem; }
+.d2-slot-belt   .d2-slot-marker { font-size: 1.5rem; }
+
+.d2-slot-weapon .d2-slot-label,
+.d2-slot-shield .d2-slot-label,
+.d2-slot-helm   .d2-slot-label,
+.d2-slot-armor  .d2-slot-label,
+.d2-slot-gloves .d2-slot-label,
+.d2-slot-boots  .d2-slot-label { font-size: 0.65rem; }
+.d2-slot-belt   .d2-slot-label { font-size: 0.6rem; }
+.d2-slot-amulet .d2-slot-label,
+.d2-slot-ring1  .d2-slot-label,
+.d2-slot-ring2  .d2-slot-label { font-size: 0.5rem; opacity: 0.75; }
+
+/* Item overlay (only sets quality color on the slot — keeps slot label visible) */
+.d2-slot.has-item .d2-slot-label,
+.d2-slot.has-item .d2-slot-marker {
+  color: inherit;
+  opacity: 1;
+}
+
+/* Item quality color coding — D2 authentic (applied via .has-item.q-* on the slot itself) */
+.d2-slot.q-unique   { color: #c8a04a; border-color: #8a6428; box-shadow: inset 0 0 10px rgba(200,160,74,0.25), inset 0 0 0 1px rgba(200,160,74,0.35); }
+.d2-slot.q-set      { color: #4ac84a; border-color: #2c7c2c; box-shadow: inset 0 0 10px rgba(74,200,74,0.25),  inset 0 0 0 1px rgba(74,200,74,0.35); }
+.d2-slot.q-magic    { color: #6a6aff; border-color: #3838a0; box-shadow: inset 0 0 10px rgba(106,106,255,0.25),inset 0 0 0 1px rgba(106,106,255,0.35); }
+.d2-slot.q-rare     { color: #ffff64; border-color: #a0a028; box-shadow: inset 0 0 10px rgba(255,255,100,0.25),inset 0 0 0 1px rgba(255,255,100,0.35); }
+.d2-slot.q-runeword { color: #c8a04a; border-color: #8a6428; box-shadow: inset 0 0 12px rgba(200,140,60,0.35), inset 0 0 0 1px rgba(200,140,60,0.4); }
+.d2-slot.q-crafted  { color: #d47a2a; border-color: #8a4a1c; box-shadow: inset 0 0 10px rgba(212,122,42,0.25),inset 0 0 0 1px rgba(212,122,42,0.35); }
+.d2-slot.q-normal   { color: #e8e8e8; }
+.d2-slot.q-unique .d2-slot-marker,
+.d2-slot.q-runeword .d2-slot-marker { opacity: 0.85; filter: none; }
+
+/* Grid placement — 9 cols × 6 rows.
+   Column 3 is an INVISIBLE SPACER (matches the width of a ring slot). It sits
+   between weapon and helm/armor so that helm, armor and belt all align on
+   cols 4-6 while ring1 keeps its natural spot at col 3, row 5 (left of belt).
+   Ring2 stays on col 7 (right of belt). */
+.d2-slot-weapon  { grid-column: 1 / 3;   grid-row: 1 / 5; }   /* 2×4 tall left */
+.d2-slot-helm    { grid-column: 4 / 7;   grid-row: 1 / 3; }   /* 3×2 center-top */
+.d2-slot-amulet  { grid-column: 7;       grid-row: 1;     }   /* 1×1 top-right of helm */
+.d2-slot-shield  { grid-column: 8 / 10;  grid-row: 1 / 5; }   /* 2×4 tall right */
+.d2-slot-armor   { grid-column: 4 / 7;   grid-row: 3 / 5; }   /* 3×2 center-bottom */
+.d2-slot-gloves  { grid-column: 1 / 3;   grid-row: 5 / 7; }   /* 2×2 bottom-left */
+.d2-slot-ring1   { grid-column: 3;       grid-row: 5;     }   /* 1×1 left of belt */
+.d2-slot-belt    { grid-column: 4 / 7;   grid-row: 5;     }   /* 3×1 inlined with helm/armor */
+.d2-slot-ring2   { grid-column: 7;       grid-row: 5;     }   /* 1×1 right of belt */
+.d2-slot-boots   { grid-column: 8 / 10;  grid-row: 5 / 7; }   /* 2×2 bottom-right */
+
+/* Mercenary bar below paperdoll */
+.d2-merc-bar {
+  display: flex; justify-content: center;
+  margin-top: 0.4rem;
+}
+.d2-merc-slot {
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  width: 100%; max-width: 348px;
+  padding: 0.55rem 1rem;
+  background: linear-gradient(135deg, #0a0605 0%, #1a120a 50%, #0a0605 100%);
+  border: 1px solid #4a3520;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: #a08862;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: all 0.15s ease;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.7);
+}
+.d2-merc-slot:hover {
+  border-color: var(--gold);
+  color: var(--gold-lt);
+  box-shadow: inset 0 0 12px rgba(200,140,40,0.3), 0 0 10px rgba(200,140,40,0.4);
+}
+.d2-merc-label { letter-spacing: 0.2em; }
+
+/* ─── D2 Item Tooltip Modal ─────────────────────────────── */
+.d2-item-modal {
+  position: fixed; inset: 0;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  animation: d2ModalIn 0.15s ease-out;
+}
+.d2-item-modal[hidden] { display: none; }
+@keyframes d2ModalIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.d2-item-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(3px);
+}
+.d2-item-tooltip {
+  position: relative;
+  min-width: 300px;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.1rem 1.3rem 1.2rem;
+  background:
+    radial-gradient(ellipse at top, rgba(40,25,15,0.95) 0%, rgba(15,8,5,0.98) 100%);
+  border: 1px solid #8a6428;
+  border-radius: 3px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.9),
+    0 0 40px rgba(200,140,40,0.4),
+    0 10px 40px rgba(0,0,0,0.9);
+  text-align: center;
+  animation: d2TooltipIn 0.2s ease-out;
+}
+@keyframes d2TooltipIn {
+  from { transform: translateY(8px) scale(0.97); opacity: 0; }
+  to   { transform: translateY(0) scale(1);      opacity: 1; }
+}
+
+.d2-item-close {
+  position: absolute; top: 0.35rem; right: 0.45rem;
+  background: transparent; border: none;
+  color: #806040; font-size: 1rem; cursor: pointer;
+  padding: 0.15rem 0.4rem; line-height: 1;
+  transition: color 0.15s ease;
+}
+.d2-item-close:hover { color: var(--gold-lt); }
+
+.d2-tt-header {
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.6rem;
+  border-bottom: 1px dashed rgba(180,130,60,0.35);
+}
+.d2-tt-name {
+  font-family: var(--font-item);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  margin-bottom: 0.2rem;
+}
+.d2-tt-name.q-unique   { color: #c8a04a; text-shadow: 0 0 8px rgba(200,160,74,0.5); }
+.d2-tt-name.q-set      { color: #4ac84a; text-shadow: 0 0 8px rgba(74,200,74,0.5); }
+.d2-tt-name.q-magic    { color: #6a6aff; text-shadow: 0 0 8px rgba(106,106,255,0.5); }
+.d2-tt-name.q-rare     { color: #ffff64; text-shadow: 0 0 8px rgba(255,255,100,0.5); }
+.d2-tt-name.q-runeword { color: #c8a04a; text-shadow: 0 0 10px rgba(200,140,60,0.6); }
+.d2-tt-name.q-crafted  { color: #d47a2a; text-shadow: 0 0 8px rgba(212,122,42,0.5); }
+.d2-tt-name.q-normal   { color: #e8e8e8; }
+
+.d2-tt-base {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: #a89468;
+  font-style: italic;
+}
+
+.d2-tt-body { margin-bottom: 0.6rem; }
+.d2-tt-stats {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 0.15rem;
+}
+.d2-tt-stats li {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: #6a6aff;     /* D2 magic-bonus blue */
+  line-height: 1.35;
+  padding: 0.1rem 0;
+}
+.d2-tt-stats li.tt-gold    { color: var(--gold-lt); }
+.d2-tt-stats li.tt-white   { color: #e8e8e8; }
+.d2-tt-stats li.tt-red     { color: #ff5a5a; }
+.d2-tt-stats li.tt-green   { color: #6adf6a; }
+.d2-tt-stats li.tt-orange  { color: #ff9040; }
+
+.d2-tt-sockets,
+.d2-tt-alts {
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  border-top: 1px dashed rgba(180,130,60,0.3);
+  text-align: left;
+}
+.d2-tt-sublabel {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  margin-bottom: 0.35rem;
+}
+.d2-tt-socket-text {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: #d4b878;
+  line-height: 1.4;
+}
+.d2-tt-alt-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 0.2rem;
+}
+.d2-tt-alt-list li {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: #b89870;
+  padding-left: 0.9rem;
+  position: relative;
+  line-height: 1.35;
+}
+.d2-tt-alt-list li::before {
+  content: '◆';
+  position: absolute; left: 0; top: 0;
+  color: var(--gold);
+  font-size: 0.6rem;
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 780px) {
+  .d2-window {
+    grid-template-columns: 1fr;
+  }
+  .d2-paperdoll-grid {
+    grid-template-columns: repeat(9, 38px);
+    grid-template-rows: repeat(6, 40px);
+    gap: 4px;
+  }
+  .d2-slot-marker { font-size: 1rem; }
+  .d2-slot-weapon .d2-slot-marker,
+  .d2-slot-shield .d2-slot-marker { font-size: 1.7rem; }
+  .d2-slot-label { font-size: 0.48rem !important; }
+  .d2-attr-row { grid-template-columns: 70px 46px 1fr; }
+}
+@media (max-width: 460px) {
+  .d2-viewer-wrap { padding: 0.8rem; }
+  .d2-window { padding: 0.6rem; }
+  .d2-paperdoll-grid {
+    grid-template-columns: repeat(9, 32px);
+    grid-template-rows: repeat(6, 34px);
+    gap: 3px;
+  }
+  .d2-slot-marker { font-size: 0.85rem; }
+  .d2-slot-weapon .d2-slot-marker,
+  .d2-slot-shield .d2-slot-marker { font-size: 1.3rem; }
+  .d2-slot-label { font-size: 0.42rem !important; }
+  .d2-viewer-header { flex-direction: column; align-items: stretch; }
+  .d2-cell-val { font-size: 0.8rem; }
+}
+
 

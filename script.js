@@ -87,35 +87,20 @@ rwFilterBtns.forEach(btn => {
   });
 });
 
-/* ─── Build filter (by class) ────────────────────────────── */
-const buildFilterBtns = document.querySelectorAll('.filter-btn[data-build-filter]');
-const classGroups     = document.querySelectorAll('.class-group');
-
-buildFilterBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    buildFilterBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    const filter = btn.dataset.buildFilter;
-
-    classGroups.forEach(group => {
-      if (filter === 'all' || group.dataset.buildClass === filter) {
-        group.classList.remove('hidden');
-      } else {
-        group.classList.add('hidden');
-      }
-    });
-  });
-});
-
-// When user clicks a class card's "View Build" link, switch to Builds page and auto-select that filter
+/* ─── Class-card "View Build" links → jump to builds page + preselect class in interactive viewer ─── */
 document.querySelectorAll('.class-build-link').forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();
     const target = link.getAttribute('href').replace('#build-', '');
     showPage('builds');
-    const targetBtn = document.querySelector(`.filter-btn[data-build-filter="${target}"]`);
-    if (targetBtn) targetBtn.click();
+    // Sync the new interactive viewer's class dropdown
+    const classSel = document.getElementById('d2-class-select');
+    if (classSel) {
+      classSel.value = target;
+      classSel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    // Smooth scroll to the viewer
+    document.getElementById('builds')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
 
@@ -969,10 +954,13 @@ tipsFilterBtns.forEach(btn => {
 
 /* ─── MF + FCR Loadout Calculator ─────────────────────── */
 (function () {
-  // Item database: { name, mf, fcr, note? }
+  // Item database: { name, mf, fcr, note?, classes?: [] }
+  //   classes: if present, item only shows for those classes.  Absent = all classes.
+  //   Class keys match the <select> values: sorc, necro, pally, druid, sin, ama, barb
   const CALC_ITEMS = {
     helm: [
       { name: "— None —", mf: 0, fcr: 0 },
+      // Universal helms
       { name: "Tarnhelm (Skull Cap)", mf: 40, fcr: 0, note: "+1 all skills" },
       { name: "Shako / Harlequin Crest", mf: 50, fcr: 0, note: "+2 skills, +2 stats" },
       { name: "Peasant Crown", mf: 0, fcr: 0, note: "+1 skills, +20 life reg" },
@@ -981,80 +969,168 @@ tipsFilterBtns.forEach(btn => {
       { name: "Nightwing's Veil", mf: 0, fcr: 0, note: "+2 skills, +5-9% cold dmg" },
       { name: "Griffon's Eye (Diadem)", mf: 0, fcr: 25, note: "-15-20% enemy lightning res" },
       { name: "Crown of Ages", mf: 0, fcr: 0, note: "+1 skills, 10-15% DR" },
+      { name: "Kira's Guardian (Tiara)", mf: 0, fcr: 0, note: "Cannot Be Frozen, +50-70 all res" },
       { name: "Magic Circlet + 10% FCR", mf: 0, fcr: 10, note: "Magic circlet cap: 10% FCR prefix" },
       { name: "Magic Circlet + 20% FCR (of the Magus)", mf: 0, fcr: 20, note: "20% FCR is the max suffix roll" },
-      { name: "Rare Circlet + 20% FCR + 30% MF", mf: 30, fcr: 20, note: "Very rare — max FCR + max MF suffix" }
+      { name: "Rare Circlet + 20% FCR + 30% MF", mf: 30, fcr: 20, note: "Very rare — max FCR + max MF suffix" },
+      // ─── Druid pelts ───
+      { name: "Jalal's Mane (Totemic Mask)", mf: 0, fcr: 20, note: "+2 druid, +30 str/energy", classes: ['druid'] },
+      { name: "Ravenlore (Sky Spirit)",       mf: 0, fcr: 0,  note: "+3 druid elemental, +250-350% fire dmg", classes: ['druid'] },
+      { name: "Cerebus' Bite (Blood Spirit)", mf: 0, fcr: 0,  note: "+2 druid shape-shifting, +25-50 life", classes: ['druid'] },
+      // ─── Barbarian helms ───
+      { name: "Arreat's Face (Slayer Guard)", mf: 0, fcr: 0, note: "+2 barb combat, +30 str, LL", classes: ['barb'] },
+      { name: "Wolfhowl (Fury Visor)",         mf: 0, fcr: 0, note: "+3-4 werewolf, +2 barb (barb only)", classes: ['barb'] },
+      { name: "Halaberd's Reign (Corona)",     mf: 0, fcr: 0, note: "+2 barb combat, all res, +40 str/dex", classes: ['barb'] },
+      { name: "Demonhorn's Edge (Destroyer Helm)", mf: 0, fcr: 0, note: "+2 warcries, +25% deadly strike", classes: ['barb'] }
     ],
     amulet: [
       { name: "— None —", mf: 0, fcr: 0 },
+      // Universal
       { name: "Mara's Kaleidoscope", mf: 0, fcr: 0, note: "+2 skills, +20-30 all res" },
       { name: "Highlord's Wrath", mf: 0, fcr: 0, note: "+1 skills, 20% IAS, DS per clvl" },
-      { name: "Tal Rasha's Adjudication", mf: 0, fcr: 0, note: "+2 sorc, +42 mana (FCR only via full set bonus)" },
       { name: "The Cat's Eye", mf: 0, fcr: 0, note: "30% FRW, +30 dex" },
       { name: "Metalgrid", mf: 0, fcr: 0, note: "+90 all res" },
+      { name: "Atma's Scarab", mf: 0, fcr: 0, note: "Amp Damage CtC, life reg" },
+      { name: "Saracen's Chance", mf: 0, fcr: 0, note: "+12 all attrs, all res" },
       { name: "Rare amulet + 10% FCR", mf: 0, fcr: 10, note: "Magic amulets cap at 10% FCR" },
       { name: "Rare amulet + 10% FCR + 30% MF", mf: 30, fcr: 10, note: "Max MF suffix (of Chance)" },
-      { name: "Crafted caster amulet (+1 class, 20% FCR)", mf: 0, fcr: 20, note: "Caster recipe: fixed 10 FCR + up to 10 suffix" }
+      { name: "Crafted caster amulet (+1 class, 20% FCR)", mf: 0, fcr: 20, note: "Caster recipe: fixed 10 FCR + up to 10 suffix" },
+      // ─── Sorc set piece ───
+      { name: "Tal Rasha's Adjudication (Amulet)", mf: 0, fcr: 0, note: "+2 sorc, +42 mana (FCR via full set bonus)", classes: ['sorc'] },
+      // ─── Class-skill crafted amulet ───
+      { name: "Crafted class-skill amulet (Sorc +1 fire/cold/light + FCR)", mf: 0, fcr: 20, note: "Crafted caster amulet, +1 to sorc tree", classes: ['sorc'] },
+      { name: "Crafted class-skill amulet (Necro summon/poison/curse + FCR)", mf: 0, fcr: 20, note: "Crafted caster amulet, +1 to necro tree", classes: ['necro'] },
+      { name: "Crafted class-skill amulet (Pala combat/offensive/defensive)", mf: 0, fcr: 10, note: "Crafted caster amulet, +1 to pala tree", classes: ['pally'] },
+      { name: "Crafted class-skill amulet (Druid elemental/summon/shape)", mf: 0, fcr: 10, note: "Crafted caster amulet, +1 to druid tree", classes: ['druid'] }
     ],
     armor: [
       { name: "— None —", mf: 0, fcr: 0 },
+      // Universal armors
       { name: "Enigma (Mage Plate)", mf: 80, fcr: 0, note: "+2 skills, Teleport, +80% MF fixed" },
       { name: "Skullder's Ire (~clvl 95)", mf: 95, fcr: 0, note: "+1 per clvl MF (max ~99% at clvl 99)" },
       { name: "Wealth (any 4os armor)", mf: 100, fcr: 0, note: "+100% MF, +300% extra gold, +10 dex" },
       { name: "Vipermagi's Serpentskin", mf: 0, fcr: 30, note: "+1 skills, all res" },
-      { name: "Ormus' Robes", mf: 0, fcr: 0, note: "+3 random sorc skill, +2 sorc" },
-      { name: "Que-Hegan's Wisdom", mf: 0, fcr: 20, note: "+1 skills" },
-      { name: "Chains of Honor", mf: 0, fcr: 0, note: "+2 skills, 65 res" },
-      { name: "Bramble", mf: 0, fcr: 0, note: "Thorns aura" }
+      { name: "Que-Hegan's Wisdom", mf: 0, fcr: 20, note: "+1 skills, +20% FCR" },
+      { name: "Chains of Honor (Dol-Um-Ber-Ist)", mf: 0, fcr: 0, note: "+2 skills, +65 res, +8% DR (Ist grants MF but stat says 0 fcr)" },
+      { name: "Bramble (Ral-Ohm-Sur-Eth)", mf: 0, fcr: 0, note: "Level 15-21 Thorns aura" },
+      { name: "Duress (Shael-Um-Thul)", mf: 0, fcr: 0, note: "+15% CB, +33% OW, cold res" },
+      { name: "Guardian Angel", mf: 0, fcr: 0, note: "+15% all max res, +30 dex" },
+      // ─── Sorceress armors ───
+      { name: "Ormus' Robes (Dusk Shroud)", mf: 0, fcr: 10, note: "+3 to random sorc skill, +5-15% cold/fire/light dmg", classes: ['sorc'] },
+      // ─── Necromancer armor ───
+      { name: "Trang-Oul's Scales (Chaos Armor)", mf: 0, fcr: 0, note: "+2 poison/curse, cold absorb (set)", classes: ['necro'] },
+      // ─── Paladin armor ───
+      { name: "Templar's Might (Sacred Armor)", mf: 0, fcr: 0, note: "+2 pala offensive, +250-350% ED, +40 str/vit", classes: ['pally'] },
+      // ─── Amazon / physical DPS ───
+      { name: "Fortitude (Chains of Honor base — El-Sol-Dol-Lo)", mf: 0, fcr: 0, note: "+300% ED, +1 skills, all res" },
+      // ─── Barb armor ───
+      { name: "Immortal King's Soul Cage (Sacred Armor)", mf: 0, fcr: 0, note: "+2 combat, high def (set)", classes: ['barb'] }
     ],
     weapon: [
       { name: "— None —", mf: 0, fcr: 0 },
+      // Universal weapons
       { name: "Gull (Dagger)", mf: 100, fcr: 0, note: "100% MF, no damage — offhand carry" },
-      { name: "Wizardspike", mf: 0, fcr: 50, note: "+75 all res, huge FCR" },
+      { name: "Wizardspike (Bone Knife)", mf: 0, fcr: 50, note: "+75 all res, huge FCR" },
       { name: "Heart of the Oak (Flail)", mf: 0, fcr: 40, note: "+3 skills, +40 all res" },
-      { name: "Death's Fathom (Dimensional Shard)", mf: 0, fcr: 30, note: "+3 sorc, +25-40% cold dmg" },
-      { name: "Eschuta's Temper (Eldritch Orb)", mf: 0, fcr: 20, note: "+3 sorc, +1-3% fire/light dmg per clvl (FCR max 20%)" },
-      { name: "Suicide Branch", mf: 0, fcr: 40, note: "+1 skills, +25 all attrs" },
       { name: "Spirit (Crystal Sword)", mf: 0, fcr: 35, note: "+2 skills, +112 mana" },
-      { name: "Hoto (short flail)", mf: 0, fcr: 40, note: "+3 skills, dispel magic" },
-      { name: "Grief (Phase Blade)", mf: 0, fcr: 0, note: "Melee — for reference" },
-      { name: "Sazabi's Cobalt Redeemer", mf: 0, fcr: 0, note: "+170% ED, +1 skills (weapon itself has no MF)" }
+      { name: "Suicide Branch (Burnt Wand)", mf: 0, fcr: 40, note: "+1 skills, +25 all attrs" },
+      { name: "Grief (Phase Blade)", mf: 0, fcr: 0, note: "Melee ED — for reference (Grief has no FCR)" },
+      { name: "Last Wish (Berserker Axe)", mf: 0, fcr: 0, note: "Might aura, CtC Life Tap" },
+      { name: "Beast (Berserker Axe / Scourge)", mf: 0, fcr: 0, note: "Fanaticism aura, +40% IAS" },
+      { name: "Insight (any polearm/staff — for merc & druid)", mf: 0, fcr: 0, note: "Meditation aura, +1-6 crit strike" },
+      // ─── Sorceress orbs ───
+      { name: "Death's Fathom (Dimensional Shard)", mf: 0, fcr: 30, note: "+3 sorc, +25-40% cold dmg", classes: ['sorc'] },
+      { name: "Eschuta's Temper (Eldritch Orb)",     mf: 0, fcr: 20, note: "+3 sorc, +1-3% fire/light dmg per clvl", classes: ['sorc'] },
+      { name: "The Oculus (Swirling Crystal)",       mf: 50, fcr: 30, note: "+3 sorc, +50% MF (Sorc BiS budget orb)", classes: ['sorc'] },
+      // ─── Necromancer wands ───
+      { name: "Death's Web (Unearthed Wand)",   mf: 0, fcr: 10, note: "+2 poison/bone, -40-50% enemy poison res", classes: ['necro'] },
+      { name: "Blackhand Key (Grim Wand)",      mf: 0, fcr: 20, note: "+2 curses, +2 poison/bone", classes: ['necro'] },
+      { name: "Boneshade (Lich Wand)",          mf: 0, fcr: 20, note: "+3-5 bone spells, huge fcr", classes: ['necro'] },
+      // ─── Paladin scepters ───
+      { name: "Heaven's Light (Mighty Scepter)", mf: 0, fcr: 0, note: "+3-6 zeal, socketed", classes: ['pally'] },
+      { name: "Astreon's Iron Ward (Caduceus)",  mf: 0, fcr: 20, note: "+2 pala skills, all res, deadly strike", classes: ['pally'] },
+      // ─── Druid weapons ───
+      { name: "Ribcracker (Quarterstaff)",  mf: 0, fcr: 0, note: "Stunning bonker, +200-300% ED", classes: ['druid'] },
+      { name: "Spirit (Broad Sword — Druid FCR)", mf: 0, fcr: 35, note: "+2 skills — druid Wind/Hurricane FCR path", classes: ['druid'] },
+      // ─── Amazon bows / javelins ───
+      { name: "Windforce (Hydra Bow)",       mf: 0, fcr: 0, note: "+250% ED, 20% mana leech", classes: ['ama'] },
+      { name: "Titan's Revenge (Ceremonial Javelin)", mf: 0, fcr: 0, note: "+2 ama, replenishes, +190% ED", classes: ['ama'] },
+      { name: "Widowmaker (Ward Bow)",       mf: 0, fcr: 0, note: "+50-80% ED, GA, all skills", classes: ['ama'] },
+      { name: "Buriza-Do Kyanon (Ballista)", mf: 0, fcr: 0, note: "Pierce, freeze, deadly strike", classes: ['ama'] },
+      // ─── Assassin claws ───
+      { name: "Bartuc's Cut-Throat (Greater Talons)", mf: 0, fcr: 0, note: "+1 sin, +150-200% ED, 30% IAS", classes: ['sin'] },
+      { name: "Firelizard's Talons (Feral Claws)",     mf: 0, fcr: 0, note: "+2 traps, fire dmg, IAS", classes: ['sin'] },
+      { name: "Chaos runeword (Claws — Fal-Ohm-Um)",   mf: 0, fcr: 0, note: "+35% IAS, Whirlwind CtC", classes: ['sin'] },
+      // ─── Barb / general melee ───
+      { name: "Breath of the Dying (Berserker Axe)", mf: 50, fcr: 0, note: "+50% MF, +200% ED — Vex/Hel/El/Eld/Zod", classes: ['barb','pally','druid','sin','ama'] },
+      { name: "Sazabi's Cobalt Redeemer (Cryptic Sword)", mf: 0, fcr: 0, note: "+170% ED, +1 skills (weapon)" }
     ],
     offhand: [
       { name: "— None —", mf: 0, fcr: 0 },
+      // Universal shields
       { name: "Spirit (Monarch Shield)", mf: 0, fcr: 35, note: "+2 skills, +22 vit, +89-112 mana" },
       { name: "Rhyme (any shield)", mf: 25, fcr: 0, note: "25% MF, all res, cannot be frozen" },
       { name: "Lidless Wall (Grim Shield)", mf: 0, fcr: 20, note: "+1 skills, +10 energy" },
-      { name: "Homunculus (Hierophant Trophy)", mf: 0, fcr: 20, note: "+2 necro, huge res" },
       { name: "Storm Shield", mf: 0, fcr: 0, note: "35% DR, high def" },
       { name: "Sanctuary (any shield)", mf: 0, fcr: 0, note: "+250 def, cleansing aura" },
-      { name: "Whitstan's Guard", mf: 0, fcr: 0, note: "55% chance to block" }
+      { name: "Whitstan's Guard", mf: 0, fcr: 0, note: "55% chance to block" },
+      { name: "Splendor (any shield — 2os)", mf: 20, fcr: 25, note: "+1 skills, +20% MF, +25% FCR (Eth-Lum)" },
+      { name: "Ancient's Pledge (any shield — 3os)", mf: 0, fcr: 0, note: "+35-50 all res (Ral-Ort-Tal)" },
+      // ─── Necromancer heads ───
+      { name: "Homunculus (Hierophant Trophy)", mf: 0, fcr: 20, note: "+2 necro, +20 all res, huge block", classes: ['necro'] },
+      { name: "Boneflame (Succubus Skull)",     mf: 0, fcr: 20, note: "+2 necro, +2 poison/bone, curse CtC", classes: ['necro'] },
+      { name: "Darkforce Spawn (Bloodlord Skull)", mf: 0, fcr: 20, note: "+2 necro, all res, high block", classes: ['necro'] },
+      { name: "Trang-Oul's Wing (Cantor Trophy)",   mf: 0, fcr: 0, note: "+1 necro, cold absorb (set)", classes: ['necro'] },
+      // ─── Paladin shields ───
+      { name: "Herald of Zakarum (Gilded Shield)", mf: 0, fcr: 0, note: "+2 pala combat, +30 str/vit, all res", classes: ['pally'] },
+      { name: "Alma Negra (Sacred Rondache)",       mf: 0, fcr: 0, note: "+1 pala, per-level skill bonuses", classes: ['pally'] },
+      { name: "Dragonscale (Sacred Targe)",          mf: 0, fcr: 0, note: "+3 pala shield skills, absorbs", classes: ['pally'] },
+      { name: "Exile runeword (Vortex/Kurast/Sacred Targe)", mf: 0, fcr: 0, note: "Defiance aura, +1-2 pala skills (Vex-Ohm-Ist-Dol)", classes: ['pally'] },
+      // ─── Assassin claws (offhand) ───
+      { name: "Bartuc's Cut-Throat (offhand)",   mf: 0, fcr: 0, note: "+1 sin, +150-200% ED, 30% IAS", classes: ['sin'] },
+      { name: "Jade Talon (Wrist Sword)",         mf: 0, fcr: 0, note: "+3 martial arts, all res", classes: ['sin'] }
     ],
     gloves: [
       { name: "— None —", mf: 0, fcr: 0 },
+      // Universal
       { name: "Chance Guards", mf: 40, fcr: 0, note: "25-40% MF" },
       { name: "Magefist", mf: 0, fcr: 20, note: "+1 fire skills, +25 mana regen" },
       { name: "Frostburn", mf: 0, fcr: 0, note: "+40% max mana" },
-      { name: "Trang-Oul's Claws", mf: 0, fcr: 20, note: "+2 curses, part of Trang's set" },
       { name: "Bloodfist", mf: 0, fcr: 0, note: "+40 life, 10% IAS" },
-      { name: "Crafted caster gloves (20% FCR)", mf: 0, fcr: 20, note: "FCR + FHR + mana" }
+      { name: "Dracul's Grasp", mf: 0, fcr: 0, note: "7-10% Life Tap, +open wounds" },
+      { name: "Steelrend (Ogre Gauntlets)", mf: 0, fcr: 0, note: "+40 str, 60-80% ED" },
+      { name: "Crafted caster gloves (20% FCR)", mf: 0, fcr: 20, note: "FCR + FHR + mana" },
+      // ─── Necromancer gloves ───
+      { name: "Trang-Oul's Claws (Chaos Gloves)", mf: 0, fcr: 20, note: "+2 curses, +25% cold res (set)", classes: ['necro'] },
+      // ─── Assassin gloves (Bartuc's-like via craft) ───
+      { name: "Crafted blood gloves (Sin — +2 martial arts)", mf: 0, fcr: 0, note: "+2 martial arts, IAS, LL", classes: ['sin'] }
     ],
     belt: [
       { name: "— None —", mf: 0, fcr: 0 },
+      // Universal
       { name: "Goldwrap", mf: 80, fcr: 0, note: "30-80% MF, +50% gold" },
       { name: "Arachnid Mesh", mf: 0, fcr: 20, note: "+1 skills, +5% max mana" },
       { name: "String of Ears", mf: 0, fcr: 0, note: "15% DR, life steal" },
       { name: "Verdungo's Hearty Cord", mf: 0, fcr: 0, note: "10-15% DR, huge life" },
-      { name: "Nightsmoke", mf: 0, fcr: 0, note: "+20 all res, +50% mana" }
+      { name: "Nightsmoke", mf: 0, fcr: 0, note: "+20 all res, +50% mana" },
+      { name: "Thundergod's Vigor (War Belt)", mf: 0, fcr: 0, note: "+3 lightning fury/mastery (ama), +20 str/vit" },
+      { name: "Snowclash (Battle Belt)", mf: 0, fcr: 0, note: "+2 cold, +45 cold absorb" },
+      { name: "Razortail (Sharkskin Belt)", mf: 0, fcr: 0, note: "Pierce, +15 max dmg" }
     ],
     boots: [
       { name: "— None —", mf: 0, fcr: 0 },
+      // Universal
       { name: "War Traveler", mf: 50, fcr: 0, note: "40-50% MF, 25% FRW, +15-25 strength" },
       { name: "Waterwalk", mf: 0, fcr: 0, note: "+65 life, 20% FRW" },
       { name: "Silkweave", mf: 0, fcr: 0, note: "+30% max mana, 20% FRW" },
-      { name: "Sandstorm Trek", mf: 0, fcr: 0, note: "20% FHR, poison res" },
-      { name: "Aldur's Advance", mf: 0, fcr: 0, note: "+180 life, 40% FRW (set)" },
-      { name: "Rare boots + 30% FRW + res", mf: 0, fcr: 0 }
+      { name: "Sandstorm Trek (Scarabshell Boots)", mf: 0, fcr: 0, note: "20% FHR, +40-70 vit/str" },
+      { name: "Gore Rider (War Boots)", mf: 0, fcr: 0, note: "+10-15% CB, +10% deadly strike, +open wounds" },
+      { name: "Aldur's Advance (Battle Boots)", mf: 0, fcr: 0, note: "+180 life, 40% FRW (set)" },
+      { name: "Rare boots + 30% FRW + res", mf: 0, fcr: 0 },
+      // ─── Necromancer boots ───
+      { name: "Marrowwalk (Boneweave Boots)", mf: 0, fcr: 0, note: "+2 necro, +2 skele mastery, oskills", classes: ['necro'] },
+      // ─── Druid boots ───
+      { name: "Shadow Dancer (Myrmidon Greaves)", mf: 0, fcr: 0, note: "+2 shadow disciplines, +25-35 dex", classes: ['sin'] }
     ],
     ring1: [
       { name: "— None —", mf: 0, fcr: 0 },
@@ -1136,52 +1212,91 @@ tipsFilterBtns.forEach(btn => {
              bp: [ [0,15], [9,14], [20,13], [37,12], [63,11], [105,10] ] }
   };
 
-  // Presets: pre-selected item indexes per slot
+  // Presets: pre-selected items per slot, looked up by NAME (survives class filtering).
+  // If a preset item is not usable by the current class, it's simply skipped.
+  //
+  // A slot value can be either:
+  //   • a string — one item name used for every class, or
+  //   • an object { default: "…", sorc: "…", druid: "…", … } — class-specific
+  //     override plus a safe universal fallback.  Missing classes use `default`.
   const CALC_PRESETS = {
-    // Mephisto MF farmer — cold sorc: max MF while holding 63% FCR breakpoint
+    // Mephisto MF farmer — hold 63% FCR breakpoint while stacking MF
     meph: {
-      helm: 2,      // Shako
-      amulet: 1,    // Mara's
-      armor: 2,     // Skullder's (MF + socket for Ist)
-      weapon: 4,    // Death's Fathom
-      offhand: 1,   // Spirit (Monarch)
-      gloves: 1,    // Chance Guards
-      belt: 2,      // Arachnid
-      boots: 1,     // War Traveler
-      ring1: 1,     // Nagelring
-      ring2: 10,    // Rare 10 FCR + 15 MF
-      charms: 7,    // Anni + Torch + 6 MF SC
-      sockets: 4    // 3× Ist (Shako + Skullder's + weapon)
+      helm:    "Shako / Harlequin Crest",
+      amulet:  "Mara's Kaleidoscope",
+      armor:   "Skullder's Ire (~clvl 95)",
+      // HoTo = safe caster fallback for any class; class BiS overrides
+      weapon: {
+        default: "Heart of the Oak (Flail)",
+        sorc:    "Death's Fathom (Dimensional Shard)",  // +3 sorc, cold dmg
+        necro:   "Heart of the Oak (Flail)",             // +3 skills, 40 FCR
+        pally:   "Heart of the Oak (Flail)",             // Hammerdin MF weapon
+        druid:   "Heart of the Oak (Flail)",             // Wind druid FCR
+        sin:     "Bartuc's Cut-Throat (Greater Talons)", // MA/trap sin
+        ama:     "Titan's Revenge (Ceremonial Javelin)", // Javazon MF
+        barb:    "Breath of the Dying (Berserker Axe)"   // +50% MF baked-in
+      },
+      offhand: {
+        default: "Spirit (Monarch Shield)",
+        necro:   "Homunculus (Hierophant Trophy)",       // Necro BiS shield
+        pally:   "Herald of Zakarum (Gilded Shield)",    // Pally BiS
+        sin:     "Bartuc's Cut-Throat (offhand)",        // dual-claw
+        ama:     "— None —",                              // bow/jav = 2H
+        barb:    "— None —"                               // 2H / dual wield
+      },
+      gloves:  "Chance Guards",
+      belt:    "Arachnid Mesh",
+      boots:   "War Traveler",
+      ring1:   "Nagelring",
+      ring2:   "Rare ring + 10% FCR + 15% MF",
+      charms:  "Anni + Torch + 6× MF SC (7%)",
+      sockets: "3× Ist (helm + armor + weapon)"
     },
     // Chaos Sanctuary XP/damage focus — max damage, hold 63% FCR
     chaos: {
-      helm: 7,      // Griffon's Eye
-      amulet: 1,    // Mara's
-      armor: 4,     // Vipermagi
-      weapon: 3,    // HotO
-      offhand: 1,   // Spirit
-      gloves: 2,    // Magefist
-      belt: 2,      // Arachnid
-      boots: 2,     // Waterwalk
-      ring1: 8,     // Rare 10 FCR
-      ring2: 9,     // Rare 10 FCR + res
-      charms: 11,   // Anni + Torch + 4 skillers
-      sockets: 0    // None — damage focus
+      helm:    "Griffon's Eye (Diadem)",
+      amulet:  "Mara's Kaleidoscope",
+      armor:   "Vipermagi's Serpentskin",
+      weapon: {
+        default: "Heart of the Oak (Flail)",
+        sorc:    "Death's Fathom (Dimensional Shard)",   // top cold dmg
+        necro:   "Death's Web (Unearthed Wand)",         // -50% enemy pois res
+        pally:   "Heart of the Oak (Flail)",             // Hammerdin BiS
+        druid:   "Heart of the Oak (Flail)",             // Wind druid BiS
+        sin:     "Chaos runeword (Claws — Fal-Ohm-Um)",  // Trapsin Chaos
+        ama:     "Titan's Revenge (Ceremonial Javelin)", // Javazon LF spam
+        barb:    "Grief (Phase Blade)"                    // WW barb Chaos
+      },
+      offhand: {
+        default: "Spirit (Monarch Shield)",
+        necro:   "Homunculus (Hierophant Trophy)",
+        pally:   "Herald of Zakarum (Gilded Shield)",
+        sin:     "Bartuc's Cut-Throat (offhand)",
+        ama:     "— None —",
+        barb:    "— None —"
+      },
+      gloves:  "Magefist",
+      belt:    "Arachnid Mesh",
+      boots:   "Waterwalk",
+      ring1:   "Rare ring + 10% FCR",
+      ring2:   "Rare ring + 10% FCR + res",
+      charms:  "Anni + Torch + 4× skiller GC",
+      sockets: "— None —"
     },
     // Pure MF speed farmer — Wealth + Gull + max MF everywhere (low FCR)
     speed: {
-      helm: 1,      // Tarnhelm
-      amulet: 1,    // Mara's
-      armor: 3,     // Wealth (+100% MF)
-      weapon: 1,    // Gull (+100% MF)
-      offhand: 2,   // Rhyme (+25% MF)
-      gloves: 1,    // Chance Guards
-      belt: 1,      // Goldwrap
-      boots: 1,     // War Traveler
-      ring1: 1,     // Nagelring
-      ring2: 1,     // Nagelring
-      charms: 9,    // Anni + Torch + Gheed's + 6× MF SC
-      sockets: 5    // 4× Ist runes
+      helm:    "Tarnhelm (Skull Cap)",
+      amulet:  "Mara's Kaleidoscope",
+      armor:   "Wealth (any 4os armor)",
+      weapon:  "Gull (Dagger)",             // universal — every class can wield
+      offhand: "Rhyme (any shield)",        // universal
+      gloves:  "Chance Guards",
+      belt:    "Goldwrap",
+      boots:   "War Traveler",
+      ring1:   "Nagelring",
+      ring2:   "Nagelring",
+      charms:  "Anni + Torch + Gheed's + 6× MF SC",
+      sockets: "4× Ist (helm + armor + shield + weapon)"
     },
     reset: null
   };
@@ -1203,18 +1318,43 @@ tipsFilterBtns.forEach(btn => {
 
   if (!slotSelects.length || !classSelect) return;
 
-  // Populate all selects
+  // True if the item is usable by the currently-selected class.
+  function itemAllowedForClass(item, classKey) {
+    if (!item) return false;
+    if (!item.classes) return true;         // no restriction = all classes
+    return item.classes.includes(classKey);
+  }
+
+  // Populate all selects, filtered by the currently-selected class.
+  // Option `value` is the item's FULL-array index (not filtered index), so
+  // getSelected() and CALC_PRESETS name→index lookups keep working when the
+  // filter changes.  Current selections are preserved by name across re-populates.
   function populateSlots() {
+    const classKey = classSelect.value;
     slotSelects.forEach(sel => {
       const slot = sel.dataset.slot;
       const items = CALC_ITEMS[slot] || [];
+      // Remember what was picked before we blow away the options.
+      const prevIdx = parseInt(sel.value, 10) || 0;
+      const prevName = items[prevIdx] ? items[prevIdx].name : null;
+
       sel.innerHTML = '';
       items.forEach((it, idx) => {
+        if (!itemAllowedForClass(it, classKey)) return;
         const opt = document.createElement('option');
         opt.value = idx;
         opt.textContent = it.note ? `${it.name}  ·  ${it.note}` : it.name;
         sel.appendChild(opt);
       });
+
+      // Restore previous selection if the item is still available.
+      if (prevName) {
+        const stillThere = Array.from(sel.options).find(o => {
+          const item = items[parseInt(o.value, 10)];
+          return item && item.name === prevName;
+        });
+        sel.value = stillThere ? stillThere.value : (sel.options[0] ? sel.options[0].value : '0');
+      }
     });
   }
 
@@ -1354,9 +1494,24 @@ tipsFilterBtns.forEach(btn => {
     } else {
       const preset = CALC_PRESETS[key];
       if (!preset) return;
+      const classKey = classSelect.value;
       slotSelects.forEach(sel => {
         const slot = sel.dataset.slot;
-        if (preset[slot] !== undefined) sel.value = String(preset[slot]);
+        const raw = preset[slot];
+        if (raw == null) return;
+        // A preset value can be a plain string or a {default, <class>: …} map.
+        const wantedName = (typeof raw === 'string')
+          ? raw
+          : (raw[classKey] || raw.default);
+        if (!wantedName) return;
+        const items = CALC_ITEMS[slot] || [];
+        const idx = items.findIndex(it => it.name === wantedName);
+        if (idx < 0) return;
+        // Only apply if that item is currently visible for this class.
+        const item = items[idx];
+        if (!itemAllowedForClass(item, classKey)) return;
+        const opt = Array.from(sel.options).find(o => parseInt(o.value, 10) === idx);
+        if (opt) sel.value = String(idx);
       });
     }
     recalculate();
@@ -1364,7 +1519,10 @@ tipsFilterBtns.forEach(btn => {
 
   populateSlots();
   slotSelects.forEach(sel => sel.addEventListener('change', recalculate));
-  classSelect.addEventListener('change', recalculate);
+  classSelect.addEventListener('change', () => {
+    populateSlots();   // re-filter items for the new class first
+    recalculate();
+  });
   presetBtns.forEach(btn => btn.addEventListener('click', () => applyPreset(btn.dataset.preset)));
   recalculate();
 })();
@@ -1397,10 +1555,10 @@ tipsFilterBtns.forEach(btn => {
     // ─── HELMS (universal) ──────────────────────────────
     { id:'shako',        name:"Harlequin Crest (Shako)",  slot:'helm', tier:'s',         boss:['mephisto','diablo','baal'] },
     { id:'kira',         name:"Kira's Guardian",          slot:'helm', tier:'s',         boss:['baal','diablo'] },
-    { id:'nightwings',   name:"Nightwing's Veil",         slot:'helm', tier:'s',         boss:['mephisto','diablo','baal'] },
-    { id:'griffons',     name:"Griffon's Eye",            slot:'helm', tier:'s',         boss:['baal','diablo','pit'] },
-    { id:'crown-ages',   name:"Crown of Ages",            slot:'helm', tier:'s',         boss:['baal'] },
-    { id:'andariels',    name:"Andariel's Visage",        slot:'helm', tier:'excellent', boss:['baal','nihlathak','pindle'] },
+    { id:'nightwings',   name:"Nightwing's Veil",         slot:'helm', tier:'s',         noActBoss:true, boss:['diablo','baal','pit','pindle','nihlathak'] },
+    { id:'griffons',     name:"Griffon's Eye",            slot:'helm', tier:'s',         noActBoss:true, boss:['baal','diablo','pit','pindle','nihlathak'] },
+    { id:'crown-ages',   name:"Crown of Ages",            slot:'helm', tier:'s',         noActBoss:true, boss:['baal','diablo','pit','pindle','nihlathak'] },
+    { id:'andariels',    name:"Andariel's Visage",        slot:'helm', tier:'excellent', boss:['baal','nihlathak','pindle','mephisto'] },
     { id:'vgaze',        name:"Vampire Gaze",             slot:'helm', tier:'excellent', boss:['mephisto','pindle'] },
     { id:'giant-skull',  name:"Giant Skull",              slot:'helm', tier:'solid',     boss:['baal','diablo'] },
     { id:'veil-steel',   name:"Veil of Steel",            slot:'helm', tier:'solid',     boss:['baal','diablo'] },
@@ -1434,7 +1592,7 @@ tipsFilterBtns.forEach(btn => {
     { id:'wolfhead',     name:"Wolfhead",                 slot:'pelt', tier:'budget',      classItem:'druid', boss:['countess','pindle'] },
 
     // ─── BODY ARMOR ─────────────────────────────────────
-    { id:'tyraels',      name:"Tyrael's Might",           slot:'body', tier:'s',         boss:['baal','uber'] },
+    { id:'tyraels',      name:"Tyrael's Might",           slot:'body', tier:'s',         qlvl:87, noActBoss:true, boss:['baal','diablo','uber'] },
     { id:'shaftstop',    name:"Shaftstop",                slot:'body', tier:'excellent', boss:['mephisto','baal'] },
     { id:'duriels',      name:"Duriel's Shell",           slot:'body', tier:'excellent', boss:['duriel','baal'] },
     { id:'guardian-angel',name:"Guardian Angel",          slot:'body', tier:'solid',     boss:['mephisto','baal'] },
@@ -1490,7 +1648,7 @@ tipsFilterBtns.forEach(btn => {
     { id:'umbral-disk',  name:"Umbral Disk",              slot:'necroshield', tier:'budget',    classItem:'necro', boss:['mephisto','pindle'] },
 
     // ─── BELTS ──────────────────────────────────────────
-    { id:'arachnid',     name:"Arachnid Mesh",            slot:'belt', tier:'s',         boss:['mephisto','baal'] },
+    { id:'arachnid',     name:"Arachnid Mesh",            slot:'belt', tier:'s',         qlvl:87, boss:['mephisto','baal','diablo','pit'] },
     { id:'verdungos',    name:"Verdungo's Hearty Cord",   slot:'belt', tier:'excellent', boss:['mephisto','baal'] },
     { id:'tgods',        name:"Thundergod's Vigor",       slot:'belt', tier:'excellent', boss:['baal','diablo'] },
     { id:'string-ears',  name:"String of Ears",           slot:'belt', tier:'solid',     boss:['mephisto','baal'] },
@@ -1506,7 +1664,7 @@ tipsFilterBtns.forEach(btn => {
     { id:'tal-belt',     name:"Tal Rasha's Fine-Spun Cloth", slot:'belt', tier:'excellent', boss:['mephisto','baal'] },
 
     // ─── BOOTS ──────────────────────────────────────────
-    { id:'war-trav',     name:"War Traveler",             slot:'boots', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'war-trav',     name:"War Traveler",             slot:'boots', tier:'excellent', boss:['mephisto','baal','nm-anda'] },
     { id:'sandstorm',    name:"Sandstorm Trek",           slot:'boots', tier:'excellent', boss:['mephisto','pit'] },
     { id:'gore-rider',   name:"Gore Rider",               slot:'boots', tier:'excellent', boss:['baal','nihlathak'] },
     { id:'shadow-dancer',name:"Shadow Dancer",            slot:'boots', tier:'solid',     boss:['baal','diablo'] },
@@ -1526,7 +1684,7 @@ tipsFilterBtns.forEach(btn => {
     { id:'steelrend',    name:"Steelrend",                slot:'gloves', tier:'excellent', boss:['baal','diablo'] },
     { id:'soul-drainer', name:"Soul Drainer",             slot:'gloves', tier:'solid',     boss:['mephisto','baal'] },
     { id:'lava-gout',    name:"Lava Gout",                slot:'gloves', tier:'solid',     boss:['mephisto','baal'] },
-    { id:'magefist',     name:"Magefist",                 slot:'gloves', tier:'solid',     boss:['countess','mephisto'] },
+    { id:'magefist',     name:"Magefist",                 slot:'gloves', tier:'solid',     boss:['countess','mephisto','nm-anda'] },
     { id:'frostburn',    name:"Frostburn",                slot:'gloves', tier:'solid',     boss:['mephisto','pindle'] },
     { id:'chance-guards',name:"Chance Guards",            slot:'gloves', tier:'solid',     boss:['countess','pindle'] },
     { id:'venom-grip',   name:"Venom Grip",               slot:'gloves', tier:'budget',    boss:['countess','pindle'] },
@@ -1537,19 +1695,19 @@ tipsFilterBtns.forEach(btn => {
     { id:'hand-broc',    name:"The Hand of Broc",         slot:'gloves', tier:'junk',      boss:['countess'] },
 
     // ─── RINGS ──────────────────────────────────────────
-    { id:'soj',          name:"Stone of Jordan",          slot:'ring', tier:'s',         boss:['nm-anda','baal','diablo'] },
-    { id:'bul-kathos',   name:"Bul-Kathos' Wedding Band", slot:'ring', tier:'s',         boss:['baal','diablo'] },
-    { id:'raven-frost',  name:"Raven Frost",              slot:'ring', tier:'excellent', boss:['countess','mephisto'] },
-    { id:'wisp',         name:"Wisp Projector",           slot:'ring', tier:'excellent', boss:['diablo','baal'] },
+    { id:'soj',          name:"Stone of Jordan",          slot:'ring', tier:'s',         boss:['nm-anda','baal','diablo','mephisto'] },
+    { id:'bul-kathos',   name:"Bul-Kathos' Wedding Band", slot:'ring', tier:'s',         boss:['baal','diablo','nm-anda','mephisto'] },
+    { id:'raven-frost',  name:"Raven Frost",              slot:'ring', tier:'excellent', boss:['countess','mephisto','nm-anda'] },
+    { id:'wisp',         name:"Wisp Projector",           slot:'ring', tier:'excellent', boss:['diablo','baal','nm-anda'] },
     { id:'nagelring',    name:"Nagelring",                slot:'ring', tier:'solid',     boss:['countess','pindle'] },
     { id:'manald',       name:"Manald Heal",              slot:'ring', tier:'solid',     boss:['countess','pindle'] },
-    { id:'dwarf-star',   name:"Dwarf Star",               slot:'ring', tier:'solid',     boss:['countess','pindle'] },
-    { id:'nature-peace', name:"Nature's Peace",           slot:'ring', tier:'solid',     boss:['mephisto','baal'] },
+    { id:'dwarf-star',   name:"Dwarf Star",               slot:'ring', tier:'solid',     boss:['countess','pindle','nm-anda'] },
+    { id:'nature-peace', name:"Nature's Peace",           slot:'ring', tier:'solid',     boss:['mephisto','baal','nm-anda'] },
     { id:'carrion-wind', name:"Carrion Wind",             slot:'ring', tier:'solid',     boss:['mephisto','baal'] },
 
     // ─── AMULETS ────────────────────────────────────────
-    { id:'mara',         name:"Mara's Kaleidoscope",      slot:'amulet', tier:'s',         boss:['mephisto','baal'] },
-    { id:'highlords',    name:"Highlord's Wrath",         slot:'amulet', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'mara',         name:"Mara's Kaleidoscope",      slot:'amulet', tier:'s',         boss:['mephisto','baal','nm-anda'] },
+    { id:'highlords',    name:"Highlord's Wrath",         slot:'amulet', tier:'excellent', boss:['mephisto','baal','nm-anda'] },
     { id:'metalgrid',    name:"Metalgrid",                slot:'amulet', tier:'excellent', boss:['baal'] },
     { id:'atmas-scarab', name:"Atma's Scarab",            slot:'amulet', tier:'solid',     boss:['mephisto','baal'] },
     { id:'cats-eye',     name:"The Cat's Eye",            slot:'amulet', tier:'solid',     boss:['mephisto','baal'] },
@@ -1559,16 +1717,16 @@ tipsFilterBtns.forEach(btn => {
     { id:'mahim-oak',    name:"The Mahim-Oak Curio",      slot:'amulet', tier:'budget',    boss:['countess','pindle'] },
     { id:'nokozan',      name:"Nokozan Relic",            slot:'amulet', tier:'junk',      boss:['countess'] },
     { id:'saracens',     name:"Saracen's Chance",         slot:'amulet', tier:'budget',    boss:['countess','pindle'] },
-    { id:'tal-ammy',     name:"Tal Rasha's Adjudication", slot:'amulet', tier:'excellent', boss:['mephisto','baal'] },
+    { id:'tal-ammy',     name:"Tal Rasha's Adjudication", slot:'amulet', tier:'excellent', boss:['mephisto','baal','nm-anda'] },
 
     // ─── SORCERESS ORBS ─────────────────────────────────
     { id:'oculus',       name:"The Oculus",               slot:'orb', tier:'solid',       classItem:'sorc', boss:['mephisto','baal'] },
-    { id:'eschutas',     name:"Eschuta's Temper",         slot:'orb', tier:'excellent',   classItem:'sorc', boss:['baal','diablo'] },
-    { id:'deaths-fathom',name:"Death's Fathom",           slot:'orb', tier:'s',           classItem:'sorc', boss:['pit','baal','diablo'] },
+    { id:'eschutas',     name:"Eschuta's Temper",         slot:'orb', tier:'excellent',   classItem:'sorc', boss:['baal','diablo','mephisto'] },
+    { id:'deaths-fathom',name:"Death's Fathom",           slot:'orb', tier:'s',           classItem:'sorc', noActBoss:true, boss:['pit','pindle','nihlathak','baal','diablo'] },
     { id:'tal-orb',      name:"Tal Rasha's Lidless Eye",  slot:'orb', tier:'excellent',   classItem:'sorc', boss:['mephisto','baal'] },
 
     // ─── NECROMANCER WANDS ──────────────────────────────
-    { id:'deaths-web',   name:"Death's Web",              slot:'wand', tier:'s',           classItem:'necro', boss:['baal','pit'] },
+    { id:'deaths-web',   name:"Death's Web",              slot:'wand', tier:'s',           classItem:'necro', noActBoss:true, boss:['baal','pit','pindle','nihlathak','diablo'] },
     { id:'boneshade',    name:"Boneshade",                slot:'wand', tier:'excellent',   classItem:'necro', boss:['baal','diablo'] },
     { id:'blackhand',    name:"Blackhand Key",            slot:'wand', tier:'solid',       classItem:'necro', boss:['mephisto','baal'] },
     { id:'suicide-branch',name:"Suicide Branch",          slot:'wand', tier:'solid',       classItem:'necro', boss:['countess','mephisto'] },
@@ -1580,7 +1738,7 @@ tipsFilterBtns.forEach(btn => {
     { id:'carin-shard',  name:"Carin Shard",              slot:'wand', tier:'junk',        classItem:'necro', boss:['countess'] },
 
     // ─── PALADIN SCEPTERS ───────────────────────────────
-    { id:'astreons',     name:"Astreon's Iron Ward",      slot:'scepter', tier:'excellent',classItem:'pala', boss:['baal','diablo'] },
+    { id:'astreons',     name:"Astreon's Iron Ward",      slot:'scepter', tier:'excellent',classItem:'pala', noActBoss:true, boss:['baal','diablo','pit','pindle','nihlathak'] },
     { id:'heavens-light',name:"Heaven's Light",           slot:'scepter', tier:'solid',    classItem:'pala', boss:['baal','diablo'] },
     { id:'hand-bl',      name:"The Hand of Blessed Light",slot:'scepter', tier:'solid',    classItem:'pala', boss:['baal','diablo'] },
     { id:'redeemer',     name:"The Redeemer",             slot:'scepter', tier:'solid',    classItem:'pala', boss:['baal','diablo'] },
@@ -1598,7 +1756,7 @@ tipsFilterBtns.forEach(btn => {
     { id:'impaler',      name:"The Impaler",              slot:'jav', tier:'budget',       classItem:'amazon', boss:['pindle','mephisto'] },
     { id:'lycander-aim', name:"Lycander's Aim",           slot:'amabow', tier:'solid',     classItem:'amazon', boss:['mephisto','baal'] },
     { id:'lycander-flank',name:"Lycander's Flank",        slot:'amaspear', tier:'solid',   classItem:'amazon', boss:['mephisto','baal'] },
-    { id:'eaglehorn',    name:"Eaglehorn",                slot:'amabow', tier:'s',         classItem:'amazon', boss:['baal','diablo'] },
+    { id:'eaglehorn',    name:"Eaglehorn",                slot:'amabow', tier:'s',         classItem:'amazon', noActBoss:true, boss:['baal','diablo','pit','pindle','nihlathak'] },
     { id:'kuko',         name:"Kuko Shakaku",             slot:'amabow', tier:'solid',     classItem:'amazon', boss:['mephisto','baal'] },
     { id:'skystrike',    name:"Skystrike",                slot:'amabow', tier:'budget',    classItem:'amazon', boss:['countess','mephisto'] },
     { id:'witchwild',    name:"Witchwild String",         slot:'amabow', tier:'solid',     classItem:'amazon', boss:['mephisto','baal'] },
@@ -1617,19 +1775,19 @@ tipsFilterBtns.forEach(btn => {
     { id:'chaos-talon',  name:"Chaos Talon",              slot:'weapon', tier:'solid',     classItem:'sin', boss:['baal','diablo'] },
 
     // ─── UNIVERSAL WEAPONS (melee/caster) ───────────────
-    { id:'grandfather',  name:"The Grandfather",          slot:'weapon', tier:'s',         boss:['baal','diablo'] },
+    { id:'grandfather',  name:"The Grandfather",          slot:'weapon', tier:'s',         noActBoss:true, boss:['pit','pindle','nihlathak','baal','diablo'] },
     { id:'doombringer',  name:"Doombringer",              slot:'weapon', tier:'excellent', boss:['baal','diablo'] },
     { id:'messerschmidts',name:"Messerschmidt's Reaver",  slot:'weapon', tier:'solid',     boss:['baal','diablo'] },
     { id:'baranars',     name:"Baranar's Star",           slot:'weapon', tier:'solid',     boss:['nihlathak','baal'] },
     { id:'hellslayer',   name:"Hellslayer",               slot:'weapon', tier:'solid',     boss:['baal','diablo'] },
-    { id:'azurewrath',   name:"Azurewrath",               slot:'weapon', tier:'excellent', boss:['cows','baal'] },
+    { id:'azurewrath',   name:"Azurewrath",               slot:'weapon', tier:'excellent', qlvl:87, boss:['cows','baal','mephisto','diablo'] },
     { id:'lightsabre',   name:"Lightsabre",               slot:'weapon', tier:'excellent', boss:['mephisto','baal'] },
-    { id:'mang-songs',   name:"Mang Song's Lesson",       slot:'weapon', tier:'s',         classItem:'sorc', boss:['baal'] },
+    { id:'mang-songs',   name:"Mang Song's Lesson",       slot:'weapon', tier:'s',         classItem:'sorc', noActBoss:true, boss:['baal','diablo','pit','pindle','nihlathak'] },
     { id:'ribcracker',   name:"Ribcracker",               slot:'weapon', tier:'solid',     boss:['mephisto','baal'] },
     { id:'bonehew',      name:"Bonehew",                  slot:'weapon', tier:'solid',     boss:['baal','diablo','cows'] },
     { id:'wizardspike',  name:"Wizardspike",              slot:'weapon', tier:'excellent', boss:['mephisto','baal'] },
     { id:'gull',         name:"Gull Dagger",              slot:'weapon', tier:'solid',     boss:['countess'] },
-    { id:'reapers',      name:"Reaper's Toll",            slot:'weapon', tier:'excellent', boss:['countess','baal'] },
+    { id:'reapers',      name:"Reaper's Toll",            slot:'weapon', tier:'excellent', boss:['countess','baal','mephisto'] },
     { id:'bloodletter',  name:"Bloodletter",              slot:'weapon', tier:'solid',     boss:['mephisto','baal'] },
     { id:'stormspire',   name:"Stormspire",               slot:'weapon', tier:'solid',     boss:['baal','diablo'] },
     { id:'ethereal-edge',name:"Ethereal Edge",            slot:'weapon', tier:'solid',     boss:['baal','diablo'] },
@@ -1641,7 +1799,7 @@ tipsFilterBtns.forEach(btn => {
     { id:'buriza',       name:"Buriza-Do Kyanon",         slot:'weapon', tier:'solid',     boss:['mephisto','pindle'] },
     { id:'hone-sundan',  name:"Hone Sundan",              slot:'weapon', tier:'solid',     boss:['countess','mephisto'] },
     { id:'widowmaker',   name:"Widowmaker",               slot:'weapon', tier:'solid',     boss:['baal','diablo'] },
-    { id:'windforce',    name:"Windforce",                slot:'weapon', tier:'s',         boss:['baal','diablo'] },
+    { id:'windforce',    name:"Windforce",                slot:'weapon', tier:'s',         noActBoss:true, boss:['baal','diablo','pit','pindle','nihlathak'] },
     { id:'crainte-vomir',name:"Crainte Vomir",            slot:'weapon', tier:'budget',    boss:['mephisto','pindle'] },
     { id:'headstriker',  name:"Headstriker",              slot:'weapon', tier:'budget',    boss:['countess','mephisto'] },
     { id:'blackbog-sharp',name:"Blackbog's Sharp",        slot:'weapon', tier:'budget',    boss:['countess','pindle'] },
@@ -1722,54 +1880,166 @@ tipsFilterBtns.forEach(btn => {
   const BOSSES = [
     { id:'countess',  boss:'countess',
       title:'👑 The Countess — Hell (Forgotten Tower Lvl 5)',
-      sub:'Rune drop specialist. Also drops all low-ilvl uniques (Gull, Manald, Nagelring, Stealskull, etc.). Fast 30s runs.' },
+      sub:'Rune drop specialist. Also drops low-ilvl uniques (Gull, Nagelring, Stealskull, etc.). Fast 30s runs. Pool covers budget/junk uniques.' },
     { id:'andariel',  boss:'nm-anda',
-      title:'👹 Nightmare Andariel — Quest Drop',
-      sub:'THE ONLY reliable Stone of Jordan farm off-Baal. Bugged quest drop has SoJ in its TC.' },
+      title:"👹 Andariel — Hell / Nightmare Quest Drop",
+      sub:"Best for JEWELRY: SoJ, BK, Raven Frost, Mara's, Highlord's, Wisp Projector, Nature's Peace. NM Andariel quest drop is the only reliable off-Baal SoJ farm. Cannot drop Elite orbs/wands/bows/tiara-helms/sacred-armor." },
     { id:'duriel',    boss:'duriel',
       title:'🐛 Duriel — Any Difficulty (Tomb of Tal Rasha)',
-      sub:"Famous for Duriel's Shell. Guaranteed rare/unique on first kill per difficulty." },
+      sub:"Famous for Duriel's Shell. Guaranteed rare/unique on first kill per difficulty. Act 2 quest boss — no Elite base drops." },
     { id:'mephisto',  boss:'mephisto',
       title:'⚡ Mephisto — Hell (Durance of Hate Lvl 3)',
-      sub:'THE MF king. Easiest boss-per-run. Drops nearly every mid-to-high-tier unique.' },
+      sub:"THE MF king (mlvl 87). Rolls most S/Excellent/Solid uniques. Cannot drop TC81/84/87 Elite bases: Death's Fathom, Griffon's, Death's Web, Crown of Ages, Nightwing's, Windforce, Tyrael's, Mang Song's, Grandfather, Eaglehorn." },
     { id:'pindle',    boss:'pindle',
       title:"🧟 Pindleskin — Hell (Nihlathak's Temple)",
-      sub:'1-screen run. Kill within 30 seconds. High density of mid-tier unique drops.' },
+      sub:'1-screen LV86 super-unique. Rolls almost every Elite unique — including Death\'s Fathom, Griffon\'s, Death\'s Web, Nightwing\'s, Crown of Ages, Windforce, Mang Song\'s. Cannot drop qlvl-87 items (Arachnid, Azurewrath, Tyrael\'s).' },
     { id:'nihlathak', boss:'nihlathak',
       title:'❄️ Nihlathak — Hell (Halls of Vaught)',
-      sub:'Corpse Explosion nightmare, but consistently drops Gore Rider / Marrowwalk / Baranar\'s Star.' },
+      sub:'LV86 boss. Same drop pool as Pindle — every Elite unique except qlvl-87 items.' },
     { id:'diablo',    boss:'diablo',
       title:'🔥 Diablo — Hell (Chaos Sanctuary)',
-      sub:"Endgame chase-item boss. Grandfather, Windforce, Griffon's, Doombringer — all high-ilvl uniques." },
+      sub:"LV94. Drops EVERYTHING — Grandfather, Windforce, Griffon's, Doombringer, Death's Fathom, Tyrael's, all runes to Zod." },
     { id:'baal',      boss:'baal',
       title:'👑 Baal — Hell (Throne of Destruction)',
-      sub:'Highest-ilvl boss in the game. Drops every unique. The endgame trophy farm.' },
+      sub:'Highest-ilvl boss (LV99 minions). Drops every item in the game — no restrictions.' },
     { id:'pit',       boss:'pit',
       title:'💀 The Pit / Ancient Tunnels — Hell (Level 85 Areas)',
-      sub:"Rainbow Facets, Death's Web, Death's Fathom, Griffon's Eye. Only true LV85 outdoor zones." },
+      sub:"Champion & Unique packs (mlvl 87) can drop EVERY unique in the game: Death's Fathom, Griffon's, Death's Web, Arachnid, Tyrael's, Azurewrath, Windforce, Crown of Ages, Nightwing's. THE Holy Grail farming area." },
     { id:'cows',      boss:'cows',
       title:'🐄 Cow Level — Hell (Secret Cow Level)',
-      sub:'Insane density. Azurewrath, Bonehew, and bulk rune drops.' },
+      sub:'LV81 zone with insane density. Azurewrath, Bonehew, and bulk rune drops.' },
     { id:'uber',      boss:'uber',
       title:'🔴 Uber Tristram — Pandemonium Event',
       sub:"Diablo Clone & Pandemonium bosses — the ONLY source of Annihilus, Hellfire Torch, and Tyrael's Might." },
   ];
-  const BOSS_CATEGORIES = BOSSES.map(b => ({
-    id:'boss-'+b.id, view:'boss', title:b.title, sub:b.sub,
-    items: ITEMS.filter(i => (i.boss||[]).includes(b.boss)).map(i => i.id)
-  })).filter(c => c.items.length);
+
+  /* Compute per-boss drop pools.
+     REALITY: In Hell, monsters in LV85 zones (Pit, Ancient Tunnels, Worldstone Keep,
+     Throne of Destruction, Chaos Sanctuary, Nihlathak's Temple) can roll almost
+     ANY unique because they meet the qlvl of every non-uber item. So a "true"
+     drop list for those bosses is huge. We build the list by union-ing:
+       1. items explicitly tagged for that boss
+       2. items in that boss's implicit drop pool (based on tier)
+     Uber-exclusive items (Anni / Torch) are excluded from non-uber pools. */
+
+  // Items that ONLY drop from uber tristram
+  const UBER_ONLY = new Set(
+    ITEMS.filter(i => (i.boss||[]).length === 1 && i.boss[0] === 'uber').map(i => i.id)
+  );
+
+  // Item pools indexed by tier (used for LV85+ zone expansion)
+  const POOL_BY_TIER = {
+    s:         ITEMS.filter(i => i.tier === 's'         && !UBER_ONLY.has(i.id)).map(i => i.id),
+    excellent: ITEMS.filter(i => i.tier === 'excellent' && !UBER_ONLY.has(i.id)).map(i => i.id),
+    solid:     ITEMS.filter(i => i.tier === 'solid'     && !UBER_ONLY.has(i.id)).map(i => i.id),
+    budget:    ITEMS.filter(i => i.tier === 'budget'    && !UBER_ONLY.has(i.id)).map(i => i.id),
+    junk:      ITEMS.filter(i => i.tier === 'junk'      && !UBER_ONLY.has(i.id)).map(i => i.id),
+  };
+
+  // What each boss/zone can realistically drop (by tier).
+  // NOTE: Act bosses (Andariel, Duriel, Mephisto) use `[]` — they only show
+  // items explicitly tagged with their boss id. This avoids inventing drops
+  // that the boss's special TC actually excludes. LV85+ zones use tier
+  // expansion because they legitimately roll from the full unique pool
+  // (subject to qlvl gate for qlvl-87 items like Arachnid/Azurewrath/Tyrael's).
+  const BOSS_TIER_POOL = {
+    countess:  ['budget','junk'],           // low-ilvl niche + explicit tags
+    'nm-anda': [],                          // explicit tags only (act boss TC)
+    duriel:    [],                          // explicit tags only (act boss TC)
+    mephisto:  [],                          // explicit tags only (act boss TC)
+    pindle:    ['s','excellent','solid'],   // LV86 super-unique — real drop pool
+    nihlathak: ['s','excellent','solid'],   // LV86 boss — real drop pool
+    diablo:    ['s','excellent','solid'],   // LV94 — everything
+    baal:      ['s','excellent','solid'],   // LV99 — everything
+    pit:       ['s','excellent','solid'],   // LV85 zone — everything via champions
+    cows:      ['excellent','solid'],       // Hell cows LV81 — mid-tier
+    uber:      [],                          // explicit-tagged only
+  };
+
+  /* Boss / area monster level. Used to gate qlvl-locked drops.
+     For a unique to drop, monster ilvl (= mlvl) must be >= unique's qlvl.
+     e.g. Arachnid Mesh (qlvl 87) doesn't drop from Pindle (mlvl 86). */
+  const BOSS_MLVL = {
+    countess:  74,
+    'nm-anda': 86,   // Hell Andariel + quest-drop bug
+    duriel:    83,
+    mephisto:  87,
+    pindle:    86,
+    nihlathak: 86,
+    diablo:    94,
+    baal:      99,
+    pit:       87,   // area lvl 85 + champion/unique mlvl bonus
+    cows:      81,
+    uber:      110,
+  };
+
+  /* Act bosses (Andariel, Duriel, Mephisto) use a special "boss" treasure
+     class that excludes certain Elite bases (Tiara, Corona, Spired Helm,
+     Dimensional Shard, Lich Wand, Hydra/Crusader Bow, Sacred Armor, Elder Staff,
+     Colossus Blade). Items flagged `noActBoss:true` are filtered out of these
+     bosses' tier-expanded pools. */
+  const ACT_BOSSES = new Set(['mephisto','nm-anda','duriel']);
+
+  const BOSS_CATEGORIES = BOSSES.map(b => {
+    const explicit = ITEMS.filter(i => (i.boss||[]).includes(b.boss)).map(i => i.id);
+    const isActBoss = ACT_BOSSES.has(b.boss);
+    // Tier expansion — apply act-boss TC filter
+    const tierPool = (BOSS_TIER_POOL[b.boss] || [])
+      .flatMap(t => POOL_BY_TIER[t] || [])
+      .filter(id => {
+        const it = ITEM_BY_ID[id];
+        if (isActBoss && it.noActBoss) return false;
+        return true;
+      });
+    const merged   = Array.from(new Set([...explicit, ...tierPool]));
+    // For non-uber bosses, keep uber-exclusive items out of the general pool
+    let cleaned   = b.boss === 'uber' ? merged : merged.filter(id => !UBER_ONLY.has(id));
+    // Enforce qlvl: item.qlvl must be <= boss mlvl
+    const mlvl = BOSS_MLVL[b.boss] ?? 99;
+    cleaned = cleaned.filter(id => {
+      const q = ITEM_BY_ID[id].qlvl;
+      return q == null || q <= mlvl;
+    });
+    // Sort by tier priority so best items appear first
+    const TIER_ORDER = { s:0, excellent:1, solid:2, budget:3, junk:4 };
+    cleaned.sort((a, bId) => {
+      const ta = TIER_ORDER[ITEM_BY_ID[a].tier] ?? 9;
+      const tb = TIER_ORDER[ITEM_BY_ID[bId].tier] ?? 9;
+      if (ta !== tb) return ta - tb;
+      return ITEM_BY_ID[a].name.localeCompare(ITEM_BY_ID[bId].name);
+    });
+    return { id:'boss-'+b.id, view:'boss', title:b.title, sub:b.sub, items: cleaned };
+  }).filter(c => c.items.length);
 
   // View: Routes (farming wishlists)
   const ROUTE_CATEGORIES = [
     { id:'route-meph', view:'route', title:'🎯 Hell Mephisto Run ⭐⭐⭐⭐⭐',
       sub:'Fastest single-boss MF loop. Still owes you these prizes:',
       items: ['mara','sandstorm','andariels','draculs','vgaze','reapers','raven-frost','tal-belt','tal-ammy','nightwings','lidless','oculus','wizardspike','skullders','shaftstop'] },
-    { id:'route-nma',  view:'route', title:'🎯 Nightmare Andariel — SoJ Hunt ⭐⭐⭐⭐⭐',
-      sub:'The exclusive Stone of Jordan farm — nowhere else outside Baal.',
-      items: ['soj'] },
+    { id:'route-nma',  view:'route', title:'🎯 Andariel — Jewelry & SoJ Hunt ⭐⭐⭐⭐⭐',
+      sub:'NM Andariel bugged quest drop = only reliable SoJ farm off-Baal. Hell Andariel great for rings/amulets/gloves.',
+      items: ['soj','bul-kathos','raven-frost','nature-peace','dwarf-star','wisp','mara','highlords','tal-ammy','magefist','war-trav'] },
+    { id:'route-meph2',view:'route', title:'🎯 Hell Mephisto — Meph-Safe Items ⭐⭐⭐⭐⭐',
+      sub:'Meph CANNOT drop Elite-TC items (Fathom, Griffon\'s, Death\'s Web, Crown of Ages, Nightwing\'s, Windforce, Tyrael\'s, Mang Song\'s, Grandfather, Eaglehorn). Focus on these instead:',
+      items: ['shako','kira','arachnid','mara','highlords','bul-kathos','soj','herald','stormshield','oculus','eschutas','reapers','titans','andariels','vgaze','draculs','tal-armor','tal-ammy','skullders','shaftstop','ormus','vipermagi','sandstorm','war-trav','azurewrath','lidless','wizardspike','nature-peace'] },
     { id:'route-at',   view:'route', title:'🎯 Ancient Tunnels / Pit ⭐⭐⭐⭐⭐',
-      sub:'True level-85 area. All facets + top-tier caster gear.',
-      items: ['deaths-fathom','griffons','deaths-web','tyraels','facet-cold','facet-fire','facet-light','facet-poison'] },
+      sub:'True level-85 zones — can roll every non-uber unique (including Death\'s Fathom, Grandfather, Windforce). Top targets:',
+      items: [
+        // S-tier chase items
+        'shako','kira','nightwings','griffons','crown-ages',
+        'tyraels','arachnid','mara','soj','bul-kathos',
+        'deaths-fathom','deaths-web','windforce','grandfather','eaglehorn','mang-songs','titans',
+        'facet-cold','facet-fire','facet-light','facet-poison',
+        // Excellent-tier
+        'andariels','vgaze','shaftstop','duriels','skullders','gladiators','ormus','arkaine','tal-armor',
+        'stormshield','lidless','herald',
+        'verdungos','tgods','tal-belt','war-trav','sandstorm','gore-rider',
+        'draculs','steelrend','raven-frost','wisp',
+        'highlords','metalgrid','tal-ammy',
+        'eschutas','tal-orb','boneshade','astreons',
+        'thunderstroke','bartucs','doombringer','azurewrath','lightsabre',
+        'reapers','wizardspike','earthshifter','schaefers'
+      ] },
     { id:'route-baal', view:'route', title:'🎯 Baal / Worldstone Keep ⭐⭐⭐⭐⭐',
       sub:'End-game trophy hunting — every rare unique.',
       items: ['crown-ages','mang-songs','tyraels','windforce','deaths-fathom','griffons','grandfather','doombringer','arreats','wolfhowl','earthshifter','schaefers'] },
@@ -1949,5 +2219,3346 @@ tipsFilterBtns.forEach(btn => {
 
   updateProgress();
 })();
+
+/* ═══════════════════════════════════════════════════════════════
+   D2 Interactive Build Viewer — paperdoll + slot-click modal
+   ═══════════════════════════════════════════════════════════════ */
+(function () {
+  const viewer = document.getElementById('d2-viewer');
+  if (!viewer) return;
+
+  // Build database. Each build has character metadata + per-slot BiS data.
+  // quality: 'unique' | 'set' | 'magic' | 'rare' | 'runeword' | 'crafted' | 'normal'
+  const BUILDS = {
+    smiter: {
+      name: 'SMITER',
+      label: 'Smiter',
+      className: 'PALADIN',
+      class: 'paladin',
+      tier: 'S',
+      stars: 5,
+      role: 'Uber Killer',
+      content: 'Endgame',
+      damage: 'Skill-based (Smite)',
+      aura: 'FANATICISM',
+      defense: '11,017',
+      stats: { str: '156', dex: '136', vit: '407', energy: '35',
+               life: '3324 / 3333', mana: '142 / 369', stamina: '987 / 987' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 All Attrs · +10–20 All Res · +5–10% Exp' },
+        { name: 'Hellfire Torch (Pal)',   quality: 'unique', stats: '+3 Paladin Skills · +10 All Attrs · +10–20 All Res' },
+        { name: 'Combat Skiller GC ×4–6', quality: 'magic',  stats: '+1 Paladin Combat Skills — stacks Holy Shield levels & block' },
+        { name: 'Small Charms (fillers)', quality: 'magic',  stats: '20 Life / 5+ All Res / +3 Max Dmg / FHR — cap resists & fill life' }
+      ],
+      skills: [
+        { name: 'Smite',           lvl: 20, tree: 'Combat',           tier: 'max' },
+        { name: 'Holy Shield',     lvl: 20, tree: 'Combat',           tier: 'max' },
+        { name: 'Fanaticism',      lvl: 20, tree: 'Offensive Auras',  tier: 'max' },
+        { name: 'Salvation',       lvl: 20, tree: 'Defensive Auras',  tier: 'max' },
+        { name: 'Charge',          lvl: 1,  tree: 'Combat',           tier: 'high' },
+        { name: 'Zeal',            lvl: 1,  tree: 'Combat',           tier: 'high' },
+        { name: 'Blessed Hammer',  lvl: 1,  tree: 'Combat',           tier: 'high' },
+        { name: 'Redemption',      lvl: 1,  tree: 'Defensive Auras',  tier: 'high' },
+        { name: 'Might',           lvl: 1,  tree: 'Offensive Auras',  tier: 'prereq' },
+        { name: 'Vigor',           lvl: 1,  tree: 'Offensive Auras',  tier: 'prereq' },
+        { name: 'Prayer',          lvl: 1,  tree: 'Defensive Auras',  tier: 'prereq' },
+        { name: 'Cleansing',       lvl: 1,  tree: 'Defensive Auras',  tier: 'prereq' },
+        { name: 'Defiance',        lvl: 1,  tree: 'Defensive Auras',  tier: 'prereq' }
+      ],
+      slots: {
+        helm: {
+          name: "Guillaume's Face", base: 'Winged Helm', quality: 'unique', icon: '⛑',
+          stats: [
+            '+120–150% Enhanced Damage',
+            '35% Chance of Crushing Blow',
+            '15% Deadly Strike',
+            '+15 to Strength',
+            '+15% Increased Attack Speed'
+          ],
+          sockets: '1os via Larzuk — socket with Ber (DR) or 15% IAS Jewel',
+          alts: [
+            "Andariel's Visage — Venom aura + 20% IAS, huge tank stats",
+            "Arreat's Face — for a Barb-hybrid Smiter (skills + IAS)"
+          ]
+        },
+        weapon: {
+          name: 'Grief', base: 'Phase Blade (5 sockets) — Runeword', quality: 'runeword', icon: '🗡',
+          stats: [
+            'Eth · Tir · Lo · Mal · Ral',
+            '35% Chance to Cast Level 15 Venom on Striking',
+            '+30–40% Increased Attack Speed',
+            'Damage +340–400',
+            'Ignore Target\'s Defense',
+            '-25% Target Defense',
+            '+(1.875 per Character Level) 1.875–185 Attack Rating'
+          ],
+          sockets: '5os Phase Blade base (indestructible, ultra-fast attack speed breakpoints)',
+          alts: [
+            "Astreon's Iron Ward — unique Caduceus, +1 all skills, huge FCR (aura swap)",
+            "Last Wish — for Life Tap + Might aura synergy"
+          ]
+        },
+        shield: {
+          name: 'Herald of Zakarum', base: 'Gilded Shield', quality: 'unique', icon: '⛨',
+          stats: [
+            '+2 to Paladin Skill Levels',
+            '+20 to Strength & Vitality',
+            '+195% Enhanced Defense',
+            'All Resistances +50',
+            '+150% Damage vs Undead & Demons',
+            '+2 to Combat Skills (Paladin only)'
+          ],
+          sockets: '1os via Larzuk — socket with Um (all-res) or 15% IAS Jewel',
+          alts: [
+            "Exile Runeword — 4os Vortex Shield, Life Tap aura + Defiance",
+            "Spirit — cheap FCR option for Auradin hybrids"
+          ]
+        },
+        armor: {
+          name: 'Enigma', base: 'Mage Plate / Archon Plate (3os) — Runeword', quality: 'runeword', icon: '🛡',
+          stats: [
+            'Jah · Ith · Ber',
+            '+2 to All Skills',
+            '+45% Faster Run/Walk',
+            '+750–775 Defense',
+            '+(0.75 per Character Level) 0.75–74 to Strength',
+            'Increase Maximum Life 5%',
+            'Damage Reduction 8%',
+            'Level 1 Teleport (as skill)'
+          ],
+          sockets: '3os body armor (Mage Plate for low-str, Archon Plate for higher def)',
+          alts: [
+            "Fortitude — massive +300% ED and life boost if you can't afford Enigma",
+            "Chains of Honor — +2 skills, +65 res, huge DR"
+          ]
+        },
+        gloves: {
+          name: "Dracul's Grasp", base: 'Vampirebone Gloves', quality: 'unique', icon: '🧤',
+          stats: [
+            '25% Chance of Open Wounds',
+            '7–10% Life Stolen per Hit',
+            '5% Chance to Cast Level 10 Life Tap on Striking',
+            '+10–15 to Strength',
+            '+50 Poison Damage over 4 Seconds'
+          ],
+          sockets: '0os — cannot be socketed (gloves aren\'t socketable)',
+          alts: [
+            "Steelrend — pure damage/CB alternative (no Life Tap proc)",
+            "Trang-Oul's Claws — for Poisonmancer merc swap only"
+          ]
+        },
+        belt: {
+          name: "Verdungo's Hearty Cord", base: 'Mithril Coil', quality: 'unique', icon: '▬',
+          stats: [
+            '+30–40 to Vitality',
+            '10–15% Damage Reduction',
+            '+100–120 to Life',
+            '+10% Faster Hit Recovery',
+            'Replenish Life +10–13'
+          ],
+          sockets: '0os — belts cannot be socketed',
+          alts: [
+            "Thundergod's Vigor — for +20 max lightning res on lightning ubers",
+            "Arachnid Mesh — only if you're an Auradin caster hybrid"
+          ]
+        },
+        boots: {
+          name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+          stats: [
+            '+160–200% Enhanced Defense',
+            '15% Chance of Deadly Strike',
+            '10% Chance of Open Wounds',
+            '15% Chance of Crushing Blow',
+            '+20% Faster Run/Walk',
+            'Requirements -50%'
+          ],
+          sockets: '0os — boots cannot be socketed',
+          alts: [
+            "Sandstorm Trek — MF/farming variant (poison res + stamina)",
+            "War Traveler — MF Smiter for chaos runs"
+          ]
+        },
+        amulet: {
+          name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+          stats: [
+            '+1 to All Skills',
+            'Deadly Strike +% per Character Level (up to +37% at lvl 99)',
+            '+20% Increased Attack Speed',
+            'Lightning Resistance +35%',
+            '+1 to Light Radius'
+          ],
+          sockets: '0os — amulets cannot be socketed',
+          alts: [
+            "Mara's Kaleidoscope — +2 skills, +20–30 all resistances (safer)",
+            "Metalgrid — huge +AR and all-res if you need to hit"
+          ]
+        },
+        ring1: {
+          name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+          stats: [
+            '+150–250 to Attack Rating',
+            'Adds 15–45 Cold Damage',
+            '+15–20 to Dexterity',
+            '+40 Mana',
+            'Cold Absorb 20%',
+            'Cannot Be Frozen'
+          ],
+          sockets: '0os — rings cannot be socketed',
+          alts: [
+            "Bul-Kathos' Wedding Band — +1 skills, +life (BiS 2nd slot)",
+            "Rare AR/leech/resist ring (Stone of Jordan alt)"
+          ]
+        },
+        ring2: {
+          name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+          stats: [
+            '+1 to All Skills',
+            '+50 to Life (+0.5 per level)',
+            '3–5% Life Stolen per Hit',
+            '+15–20 to Strength'
+          ],
+          sockets: '0os — rings cannot be socketed',
+          alts: [
+            "Stone of Jordan — +1 skills + huge mana (mana-hungry variants)",
+            "Rare Dual Leech ring — LL+ML with resists for defense"
+          ]
+        },
+        merc: {
+          name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+          stats: [
+            'Weapon: Insight → Reaper\'s Toll (Decrepify proc + IAS)',
+            'Armor: Fortitude Runeword (+300% ED, +200% ED aura, huge life)',
+            'Helm: Andariel\'s Visage (Venom + IAS + huge stats)',
+            '',
+            '► Reaper\'s Decrepify halves boss physical resist & slows attack speed',
+            '► Andariel\'s Venom stacks with your Grief for extra poison damage'
+          ],
+          sockets: 'Reaper\'s = 0os (unique fixed) • Fortitude = 4os body (El+Sol+Dol+Lo) • Andy\'s = 1os via Larzuk (Ber or Cham)',
+          alts: [
+            "Pride Runeword polearm — Concentration aura for FoH swap builds",
+            "Infinity polearm — for Auradin hybrids running Conviction"
+          ]
+        }
+      }
+    },
+
+    /* ═════════════ AMAZON ═════════════ */
+    javazon: {
+      name: 'JAVAZON', label: 'Javazon',
+      className: 'AMAZON', class: 'amazon',
+      tier: 'S', stars: 5,
+      role: 'Lightning Cows', content: 'MF / Farming',
+      damage: 'Charged Strike / Lightning Fury',
+      aura: 'VALKYRIE',
+      defense: '4,200',
+      stats: { str: '156', dex: '340', vit: '250', energy: '20',
+               life: '2,450 / 2,450', mana: '180 / 240', stamina: '650 / 650' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 All Attrs · +10–20 All Res · +5–10% Exp' },
+        { name: 'Hellfire Torch (Ama)',   quality: 'unique', stats: '+3 Amazon Skills · +10 All Attrs · +10–20 All Res' },
+        { name: 'Java Skiller GC ×4–6',   quality: 'magic',  stats: '+1 Javelin & Spear Skills — boosts Fury/CS/LB' },
+        { name: 'Small Charms (fillers)', quality: 'magic',  stats: '20 Life / 5+ All Res / +3 Max Dmg — cap resists' }
+      ],
+      skills: [
+        { name: 'Lightning Fury',   lvl: 20, tree: 'Javelin & Spear', tier: 'max' },
+        { name: 'Charged Strike',   lvl: 20, tree: 'Javelin & Spear', tier: 'max' },
+        { name: 'Lightning Bolt',   lvl: 20, tree: 'Javelin & Spear', tier: 'max' },
+        { name: 'Power Strike',     lvl: 20, tree: 'Javelin & Spear', tier: 'max' },
+        { name: 'Valkyrie',         lvl: 1,  tree: 'Passive & Magic', tier: 'high' },
+        { name: 'Decoy',            lvl: 1,  tree: 'Passive & Magic', tier: 'high' },
+        { name: 'Pierce',           lvl: 1,  tree: 'Passive & Magic', tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Griffon's Eye", base: 'Diadem', quality: 'unique', icon: '⛑',
+                  stats: ['+1 All Skills','-15–20% to Enemy Lightning Res','+10–15% Lightning Skill Damage'],
+                  sockets: '1os via Larzuk — Ist (MF) or 15% IAS Jewel',
+                  alts: ["Andariel's Visage — +2 skills, 20% IAS, venom"] },
+        weapon: { name: "Titan's Revenge", base: 'Ceremonial Javelin', quality: 'unique', icon: '🗡',
+                  stats: ['+2 Amazon Skills','Replenishes Javelins','+180–200% ED','+30–40 Strength'],
+                  alts: ["Thunderstroke — +2 Light Skills, huge lightning damage"] },
+        shield: { name: 'Stormshield', base: 'Monarch', quality: 'unique', icon: '⛨',
+                  stats: ['35% Damage Reduction','25% Chance to Block','+30 Strength'],
+                  alts: ['Spirit Monarch — for FCR/caster hybrid builds'] },
+        armor:  { name: 'Enigma', base: 'Mage Plate 3os — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Jah · Ith · Ber','+2 All Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Chains of Honor — 65 all res + DR','Fortitude — +300% ED'] },
+        gloves: { name: 'Bloodfist', base: 'Heavy Gloves', quality: 'unique', icon: '🧤',
+                  stats: ['+40 Life','10% IAS','+5–10 Minimum Damage'],
+                  alts: ["Trang-Oul's Claws — 20% FCR + +2 Curses"] },
+        belt:   { name: 'Razortail', base: 'Sharkskin Belt', quality: 'unique', icon: '▬',
+                  stats: ['+15% Piercing Attack','+15 Dexterity','+40–50 Max Damage'],
+                  alts: ["Verdungo's Hearty Cord — +100–120 Life, DR"] },
+        boots:  { name: 'War Traveler', base: 'Battle Boots', quality: 'unique', icon: '👢',
+                  stats: ['25% Better Magic Find','+10 Vitality','+15% ED'],
+                  alts: ['Gore Rider — 15% CB / 10% DS for CS strikes'] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 All Skills','+Deadly Strike per Char Level','20% IAS'],
+                  alts: ["Mara's Kaleidoscope — +2 skills, +20–30 All Res"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['Cannot Be Frozen','+15–20 Dexterity','+150–250 AR'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 All Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity (Cryptic Axe) — Conviction aura','Fortitude Archon Plate','Andariel\'s Visage'],
+                  alts: ["Reaper's Toll polearm — Decrepify on strike"] }
+      }
+    },
+
+    freezingArrow: {
+      name: 'FREEZING ARROW', label: 'Freezing Arrow',
+      className: 'AMAZON', class: 'amazon',
+      tier: 'A', stars: 4,
+      role: 'Cold Bow', content: 'MF / Farming',
+      damage: 'Freezing Arrow (Cold AoE)',
+      aura: 'MEDITATION (Merc)',
+      defense: '2,800',
+      stats: { str: '95', dex: '280', vit: '180', energy: '25',
+               life: '1,700 / 1,700', mana: '220 / 260', stamina: '540 / 540' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 All Attrs · +10–20 All Res' },
+        { name: 'Hellfire Torch (Ama)',   quality: 'unique', stats: '+3 Amazon Skills · +10 All Attrs' },
+        { name: 'Bow Skiller GC ×4–6',    quality: 'magic',  stats: '+1 Bow & Crossbow Skills — stacks FA damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ All Res / +3 Max Dmg' }
+      ],
+      skills: [
+        { name: 'Freezing Arrow',   lvl: 20, tree: 'Bow & Crossbow',  tier: 'max' },
+        { name: 'Ice Arrow',        lvl: 20, tree: 'Bow & Crossbow',  tier: 'max' },
+        { name: 'Cold Arrow',       lvl: 20, tree: 'Bow & Crossbow',  tier: 'max' },
+        { name: 'Penetrate',        lvl: 20, tree: 'Passive & Magic', tier: 'max' },
+        { name: 'Critical Strike',  lvl: 1,  tree: 'Passive & Magic', tier: 'prereq' },
+        { name: 'Valkyrie',         lvl: 1,  tree: 'Passive & Magic', tier: 'high' },
+        { name: 'Decoy',            lvl: 1,  tree: 'Passive & Magic', tier: 'high' },
+        { name: 'Pierce',           lvl: 1,  tree: 'Passive & Magic', tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Andariel's Visage", base: 'Demonhead', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','20% IAS','+8–10 Life Steal','Level 15 Venom when equipped'],
+                  sockets: '1os via Larzuk — 15% IAS Jewel or Ral (fire res patch)',
+                  alts: ["Griffon's Eye — swap for lightning bow hybrids"] },
+        weapon: { name: 'Faith', base: 'Grand Matron Bow 4os — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Ohm · Jah · Lem · Eld','Level 12–15 Fanaticism Aura','+1–2 All Skills','+330% ED'],
+                  alts: ['Windforce — physical dmg + KB','Ice Bow (rare) for cold-only'] },
+        shield: { name: '(No Shield — Bow build)', base: '2-Handed Weapon', quality: 'normal', icon: '⛨',
+                  stats: ['Bowazons wield bows two-handed — shield slot unused'],
+                  alts: ['Some hybrids swap to Stormshield for tanking'] },
+        armor:  { name: 'Fortitude', base: 'Archon Plate 4os — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['El · Sol · Dol · Lo','+300% Enhanced Damage','+200% ED (armor)','+8% FCR'],
+                  alts: ['Enigma — teleport mobility','Treachery — 25% IAS + Fade'] },
+        gloves: { name: 'Laying of Hands', base: 'Bramble Mitts', quality: 'set', icon: '🧤',
+                  stats: ['20% IAS','+350% Damage to Demons','+50% Fire Resist'],
+                  alts: ["Bloodfist — +40 Life + 10% IAS"] },
+        belt:   { name: 'Razortail', base: 'Sharkskin Belt', quality: 'unique', icon: '▬',
+                  stats: ['+15% Piercing Attack','+15 Dexterity','+40–50 Max Damage'],
+                  alts: ['Goldwrap — 10% IAS + gold find for MF runs'] },
+        boots:  { name: 'War Traveler', base: 'Battle Boots', quality: 'unique', icon: '👢',
+                  stats: ['25% Better Magic Find','+10 Vitality','+15% ED'],
+                  alts: ['Sandstorm Trek — poison res + str/vit'] },
+        amulet: { name: "Cat's Eye", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+25 Defense','+30 Dexterity','20% IAS','30% FRW'],
+                  alts: ["Highlord's Wrath — +1 skills + DS"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['Cannot Be Frozen','+15–20 Dexterity','+150–250 AR'] },
+        ring2:  { name: 'Nagelring', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+15–30% Magic Find','+50 Attack Rating'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might — boosts merc physical damage','Insight polearm — Meditation aura for merc mana','Fortitude Archon Plate — huge merc life & damage','Andariel’s Visage — Venom + 20% IAS'],
+                  alts: ['Infinity Cryptic Axe — Conviction aura breaks Immunes (endgame)','Reaper’s Toll — procs Decrepify on hit'] }
+      }
+    },
+
+    multishot: {
+      name: 'MULTISHOT', label: 'Multishot',
+      className: 'AMAZON', class: 'amazon',
+      tier: 'B', stars: 3,
+      role: 'Physical Bow', content: 'General',
+      damage: 'Multishot / Guided Arrow',
+      aura: 'FANATICISM (Faith)',
+      defense: '3,100',
+      stats: { str: '95', dex: '310', vit: '200', energy: '15',
+               life: '1,900 / 1,900', mana: '140 / 180', stamina: '620 / 620' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 All Attrs · +10–20 All Res' },
+        { name: 'Hellfire Torch (Ama)',   quality: 'unique', stats: '+3 Amazon Skills · +10 All Attrs' },
+        { name: 'Bow Skiller GC ×4–6',    quality: 'magic',  stats: '+1 Bow & Crossbow — Multishot boost' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / +max dmg / res' }
+      ],
+      skills: [
+        { name: 'Multishot',        lvl: 20, tree: 'Bow & Crossbow',  tier: 'max' },
+        { name: 'Guided Arrow',     lvl: 20, tree: 'Bow & Crossbow',  tier: 'max' },
+        { name: 'Strafe',           lvl: 20, tree: 'Bow & Crossbow',  tier: 'max' },
+        { name: 'Critical Strike',  lvl: 20, tree: 'Passive & Magic', tier: 'max' },
+        { name: 'Penetrate',        lvl: 1,  tree: 'Passive & Magic', tier: 'high' },
+        { name: 'Pierce',           lvl: 1,  tree: 'Passive & Magic', tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Andariel's Visage", base: 'Demonhead', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','20% IAS','Venom proc'],
+                  sockets: '1os via Larzuk — 15% IAS Jewel',
+                  alts: ['+2 Bow Skills Circlet with sockets'] },
+        weapon: { name: 'Faith', base: 'Grand Matron Bow — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Ohm · Jah · Lem · Eld','Fanaticism Aura (dmg + IAS)','+330% ED'],
+                  alts: ['Windforce — KB','Eaglehorn — +1 skills, huge AR'] },
+        shield: { name: '(No Shield — 2H Bow)', base: '2-Handed Weapon', quality: 'normal', icon: '⛨',
+                  stats: ['Bows are 2-handed — no shield'],
+                  alts: [] },
+        armor:  { name: 'Fortitude', base: 'Archon Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+300% ED','+200% ED (armor)','+8% FCR'],
+                  alts: ['Enigma for teleport','Treachery for IAS+Fade'] },
+        gloves: { name: 'Laying of Hands', base: 'Bramble Mitts', quality: 'set', icon: '🧤',
+                  stats: ['20% IAS','+350% Damage to Demons'],
+                  alts: ["Dracul's Grasp — Life Tap on striking"] },
+        belt:   { name: 'Razortail', base: 'Sharkskin Belt', quality: 'unique', icon: '▬',
+                  stats: ['+15% Piercing Attack','+15 Dex','+40–50 Max Dmg'],
+                  alts: ["Nosferatu's Coil — 10% IAS + Life Leech"] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% Crushing Blow','10% Deadly Strike','15% Open Wounds'],
+                  alts: ['War Traveler — 25% MF'] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 All Skills','+DS per Char Level','20% IAS'],
+                  alts: ["Cat's Eye — 20% IAS + 30 Dex"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['Cannot Be Frozen','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: 'Rare Dex Ring', base: 'Ring', quality: 'rare', icon: '◯',
+                  stats: ['+10–15 Dexterity','+70+ AR','+Life/Res'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might — boosts your bow & merc damage','Insight polearm — Meditation aura for merc mana','Fortitude Archon Plate — huge merc life & damage','Andariel’s Visage — Venom + 20% IAS'],
+                  alts: ['Infinity Cryptic Axe — Conviction aura breaks Immunes (endgame)','Reaper’s Toll — procs Decrepify on hit'] }
+      }
+    },
+
+    budgetJavazon: {
+      name: 'BUDGET JAVAZON', label: 'Budget Javazon',
+      className: 'AMAZON', class: 'amazon',
+      tier: 'B', stars: 3,
+      role: 'Starter', content: 'Leveling',
+      damage: 'Charged Strike / Lightning Fury',
+      aura: 'VALKYRIE',
+      defense: '1,800',
+      stats: { str: '90', dex: '200', vit: '150', energy: '15',
+               life: '1,200 / 1,200', mana: '120 / 150', stamina: '480 / 480' },
+      charms: [
+        { name: 'Java Skiller GC ×1–3',   quality: 'magic',  stats: '+1 Javelin & Spear — save these for later!' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5 All Res / +max dmg — cap resists first' },
+        { name: 'Gheed\'s Fortune',       quality: 'unique', stats: 'Optional — +MF, +Gold, vendor discount' }
+      ],
+      skills: [
+        { name: 'Charged Strike',   lvl: 20, tree: 'Javelin & Spear', tier: 'max' },
+        { name: 'Lightning Fury',   lvl: 20, tree: 'Javelin & Spear', tier: 'max' },
+        { name: 'Power Strike',     lvl: 20, tree: 'Javelin & Spear', tier: 'high' },
+        { name: 'Lightning Bolt',   lvl: 20, tree: 'Javelin & Spear', tier: 'high' },
+        { name: 'Valkyrie',         lvl: 1,  tree: 'Passive & Magic', tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Tal Rasha's Horadric Crest", base: 'Death Mask', quality: 'set', icon: '⛑',
+                  stats: ['+2 All Skills (with set)','+30 Mana','+45 Life','+15% All Res'],
+                  alts: ['Peasant Crown — +1 skills, cheap'] },
+        weapon: { name: "Titan's Revenge", base: 'Ceremonial Javelin', quality: 'unique', icon: '🗡',
+                  stats: ['+2 Ama Skills','Replenishes Javelins','+180–200% ED'],
+                  alts: ['Stormstrike — +2 Light Skills, budget alt'] },
+        shield: { name: "Ancient's Pledge", base: 'Kite Shield 3os — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Ral · Ort · Tal','+50% All Res','+50% ED'],
+                  alts: ['Rhyme (Shael+Eth) — CBF + MF'] },
+        armor:  { name: 'Skin of the Vipermagi', base: 'Serpentskin Armor', quality: 'unique', icon: '🛡',
+                  stats: ['+1 All Skills','+30% FCR','+20–35 All Res'],
+                  alts: ['Smoke Runeword — 50 all res + FRW'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire Skills','20% FCR','25% Mana Regen'],
+                  alts: ['Rare +2 Amazon gloves'] },
+        belt:   { name: 'String of Ears', base: 'Demonhide Sash', quality: 'unique', icon: '▬',
+                  stats: ['15% Damage Reduction','+150 AR','6–8% Life Steal'],
+                  alts: ['Razortail — Piercing Attack'] },
+        boots:  { name: 'Goblin Toe', base: 'Light Plated Boots', quality: 'unique', icon: '👢',
+                  stats: ['25% Crushing Blow','+15 Def','+1 Life per Level'],
+                  alts: ['Waterwalk — +40 Dex + Life'] },
+        amulet: { name: 'Rare +2 Javelin & Spear', base: 'Amulet', quality: 'rare', icon: '📿',
+                  stats: ['+2 Javelin & Spear','+Life/Res/FRW','+Attributes'],
+                  alts: ["Highlord's Wrath — if you can afford"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['Cannot Be Frozen','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: 'Rare Life/Res Ring', base: 'Ring', quality: 'rare', icon: '◯',
+                  stats: ['+40+ Life','+15%+ Res','+AR/Stats'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Insight polearm — Meditation for mana','Treachery Dusk Shroud','Any 3os helm'],
+                  alts: [] }
+      }
+    },
+
+    strafeazon: {
+      name: 'STRAFEAZON', label: 'Strafeazon',
+      className: 'AMAZON', class: 'amazon',
+      tier: 'A', stars: 4,
+      role: 'Physical Bow', content: 'Boss Killer',
+      damage: 'Strafe / Guided Arrow',
+      aura: 'FANATICISM (Faith)',
+      defense: '3,000',
+      stats: { str: '95', dex: '320', vit: '200', energy: '15',
+               life: '1,850 / 1,850', mana: '130 / 170', stamina: '620 / 620' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Ama)',   quality: 'unique', stats: '+3 Amazon Skills · +Stats · +Res' },
+        { name: 'Bow Skiller GC ×4–6',    quality: 'magic',  stats: '+1 Bow & Crossbow — Strafe damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5 Res / +3 Max Dmg' }
+      ],
+      skills: [
+        { name: 'Strafe',           lvl: 20, tree: 'Bow & Crossbow',  tier: 'max' },
+        { name: 'Guided Arrow',     lvl: 20, tree: 'Bow & Crossbow',  tier: 'max' },
+        { name: 'Multishot',        lvl: 20, tree: 'Bow & Crossbow',  tier: 'max' },
+        { name: 'Critical Strike',  lvl: 20, tree: 'Passive & Magic', tier: 'max' },
+        { name: 'Penetrate',        lvl: 1,  tree: 'Passive & Magic', tier: 'high' },
+        { name: 'Valkyrie',         lvl: 1,  tree: 'Passive & Magic', tier: 'high' },
+        { name: 'Pierce',           lvl: 1,  tree: 'Passive & Magic', tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Andariel's Visage", base: 'Demonhead', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','20% IAS','Venom proc','+8–10 Life Steal'],
+                  sockets: '1os via Larzuk — 15% IAS Jewel',
+                  alts: ["Griffon's Eye for lightning bow builds"] },
+        weapon: { name: 'Faith', base: 'Grand Matron Bow — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Fanaticism Aura (huge IAS + dmg)','+330% ED','+1–2 All Skills'],
+                  alts: ['Windforce — KB physical bow','Eaglehorn — +1 skills, huge AR'] },
+        shield: { name: '(No Shield — 2H Bow)', base: '2-Handed Weapon', quality: 'normal', icon: '⛨',
+                  stats: ['Bows occupy both hands'], alts: [] },
+        armor:  { name: 'Fortitude', base: 'Archon Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+300% ED','+200% ED (armor)','+8% FCR'],
+                  alts: ['Enigma for teleport mobility'] },
+        gloves: { name: 'Laying of Hands', base: 'Bramble Mitts', quality: 'set', icon: '🧤',
+                  stats: ['20% IAS','+350% Damage to Demons'],
+                  alts: [] },
+        belt:   { name: 'Razortail', base: 'Sharkskin Belt', quality: 'unique', icon: '▬',
+                  stats: ['+15% Piercing Attack','+15 Dex','+40–50 Max Dmg'],
+                  alts: ['String of Ears — 15% DR + Life Leech'] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Char Level','20% IAS'],
+                  alts: ["Cat's Eye for 20% IAS + Dex"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: 'Raven Frost #2 or Rare AR Ring', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['Double Ravens for AR/Dex','or Rare with LL/AR'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction (breaks LI)','Fortitude Archon Plate','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    spearazon: {
+      name: 'SPEARAZON', label: 'Spearazon (Fend/Impale)',
+      className: 'AMAZON', class: 'amazon',
+      tier: 'B', stars: 3,
+      role: 'Melee Amazon', content: 'PvP',
+      damage: 'Fend (multi-hit combo)',
+      aura: 'FANATICISM (merc/Torch)',
+      defense: '4,500',
+      stats: { str: '156', dex: '240', vit: '250', energy: '20',
+               life: '2,300 / 2,300', mana: '150 / 190', stamina: '780 / 780' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 All Attrs' },
+        { name: 'Hellfire Torch (Ama)',   quality: 'unique', stats: '+3 Amazon Skills · +Stats' },
+        { name: 'Java Skiller GC ×4–6',   quality: 'magic',  stats: '+1 Javelin & Spear — Fend damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FHR' }
+      ],
+      skills: [
+        { name: 'Fend',             lvl: 20, tree: 'Javelin & Spear', tier: 'max' },
+        { name: 'Jab',              lvl: 20, tree: 'Javelin & Spear', tier: 'max' },
+        { name: 'Impale',           lvl: 20, tree: 'Javelin & Spear', tier: 'max' },
+        { name: 'Critical Strike',  lvl: 20, tree: 'Passive & Magic', tier: 'max' },
+        { name: 'Penetrate',        lvl: 1,  tree: 'Passive & Magic', tier: 'high' },
+        { name: 'Valkyrie',         lvl: 1,  tree: 'Passive & Magic', tier: 'high' },
+        { name: 'Pierce',           lvl: 1,  tree: 'Passive & Magic', tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Andariel's Visage", base: 'Demonhead', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','20% IAS','Venom proc'],
+                  alts: ["Guillaume's Face — CB/DS/Str"] },
+        weapon: { name: "Lycander's Flank", base: 'Ceremonial Pike', quality: 'unique', icon: '🗡',
+                  stats: ['+2 Amazon Skills','+40 Str/Dex','+220% ED','+180% ED to Demons'],
+                  alts: ['Hone Sundan — CB proc','Ghostflame — fire dmg + Ignore Def'] },
+        shield: { name: '(2H Spear — no shield)', base: '2-Handed Weapon', quality: 'normal', icon: '⛨',
+                  stats: ['Spears require both hands'], alts: [] },
+        armor:  { name: 'Fortitude', base: 'Archon Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+300% ED','+200% ED (armor)','+8% FCR'],
+                  alts: ['Chains of Honor — 65 all res'] },
+        gloves: { name: "Dracul's Grasp", base: 'Vampirebone Gloves', quality: 'unique', icon: '🧤',
+                  stats: ['25% Life Tap on Striking','+10–15 Str','+7–10% Life Leech'],
+                  alts: ['Laying of Hands — 20% IAS + demon dmg'] },
+        belt:   { name: "Verdungo's Hearty Cord", base: 'Mithril Coil', quality: 'unique', icon: '▬',
+                  stats: ['+100–120 Life','+30–40 Vit','10–15% DR'],
+                  alts: ["Thundergod's Vigor — Light Absorb"] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: ["Mara's Kaleidoscope — +2 skills + Res"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 All Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Reaper\'s Toll — Decrepify proc','Treachery — 25% IAS + Fade','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    /* ═════════════ ASSASSIN ═════════════ */
+    trapsin: {
+      name: 'TRAPSIN', label: 'Trapsin',
+      className: 'ASSASSIN', class: 'assassin',
+      tier: 'S', stars: 5,
+      role: 'Lightning Traps', content: 'Endgame',
+      damage: 'Lightning Sentry / Death Sentry',
+      aura: 'FADE',
+      defense: '3,800',
+      stats: { str: '90', dex: '110', vit: '380', energy: '35',
+               life: '3,100 / 3,100', mana: '200 / 240', stamina: '780 / 780' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 All Attrs · +Res' },
+        { name: 'Hellfire Torch (Sin)',   quality: 'unique', stats: '+3 Assassin Skills · +Stats · +Res' },
+        { name: 'Trap Skiller GC ×6–8',   quality: 'magic',  stats: '+1 Traps — stacks LS/DS damage massively' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FHR' }
+      ],
+      skills: [
+        { name: 'Lightning Sentry', lvl: 20, tree: 'Traps',           tier: 'max' },
+        { name: 'Death Sentry',     lvl: 20, tree: 'Traps',           tier: 'max' },
+        { name: 'Shock Web',        lvl: 20, tree: 'Traps',           tier: 'max' },
+        { name: 'Charged Bolt Sen.',lvl: 20, tree: 'Traps',           tier: 'max' },
+        { name: 'Fade',             lvl: 1,  tree: 'Shadow Disc.',    tier: 'high' },
+        { name: 'Shadow Master',    lvl: 1,  tree: 'Shadow Disc.',    tier: 'high' },
+        { name: 'Burst of Speed',   lvl: 1,  tree: 'Shadow Disc.',    tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Griffon's Eye", base: 'Diadem', quality: 'unique', icon: '⛑',
+                  stats: ['+1 All Skills','-15–20% Enemy Light Res','+10–15% Light Skill Dmg'],
+                  sockets: '1os via Larzuk — Ist (MF) or Cham (CBF)',
+                  alts: ['Harlequin Crest (Shako) — +2 skills, +MF'] },
+        weapon: { name: "Bartuc's Cut-Throat", base: 'Greater Talons', quality: 'unique', icon: '🗡',
+                  stats: ['+2 Martial Arts Skills','+1 Assassin Skills','+150–200% ED','30% IAS'],
+                  alts: ['Chaos Runic Talons — Whirlwind + Cold Enchant proc'] },
+        shield: { name: '+3 Lightning Sentry Claw', base: 'Runic Talons', quality: 'magic', icon: '⛨',
+                  stats: ['+3 Lightning Sentry','+3 Death Sentry','+3 Shock Web','+3 Fire Blast'],
+                  alts: ["Bartuc's Cut-Throat — dual Bartuc's for +Skills"] },
+        armor:  { name: 'Enigma', base: 'Mage Plate 3os — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Jah · Ith · Ber','+2 All Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Chains of Honor — 65 all res'] },
+        gloves: { name: "Trang-Oul's Claws", base: 'Heavy Bracers', quality: 'set', icon: '🧤',
+                  stats: ['+2 Necro Curses','20% FCR','+30% Cold Res','+30% Poison Res'],
+                  alts: ['Magefist — +1 Fire, 20% FCR'] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 All Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'War Traveler', base: 'Battle Boots', quality: 'unique', icon: '👢',
+                  stats: ['25% MF','+10 Vit','+15% ED'],
+                  alts: ['Shadow Dancer — +2 Shadow Skills'] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res','+5 All Attrs'],
+                  alts: [] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 All Skills','+20 Mana','+25% Max Mana'] },
+        ring2:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction (breaks LI)','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    kicksin: {
+      name: 'KICKSIN', label: 'Kicksin (Dragon Talon)',
+      className: 'ASSASSIN', class: 'assassin',
+      tier: 'A', stars: 4,
+      role: 'Uber Killer', content: 'Uber Tristram',
+      damage: 'Dragon Talon (Boots dmg)',
+      aura: 'FADE',
+      defense: '4,900',
+      stats: { str: '156', dex: '180', vit: '340', energy: '25',
+               life: '2,900 / 2,900', mana: '160 / 200', stamina: '820 / 820' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Sin)',   quality: 'unique', stats: '+3 Assassin Skills · +Stats · +Res' },
+        { name: 'MA Skiller GC ×4–6',     quality: 'magic',  stats: '+1 Martial Arts — Dragon Talon damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / +max dmg' }
+      ],
+      skills: [
+        { name: 'Dragon Talon',     lvl: 20, tree: 'Martial Arts',    tier: 'max' },
+        { name: 'Dragon Flight',    lvl: 1,  tree: 'Martial Arts',    tier: 'high' },
+        { name: 'Venom',            lvl: 20, tree: 'Shadow Disc.',    tier: 'max' },
+        { name: 'Weapon Block',     lvl: 20, tree: 'Shadow Disc.',    tier: 'max' },
+        { name: 'Fade',             lvl: 20, tree: 'Shadow Disc.',    tier: 'max' },
+        { name: 'Shadow Master',    lvl: 1,  tree: 'Shadow Disc.',    tier: 'high' },
+        { name: 'Burst of Speed',   lvl: 1,  tree: 'Shadow Disc.',    tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Guillaume's Face", base: 'Winged Helm', quality: 'unique', icon: '⛑',
+                  stats: ['35% CB','15% DS','+120% ED','+15 Str'],
+                  sockets: '1os via Larzuk — Ber (DR) or 15% IAS',
+                  alts: ["Andariel's Visage — venom + 20% IAS"] },
+        weapon: { name: 'Chaos', base: 'Runic Talons 3os — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Fal · Ohm · Um','+9 to WW','+240% ED','35% Cold Enchant proc'],
+                  alts: ["Bartuc's Cut-Throat — +2 MA skills"] },
+        shield: { name: "Bartuc's Cut-Throat (Off)", base: 'Greater Talons', quality: 'unique', icon: '⛨',
+                  stats: ['+2 MA Skills','+1 Sin Skills','30% IAS','+150–200% ED'],
+                  alts: ['+3 Dragon Talon Rare Claw'] },
+        armor:  { name: 'Enigma', base: 'Mage Plate 3os — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Fortitude — +300% ED'] },
+        gloves: { name: "Dracul's Grasp", base: 'Vampirebone Gloves', quality: 'unique', icon: '🧤',
+                  stats: ['25% Life Tap on Striking','+10–15 Str','+7–10% LL'],
+                  alts: [] },
+        belt:   { name: "Verdungo's Hearty Cord", base: 'Mithril Coil', quality: 'unique', icon: '▬',
+                  stats: ['+100–120 Life','+30–40 Vit','10–15% DR'],
+                  alts: ["Thundergod's Vigor for light absorb"] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW','+160% ED'],
+                  alts: ['Only Gore Rider for Kicksin — CB/DS'] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: ["Mara's Kaleidoscope"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Reaper\'s Toll — Decrepify proc for Ubers','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    wwsin: {
+      name: 'WHIRLWIND', label: 'Whirlwind',
+      className: 'ASSASSIN', class: 'assassin',
+      tier: 'A', stars: 4,
+      role: 'Whirlwind', content: 'Endgame',
+      damage: 'Whirlwind (from Chaos)',
+      aura: 'FADE',
+      defense: '4,400',
+      stats: { str: '156', dex: '180', vit: '320', energy: '25',
+               life: '2,700 / 2,700', mana: '160 / 200', stamina: '780 / 780' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Sin)',   quality: 'unique', stats: '+3 Sin Skills · +Stats' },
+        { name: 'MA Skiller GC ×4–6',     quality: 'magic',  stats: '+1 Martial Arts — boosts Venom + Weapon Block' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / +max dmg' }
+      ],
+      skills: [
+        { name: 'Whirlwind (Chaos)',lvl: '+9',tree: 'Weapon RW',      tier: 'max' },
+        { name: 'Venom',            lvl: 20, tree: 'Shadow Disc.',    tier: 'max' },
+        { name: 'Weapon Block',     lvl: 20, tree: 'Shadow Disc.',    tier: 'max' },
+        { name: 'Claw Mastery',     lvl: 20, tree: 'Martial Arts',    tier: 'max' },
+        { name: 'Shadow Master',    lvl: 1,  tree: 'Shadow Disc.',    tier: 'high' },
+        { name: 'Fade',             lvl: 1,  tree: 'Shadow Disc.',    tier: 'high' },
+        { name: 'Burst of Speed',   lvl: 1,  tree: 'Shadow Disc.',    tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Guillaume's Face", base: 'Winged Helm', quality: 'unique', icon: '⛑',
+                  stats: ['35% CB','15% DS','+120% ED','+15 Str'],
+                  alts: ["Andariel's Visage — venom + IAS"] },
+        weapon: { name: 'Chaos', base: 'Suwayyah 3os — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Fal · Ohm · Um','+9 to Whirlwind','+240% ED','35% Cold Enchant proc'],
+                  alts: [] },
+        shield: { name: 'Chaos (Off-hand)', base: 'Suwayyah — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Second Chaos claw or','Fury Runic Talons for LL/DS'],
+                  alts: ['Rare +3 WW claw'] },
+        armor:  { name: 'Fortitude', base: 'Archon Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+300% ED','+200% ED (armor)','+8% FCR'],
+                  alts: ['Enigma teleport','Chains of Honor for res'] },
+        gloves: { name: "Dracul's Grasp", base: 'Vampirebone Gloves', quality: 'unique', icon: '🧤',
+                  stats: ['25% Life Tap','+10–15 Str','+7–10% LL'],
+                  alts: [] },
+        belt:   { name: "Verdungo's Hearty Cord", base: 'Mithril Coil', quality: 'unique', icon: '▬',
+                  stats: ['+100–120 Life','+30–40 Vit','10–15% DR'],
+                  alts: ["Nosferatu's Coil — 10% IAS + LL"] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: ["Mara's Kaleidoscope"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might — pairs with your Whirlwind physical damage','Insight polearm — Meditation aura for merc mana','Fortitude Archon Plate — huge merc life & damage','Andariel’s Visage — Venom + 20% IAS'],
+                  alts: ['Infinity Cryptic Axe — Conviction aura breaks Immunes (endgame)','Reaper’s Toll — procs Decrepify on hit'] }
+      }
+    },
+
+    budgetTrapsin: {
+      name: 'BUDGET TRAPSIN', label: 'Budget Trapsin',
+      className: 'ASSASSIN', class: 'assassin',
+      tier: 'B', stars: 3,
+      role: 'Starter', content: 'Farming',
+      damage: 'Lightning Sentry / Death Sentry',
+      aura: 'FADE',
+      defense: '2,000',
+      stats: { str: '80', dex: '90', vit: '250', energy: '25',
+               life: '1,700 / 1,700', mana: '160 / 190', stamina: '620 / 620' },
+      charms: [
+        { name: 'Trap Skiller GC ×1–3',   quality: 'magic',  stats: '+1 Traps — save for later!' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5 Res / FHR — cap resists first' },
+        { name: "Gheed's Fortune",        quality: 'unique', stats: 'MF/gold/vendor discount — great early charm' }
+      ],
+      skills: [
+        { name: 'Lightning Sentry', lvl: 20, tree: 'Traps',           tier: 'max' },
+        { name: 'Death Sentry',     lvl: 20, tree: 'Traps',           tier: 'max' },
+        { name: 'Shock Web',        lvl: 20, tree: 'Traps',           tier: 'high' },
+        { name: 'Fade',             lvl: 1,  tree: 'Shadow Disc.',    tier: 'high' },
+        { name: 'Shadow Warrior',   lvl: 1,  tree: 'Shadow Disc.',    tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: 'Lore', base: 'Helm 2os — Runeword', quality: 'runeword', icon: '⛑',
+                  stats: ['Ort · Sol','+1 All Skills','+30% Lightning Res','+10 Energy'],
+                  alts: ['+3 Trap Circlet with sockets'] },
+        weapon: { name: 'Rare +3 LS / +3 DS Claw', base: 'Suwayyah', quality: 'rare', icon: '🗡',
+                  stats: ['+3 Lightning Sentry','+3 Death Sentry','+2 Traps','20% IAS'],
+                  alts: ['Any +Trap Claw is great early'] },
+        shield: { name: '+3 Trap Claw', base: 'Runic Talons', quality: 'magic', icon: '⛨',
+                  stats: ['+3 LS / +3 DS','+3 Shock Web','+3 Fire Blast'],
+                  alts: [] },
+        armor:  { name: 'Skin of the Vipermagi', base: 'Serpentskin Armor', quality: 'unique', icon: '🛡',
+                  stats: ['+1 All Skills','30% FCR','+20–35 All Res'],
+                  alts: ['Smoke Runeword — 50 all res'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: ["Trang-Oul's Claws for +2 curses"] },
+        belt:   { name: 'Goldwrap', base: 'Heavy Belt', quality: 'unique', icon: '▬',
+                  stats: ['10% IAS','+30–50% Gold Find'],
+                  alts: ['String of Ears — 15% DR'] },
+        boots:  { name: 'Silkweave', base: 'Mesh Boots', quality: 'unique', icon: '👢',
+                  stats: ['+30 Mana Regen','+30% FRW','+20 Def'],
+                  alts: ['Waterwalk — +40 Dex + Life'] },
+        amulet: { name: 'Rare +2 Assassin Amulet', base: 'Amulet', quality: 'rare', icon: '📿',
+                  stats: ['+2 Assassin Skills','+FCR','+Life/Res'],
+                  alts: ['Any +Skills Amulet'] },
+        ring1:  { name: 'Rare Life/Mana Ring', base: 'Ring', quality: 'rare', icon: '◯',
+                  stats: ['+40+ Life','+50+ Mana','+Res'] },
+        ring2:  { name: 'Rare Life/Res Ring', base: 'Ring', quality: 'rare', icon: '◯',
+                  stats: ['+Life','+All Res','+Attrs'] },
+        merc:   { name: 'Act 2 Prayer Merc', base: 'Hell Combat · Prayer Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Prayer','Insight polearm — Meditation for mana','Treachery','Any 3os helm'],
+                  alts: [] }
+      }
+    },
+
+    phoenixStriker: {
+      name: 'PHOENIX STRIKER', label: 'Phoenix Striker (MA)',
+      className: 'ASSASSIN', class: 'assassin',
+      tier: 'A', stars: 4,
+      role: 'Charge-Up MA', content: 'General',
+      damage: 'Phoenix Strike + Dragon Talon',
+      aura: 'FADE / BoS',
+      defense: '4,600',
+      stats: { str: '95', dex: '160', vit: '340', energy: '25',
+               life: '2,800 / 2,800', mana: '170 / 210', stamina: '780 / 780' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Sin)',   quality: 'unique', stats: '+3 Assassin Skills · +Stats' },
+        { name: 'MA Skiller GC ×4–6',     quality: 'magic',  stats: '+1 Martial Arts — Phoenix Strike dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FHR' }
+      ],
+      skills: [
+        { name: 'Phoenix Strike',   lvl: 20, tree: 'Martial Arts',    tier: 'max' },
+        { name: 'Dragon Talon',     lvl: 20, tree: 'Martial Arts',    tier: 'max' },
+        { name: 'Cobra Strike',     lvl: 20, tree: 'Martial Arts',    tier: 'max' },
+        { name: 'Claw Mastery',     lvl: 20, tree: 'Martial Arts',    tier: 'max' },
+        { name: 'Weapon Block',     lvl: 1,  tree: 'Shadow Disc.',    tier: 'high' },
+        { name: 'Venom',            lvl: 1,  tree: 'Shadow Disc.',    tier: 'high' },
+        { name: 'Fade',             lvl: 1,  tree: 'Shadow Disc.',    tier: 'high' },
+        { name: 'Burst of Speed',   lvl: 1,  tree: 'Shadow Disc.',    tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Guillaume's Face", base: 'Winged Helm', quality: 'unique', icon: '⛑',
+                  stats: ['35% CB','15% DS','+120% ED','+15 Str'],
+                  alts: ["Andariel's Visage — venom + IAS"] },
+        weapon: { name: "Bartuc's Cut-Throat", base: 'Greater Talons', quality: 'unique', icon: '🗡',
+                  stats: ['+2 MA Skills','+1 Sin Skills','30% IAS','+150–200% ED'],
+                  alts: ['Chaos Runic Talons — WW + Cold Enchant'] },
+        shield: { name: 'Chaos Runic Talons (Off)', base: 'Runic Talons — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['+9 WW option','+240% ED','35% CE proc'],
+                  alts: ["Second Bartuc's for +Skills"] },
+        armor:  { name: 'Chains of Honor', base: 'Dusk Shroud 4os — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Dol · Um · Ber · Ist','+2 Skills','+65% All Res','+8% DR'],
+                  alts: ['Fortitude — +300% ED'] },
+        gloves: { name: "Dracul's Grasp", base: 'Vampirebone Gloves', quality: 'unique', icon: '🧤',
+                  stats: ['25% Life Tap','+10–15 Str','+7–10% LL'],
+                  alts: [] },
+        belt:   { name: "Thundergod's Vigor", base: 'War Belt', quality: 'unique', icon: '▬',
+                  stats: ['+200 Light Dmg','+10–20 Str/Vit','+10% Max Light Res'],
+                  alts: ["Verdungo's for +Life/DR"] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: ["Mara's Kaleidoscope"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction (breaks LI)','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    bladeFury: {
+      name: 'BLADE FURY', label: 'Blade Fury',
+      className: 'ASSASSIN', class: 'assassin',
+      tier: 'B', stars: 3,
+      role: 'Ranged Poison', content: 'PvP',
+      damage: 'Blade Fury + Poison DoT',
+      aura: 'BURST OF SPEED',
+      defense: '3,200',
+      stats: { str: '90', dex: '120', vit: '320', energy: '35',
+               life: '2,600 / 2,600', mana: '190 / 230', stamina: '720 / 720' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Sin)',   quality: 'unique', stats: '+3 Assassin Skills · +Stats' },
+        { name: 'MA Skiller GC ×4–6',     quality: 'magic',  stats: '+1 Martial Arts — Blade Fury dmg' },
+        { name: 'Poison Small Charms',    quality: 'magic',  stats: '+Poison Dmg / 20 Life / 5 Res' }
+      ],
+      skills: [
+        { name: 'Blade Fury',       lvl: 20, tree: 'Martial Arts',    tier: 'max' },
+        { name: 'Blade Shield',     lvl: 20, tree: 'Martial Arts',    tier: 'max' },
+        { name: 'Blade Sentinel',   lvl: 20, tree: 'Martial Arts',    tier: 'max' },
+        { name: 'Claw Mastery',     lvl: 20, tree: 'Martial Arts',    tier: 'max' },
+        { name: 'Venom',            lvl: 1,  tree: 'Shadow Disc.',    tier: 'high' },
+        { name: 'Shadow Master',    lvl: 1,  tree: 'Shadow Disc.',    tier: 'high' },
+        { name: 'Fade',             lvl: 1,  tree: 'Shadow Disc.',    tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Harlequin Crest (Shako)', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 All Attrs per Level','+50% MF','10% DR'],
+                  alts: ['+3 MA Circlet with sockets'] },
+        weapon: { name: "Death's Web", base: 'Unearthed Wand', quality: 'unique', icon: '🗡',
+                  stats: ['+2 Skills','+40–50% Poison Skill Dmg','-40–50% Poison Res','+10 All Attrs'],
+                  alts: ['+3 MA Rare Claw for Blade Fury'] },
+        shield: { name: '+3 Martial Arts Claw', base: 'Runic Talons', quality: 'magic', icon: '⛨',
+                  stats: ['+3 MA Skills','+2 Blade Fury','+2 Blade Shield'],
+                  alts: [] },
+        armor:  { name: 'Bramble', base: 'Dusk Shroud 4os — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Ral · Ohm · Sur · Eth','Thorns Aura','+50% Poison Skill Dmg','+25–50% Poison Res'],
+                  alts: ['Chains of Honor for res+DR'] },
+        gloves: { name: "Trang-Oul's Claws", base: 'Heavy Bracers', quality: 'set', icon: '🧤',
+                  stats: ['+2 Necro Curses','20% FCR','+30% Cold/Poison Res'],
+                  alts: [] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 All Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit','+50% Poison Res'],
+                  alts: ['War Traveler — 25% MF'] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res','+5 All Attrs'],
+                  alts: ['+3 MA Rare Amulet'] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        ring2:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might — boosts your Blade Fury physical damage','Insight polearm — Meditation aura for merc mana','Fortitude Archon Plate — huge merc life & damage','Andariel’s Visage — Venom + 20% IAS'],
+                  alts: ['Infinity Cryptic Axe — Conviction aura breaks Immunes (endgame)','Reaper’s Toll — procs Decrepify on hit'] }
+      }
+    },
+
+    /* ═════════════ BARBARIAN ═════════════ */
+    wwBarb: {
+      name: 'WHIRLWIND', label: 'Whirlwind',
+      className: 'BARBARIAN', class: 'barbarian',
+      tier: 'S', stars: 5,
+      role: 'Whirlwind', content: 'Endgame',
+      damage: 'Whirlwind (Grief PB)',
+      aura: 'BATTLE ORDERS',
+      defense: '5,200',
+      stats: { str: '156', dex: '160', vit: '400', energy: '10',
+               life: '3,600 / 3,600', mana: '110 / 140', stamina: '900 / 900' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Barb)',  quality: 'unique', stats: '+3 Barbarian Skills · +Stats · +Res' },
+        { name: 'Combat Skiller GC ×4–6', quality: 'magic',  stats: '+1 Combat Skills — WW/Mastery boost' },
+        { name: 'Warcry Skiller GC ×2–3', quality: 'magic',  stats: '+1 Warcries — Battle Orders life boost' }
+      ],
+      skills: [
+        { name: 'Whirlwind',        lvl: 20, tree: 'Combat Skills',   tier: 'max' },
+        { name: 'Berserk',          lvl: 1,  tree: 'Combat Skills',   tier: 'high' },
+        { name: 'Sword Mastery',    lvl: 20, tree: 'Combat Masteries',tier: 'max' },
+        { name: 'Battle Orders',    lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Shout',            lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Battle Command',   lvl: 1,  tree: 'Warcries',        tier: 'high' },
+        { name: 'Increased Speed',  lvl: 1,  tree: 'Combat Masteries',tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Arreat's Face", base: 'Slayer Guard', quality: 'unique', icon: '⛑',
+                  stats: ['+2 Barb Skills','+2 Combat Skills','20% IAS','+150 AR'],
+                  sockets: '1os via Larzuk — Ber (DR) or 15% IAS Jewel',
+                  alts: ["Guillaume's Face — CB/DS for BvC"] },
+        weapon: { name: 'Grief', base: 'Phase Blade 5os — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Eth · Tir · Lo · Mal · Ral','+30–40% IAS','+340–400 Dmg','Ignore Target Def'],
+                  alts: ['Grief Berserker Axe — physical dmg swap','Beast BA — Fanaticism aura'] },
+        shield: { name: 'Grief (Off-hand)', base: 'Phase Blade — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Dual-wielding — 2nd weapon for WW','Second Grief maximizes damage'],
+                  alts: ['Beast Berserker Axe — Fanaticism aura'] },
+        armor:  { name: 'Enigma', base: 'Mage Plate 3os — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Jah · Ith · Ber','+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Fortitude for pure damage','Chains of Honor for res'] },
+        gloves: { name: "Dracul's Grasp", base: 'Vampirebone Gloves', quality: 'unique', icon: '🧤',
+                  stats: ['25% Life Tap on Striking','+10–15 Str','+7–10% LL'],
+                  alts: ['Steelrend — +50% ED + 10% CB'] },
+        belt:   { name: "Verdungo's Hearty Cord", base: 'Mithril Coil', quality: 'unique', icon: '▬',
+                  stats: ['+100–120 Life','+30–40 Vit','10–15% DR'],
+                  alts: ["Nosferatu's Coil — 10% IAS + LL"] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: ['Metalgrid — AR + Res'] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    frenzyBarb: {
+      name: 'FRENZY', label: 'Frenzy',
+      className: 'BARBARIAN', class: 'barbarian',
+      tier: 'A', stars: 4,
+      role: 'Speed Farmer', content: 'General',
+      damage: 'Frenzy (dual-wield)',
+      aura: 'BATTLE ORDERS',
+      defense: '4,800',
+      stats: { str: '156', dex: '180', vit: '380', energy: '10',
+               life: '3,400 / 3,400', mana: '110 / 140', stamina: '900 / 900' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Barb)',  quality: 'unique', stats: '+3 Barb Skills · +Stats' },
+        { name: 'Combat Skiller GC ×4–6', quality: 'magic',  stats: '+1 Combat — Frenzy/Double Swing dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / IAS' }
+      ],
+      skills: [
+        { name: 'Frenzy',           lvl: 20, tree: 'Combat Skills',   tier: 'max' },
+        { name: 'Double Swing',     lvl: 20, tree: 'Combat Skills',   tier: 'max' },
+        { name: 'Taunt',            lvl: 1,  tree: 'Warcries',        tier: 'high' },
+        { name: 'Sword Mastery',    lvl: 20, tree: 'Combat Masteries',tier: 'max' },
+        { name: 'Battle Orders',    lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Shout',            lvl: 1,  tree: 'Warcries',        tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: "Arreat's Face", base: 'Slayer Guard', quality: 'unique', icon: '⛑',
+                  stats: ['+2 Barb Skills','+2 Combat Skills','20% IAS','+150 AR'],
+                  alts: ["Guillaume's Face — CB/DS/Str"] },
+        weapon: { name: 'Grief', base: 'Phase Blade — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['+30–40% IAS','+340–400 Dmg','Ignore Target Def'],
+                  alts: [] },
+        shield: { name: 'Grief (Off-hand)', base: 'Phase Blade — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Dual-wield 2nd weapon','Second Grief or rare fast IAS sword'],
+                  alts: [] },
+        armor:  { name: 'Fortitude', base: 'Archon Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+300% ED','+200% ED (armor)','+8% FCR'],
+                  alts: ['Enigma teleport','Chains of Honor for res'] },
+        gloves: { name: 'Steelrend', base: 'Ogre Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+50% ED','10% CB','+20 Str','+70+ Life'],
+                  alts: ['Laying of Hands — 20% IAS + demon dmg'] },
+        belt:   { name: 'String of Ears', base: 'Demonhide Sash', quality: 'unique', icon: '▬',
+                  stats: ['15% DR','+150 AR','6–8% LL'],
+                  alts: ["Verdungo's Hearty Cord — +Life"] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: ['Metalgrid — AR + Res'] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: 'Rare LL/IAS Ring', base: 'Ring', quality: 'rare', icon: '◯',
+                  stats: ['+Life Leech','+Attack Rating','+Attrs'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    berserker: {
+      name: 'BERSERKER', label: 'Berserker',
+      className: 'BARBARIAN', class: 'barbarian',
+      tier: 'B', stars: 3,
+      role: 'PI Killer', content: 'General',
+      damage: 'Berserk (Magic Damage)',
+      aura: 'BATTLE ORDERS',
+      defense: '4,600',
+      stats: { str: '156', dex: '150', vit: '380', energy: '10',
+               life: '3,400 / 3,400', mana: '110 / 140', stamina: '900 / 900' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Barb)',  quality: 'unique', stats: '+3 Barb Skills · +Stats' },
+        { name: 'Combat Skiller GC ×4–6', quality: 'magic',  stats: '+1 Combat — Berserk damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FHR' }
+      ],
+      skills: [
+        { name: 'Berserk',          lvl: 20, tree: 'Combat Skills',   tier: 'max' },
+        { name: 'Battle Orders',    lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Shout',            lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Sword Mastery',    lvl: 20, tree: 'Combat Masteries',tier: 'max' },
+        { name: 'Iron Skin',        lvl: 1,  tree: 'Combat Masteries',tier: 'high' },
+        { name: 'Battle Command',   lvl: 1,  tree: 'Warcries',        tier: 'high' },
+        { name: 'Howl',             lvl: 1,  tree: 'Warcries',        tier: 'prereq' },
+        { name: 'Taunt',            lvl: 1,  tree: 'Warcries',        tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Arreat's Face", base: 'Slayer Guard', quality: 'unique', icon: '⛑',
+                  stats: ['+2 Barb Skills','+2 Combat Skills','20% IAS','+150 AR'],
+                  alts: ["Guillaume's Face — CB/DS"] },
+        weapon: { name: 'Grief', base: 'Berserker Axe — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['+340–400 Dmg','+30–40% IAS','Ignore Target Def'],
+                  alts: ['Breath of the Dying — +200% ED, huge magic dmg','Doombringer BA — magic dmg'] },
+        shield: { name: 'Stormshield', base: 'Monarch', quality: 'unique', icon: '⛨',
+                  stats: ['35% DR','25% Block','+30 Str','+60% Cold Res'],
+                  alts: ['(dual-wield alternative)'] },
+        armor:  { name: 'Fortitude', base: 'Archon Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+300% ED','+200% ED (armor)','+8% FCR'],
+                  alts: ['Chains of Honor for res'] },
+        gloves: { name: 'Steelrend', base: 'Ogre Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+50% ED','10% CB','+20 Str'],
+                  alts: ["Dracul's Grasp — Life Tap"] },
+        belt:   { name: "Verdungo's Hearty Cord", base: 'Mithril Coil', quality: 'unique', icon: '▬',
+                  stats: ['+100–120 Life','+30–40 Vit','10–15% DR'],
+                  alts: ['String of Ears — 15% DR'] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: ["Cat's Eye — 20% IAS + Dex"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Defiance Merc', base: 'Hell Defensive · Defiance Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Defiance','Insight polearm — Meditation','Andariel\'s Visage','Treachery'],
+                  alts: [] }
+      }
+    },
+
+    budgetBarb: {
+      name: 'BUDGET WW', label: 'Budget Whirlwind',
+      className: 'BARBARIAN', class: 'barbarian',
+      tier: 'B', stars: 3,
+      role: 'Starter', content: 'Leveling',
+      damage: 'Whirlwind (Oath)',
+      aura: 'BATTLE ORDERS',
+      defense: '2,800',
+      stats: { str: '120', dex: '130', vit: '280', energy: '10',
+               life: '2,400 / 2,400', mana: '90 / 120', stamina: '780 / 780' },
+      charms: [
+        { name: 'Combat Skiller GC ×1–3', quality: 'magic',  stats: '+1 Combat — save for later!' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5 Res / IAS — cap resists' },
+        { name: "Gheed's Fortune",        quality: 'unique', stats: 'Optional MF/gold charm' }
+      ],
+      skills: [
+        { name: 'Whirlwind',        lvl: 20, tree: 'Combat Skills',   tier: 'max' },
+        { name: 'Sword Mastery',    lvl: 20, tree: 'Combat Masteries',tier: 'max' },
+        { name: 'Battle Orders',    lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Shout',            lvl: 1,  tree: 'Warcries',        tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Rockstopper', base: 'Sallet', quality: 'unique', icon: '⛑',
+                  stats: ['+30% Fire/Light/Cold Res','+15% FHR','10% DR','+30% Life'],
+                  alts: ['Peasant Crown — +1 skills, cheap'] },
+        weapon: { name: 'Oath', base: 'Berserker Axe 4os — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Shael · Pul · Mal · Lum','+50% IAS','+210–340% ED','Cannot Be Frozen'],
+                  alts: ['Any 4os BA — great budget WW weapon'] },
+        shield: { name: 'Oath (Off-hand)', base: 'Berserker Axe — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Second Oath for dual-wield WW'],
+                  alts: ['Rare +Skills BA'] },
+        armor:  { name: 'Duress', base: 'Dusk Shroud 3os — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Shael · Um · Thul','+15% Crushing Blow','+33% Open Wounds','+50 Cold Dmg'],
+                  alts: ['Stone — great budget armor'] },
+        gloves: { name: 'Bloodfist', base: 'Heavy Gloves', quality: 'unique', icon: '🧤',
+                  stats: ['+40 Life','10% IAS','+5 Max Dmg'],
+                  alts: ["Sigon's Gage — +10 Str + IAS"] },
+        belt:   { name: 'String of Ears', base: 'Demonhide Sash', quality: 'unique', icon: '▬',
+                  stats: ['15% DR','+150 AR','6–8% LL'],
+                  alts: ['Goldwrap — 10% IAS + gold find'] },
+        boots:  { name: 'Goblin Toe', base: 'Light Plated Boots', quality: 'unique', icon: '👢',
+                  stats: ['25% Crushing Blow','+15 Def','+1 Life per Lvl'],
+                  alts: ['Gore Rider — endgame'] },
+        amulet: { name: "Cat's Eye", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+30 Dex','20% IAS','30% FRW'],
+                  alts: ["Highlord's Wrath — if you can find one"] },
+        ring1:  { name: 'Manald Heal', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['Heal +5–8 Life','+8–12 Mana'] },
+        ring2:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Insight polearm — Meditation','Rockstopper','Duriel\'s Shell'],
+                  alts: [] }
+      }
+    },
+
+    concentrateBarb: {
+      name: 'CONCENTRATE', label: 'Concentrate',
+      className: 'BARBARIAN', class: 'barbarian',
+      tier: 'A', stars: 4,
+      role: 'HC-Safe Melee', content: 'Hardcore',
+      damage: 'Concentrate (Un-interruptable)',
+      aura: 'BATTLE ORDERS',
+      defense: '6,200',
+      stats: { str: '156', dex: '160', vit: '420', energy: '10',
+               life: '3,800 / 3,800', mana: '110 / 140', stamina: '900 / 900' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Barb)',  quality: 'unique', stats: '+3 Barb Skills · +Stats' },
+        { name: 'Combat Skiller GC ×4–6', quality: 'magic',  stats: '+1 Combat — Concentrate damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FHR' }
+      ],
+      skills: [
+        { name: 'Concentrate',      lvl: 20, tree: 'Combat Skills',   tier: 'max' },
+        { name: 'Battle Orders',    lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Battle Cry',       lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Sword Mastery',    lvl: 20, tree: 'Combat Masteries',tier: 'max' },
+        { name: 'Iron Skin',        lvl: 1,  tree: 'Combat Masteries',tier: 'high' },
+        { name: 'Battle Command',   lvl: 1,  tree: 'Warcries',        tier: 'high' },
+        { name: 'Shout',            lvl: 1,  tree: 'Warcries',        tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: "Arreat's Face", base: 'Slayer Guard', quality: 'unique', icon: '⛑',
+                  stats: ['+2 Barb Skills','+2 Combat Skills','20% IAS'],
+                  alts: ["Kira's Guardian for CBF + Res"] },
+        weapon: { name: 'Breath of the Dying', base: 'Colossus Blade 6os — RW', quality: 'runeword', icon: '🗡',
+                  stats: ['Vex · Hel · El · Eld · Zod · Eth','+50% IAS','+350–400% ED','Indestructible'],
+                  alts: ['Grief PB — cheaper alt'] },
+        shield: { name: 'Stormshield', base: 'Monarch', quality: 'unique', icon: '⛨',
+                  stats: ['35% DR','25% Block','+30 Str','+60% Cold Res'],
+                  alts: [] },
+        armor:  { name: 'Chains of Honor', base: 'Dusk Shroud — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Dol · Um · Ber · Ist','+2 Skills','+65% All Res','+8% DR'],
+                  alts: ['Fortitude for damage'] },
+        gloves: { name: 'Steelrend', base: 'Ogre Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+50% ED','10% CB','+20 Str'],
+                  alts: ["Dracul's Grasp — Life Tap"] },
+        belt:   { name: "Verdungo's Hearty Cord", base: 'Mithril Coil', quality: 'unique', icon: '▬',
+                  stats: ['+100–120 Life','+30–40 Vit','10–15% DR'],
+                  alts: ['String of Ears — 15% DR'] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: ['Metalgrid — AR + Res'] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Defiance Merc', base: 'Hell Defensive · Defiance Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Defiance (huge merc def)','Insight polearm — Meditation','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    singer: {
+      name: 'SINGER', label: 'Singer (War Cry)',
+      className: 'BARBARIAN', class: 'barbarian',
+      tier: 'B', stars: 3,
+      role: 'PvP Caster', content: 'PvP',
+      damage: 'War Cry (Magic Dmg)',
+      aura: 'BATTLE ORDERS',
+      defense: '4,000',
+      stats: { str: '95', dex: '90', vit: '380', energy: '35',
+               life: '3,200 / 3,200', mana: '260 / 300', stamina: '820 / 820' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Barb)',  quality: 'unique', stats: '+3 Barb Skills · +Stats' },
+        { name: 'Warcry Skiller GC ×6–8', quality: 'magic',  stats: '+1 Warcries — massive War Cry dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'War Cry',          lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Battle Cry',       lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Battle Orders',    lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Battle Command',   lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Shout',            lvl: 1,  tree: 'Warcries',        tier: 'high' },
+        { name: 'Iron Skin',        lvl: 1,  tree: 'Combat Masteries',tier: 'prereq' },
+        { name: 'Natural Resist',   lvl: 1,  tree: 'Combat Masteries',tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Halaberd's Reign", base: 'Corona', quality: 'unique', icon: '⛑',
+                  stats: ['+2 Barb Skills','+2 Warcry Skills','+150–200 Def'],
+                  alts: ['+3 War Cry Rare Helm'] },
+        weapon: { name: 'Call to Arms', base: 'Flail 5os — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Amn · Ral · Mal · Ist · Ohm','+1–6 BO','+1–4 Battle Command','+1–6 Prayer'],
+                  alts: ['Heart of the Oak for FCR'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch 4os — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Tal · Thul · Ort · Amn','+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: [] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Chains of Honor — Res'] },
+        gloves: { name: "Trang-Oul's Claws", base: 'Heavy Bracers', quality: 'set', icon: '🧤',
+                  stats: ['+2 Necro Curses','20% FCR','+30% Cold/Poison Res'],
+                  alts: ['Magefist — +1 Fire, 20% FCR'] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit','+50% Poison Res'],
+                  alts: ['Waterwalk — +40 Dex + Life'] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res','+5 Attrs'],
+                  alts: ['+3 Warcry Rare Amulet'] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        ring2:  { name: 'Rare FCR Ring', base: 'Ring', quality: 'rare', icon: '◯',
+                  stats: ['+10% FCR','+Life','+Mana','+Res'] },
+        merc:   { name: 'Act 2 Prayer Merc', base: 'Hell Combat · Prayer Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Prayer','Insight polearm — Meditation','Treachery','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    throwBarb: {
+      name: 'THROW', label: 'Throw',
+      className: 'BARBARIAN', class: 'barbarian',
+      tier: 'B', stars: 3,
+      role: 'Ranged Melee', content: 'General',
+      damage: 'Double Throw (Lacerator)',
+      aura: 'BATTLE ORDERS',
+      defense: '4,200',
+      stats: { str: '156', dex: '200', vit: '360', energy: '10',
+               life: '3,200 / 3,200', mana: '110 / 140', stamina: '900 / 900' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Barb)',  quality: 'unique', stats: '+3 Barb Skills · +Stats' },
+        { name: 'Combat Skiller GC ×4–6', quality: 'magic',  stats: '+1 Combat — Throw damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / IAS' }
+      ],
+      skills: [
+        { name: 'Double Throw',     lvl: 20, tree: 'Combat Skills',   tier: 'max' },
+        { name: 'Double Swing',     lvl: 20, tree: 'Combat Skills',   tier: 'max' },
+        { name: 'Throw',            lvl: 1,  tree: 'Combat Skills',   tier: 'prereq' },
+        { name: 'Throwing Mastery', lvl: 20, tree: 'Combat Masteries',tier: 'max' },
+        { name: 'Iron Skin',        lvl: 20, tree: 'Combat Masteries',tier: 'max' },
+        { name: 'Battle Orders',    lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Battle Command',   lvl: 1,  tree: 'Warcries',        tier: 'high' },
+        { name: 'Shout',            lvl: 1,  tree: 'Warcries',        tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: "Arreat's Face", base: 'Slayer Guard', quality: 'unique', icon: '⛑',
+                  stats: ['+2 Barb Skills','+2 Combat Skills','20% IAS'],
+                  alts: ["Andariel's Visage — venom + IAS"] },
+        weapon: { name: 'Lacerator', base: 'Winged Axe', quality: 'unique', icon: '🗡',
+                  stats: ['33% Chance of Amp Damage','20% IAS','+200% ED','+80–120 Fire Dmg'],
+                  alts: ['Warshrike — throwing star, +2 skills','Eth throwers for physical dmg'] },
+        shield: { name: 'Lacerator (Off-hand)', base: 'Winged Axe', quality: 'unique', icon: '⛨',
+                  stats: ['Second Lacerator — dual-wield','More Amp Damage procs'],
+                  alts: ['Warshrike off-hand'] },
+        armor:  { name: 'Fortitude', base: 'Archon Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+300% ED','+200% ED (armor)','+8% FCR'],
+                  alts: ['Enigma teleport'] },
+        gloves: { name: 'Laying of Hands', base: 'Bramble Mitts', quality: 'set', icon: '🧤',
+                  stats: ['20% IAS','+350% Dmg to Demons'],
+                  alts: ["Dracul's Grasp — Life Tap on Strike"] },
+        belt:   { name: "Thundergod's Vigor", base: 'War Belt', quality: 'unique', icon: '▬',
+                  stats: ['+200 Light Dmg','+10–20 Str/Vit','+10% Max Light Res'],
+                  alts: ['Razortail — +Pierce'] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: ['War Traveler — 25% MF'] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: ['Metalgrid — AR + Res'] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: 'Angelic Ring', base: 'Ring', quality: 'set', icon: '◯',
+                  stats: ['+Attack Rating (huge with Angelic Ammy)','+Life'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    ikBarb: {
+      name: 'IMMORTAL KING', label: 'Immortal King',
+      className: 'BARBARIAN', class: 'barbarian',
+      tier: 'A', stars: 4,
+      role: 'Set Meta', content: 'Endgame',
+      damage: 'Whirlwind (IK Maul)',
+      aura: 'BATTLE ORDERS',
+      defense: '6,800',
+      stats: { str: '250', dex: '110', vit: '350', energy: '10',
+               life: '3,500 / 3,500', mana: '110 / 140', stamina: '900 / 900' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Barb)',  quality: 'unique', stats: '+3 Barb Skills · +Stats' },
+        { name: 'Combat Skiller GC ×4–6', quality: 'magic',  stats: '+1 Combat — WW/Frenzy dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / +max dmg' }
+      ],
+      skills: [
+        { name: 'Whirlwind',        lvl: 20, tree: 'Combat Skills',   tier: 'max' },
+        { name: 'Mace Mastery',     lvl: 20, tree: 'Combat Masteries',tier: 'max' },
+        { name: 'Frenzy',           lvl: 1,  tree: 'Combat Skills',   tier: 'high' },
+        { name: 'Battle Orders',    lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Shout',            lvl: 20, tree: 'Warcries',        tier: 'max' },
+        { name: 'Battle Command',   lvl: 1,  tree: 'Warcries',        tier: 'high' },
+        { name: 'Iron Skin',        lvl: 1,  tree: 'Combat Masteries',tier: 'high' },
+        { name: 'Increased Speed',  lvl: 1,  tree: 'Combat Masteries',tier: 'prereq' },
+        { name: 'Natural Resist',   lvl: 1,  tree: 'Combat Masteries',tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Immortal King's Will", base: 'Avenger Guard', quality: 'set', icon: '⛑',
+                  stats: ['+2 Combat Skills (set)','+65% ED (set)','+40 Def','+3 Level 8 Whirlwind'],
+                  alts: ['Full IK set required for aura bonuses'] },
+        weapon: { name: "Immortal King's Stone Crusher", base: 'Ogre Maul', quality: 'set', icon: '🗡',
+                  stats: ['+200% ED','+150 Damage','+40% IAS (set)','+3 Combat Skills'],
+                  alts: [] },
+        shield: { name: '(IK is 2H Maul)', base: '2-Handed', quality: 'normal', icon: '⛨',
+                  stats: ['Ogre Maul is 2-handed — no shield'], alts: [] },
+        armor:  { name: "Immortal King's Soul Cage", base: 'Sacred Armor', quality: 'set', icon: '🛡',
+                  stats: ['+400 Def','+50 Life','+2 Skills (set)','+All Res (set)'],
+                  alts: [] },
+        gloves: { name: "Immortal King's Forge", base: 'War Gauntlets', quality: 'set', icon: '🧤',
+                  stats: ['+65% ED','+65 AR','+20 Str/Dex','12% IAS'],
+                  alts: [] },
+        belt:   { name: "Immortal King's Detail", base: 'War Belt', quality: 'set', icon: '▬',
+                  stats: ['+65% ED','+40 AR','+30 All Res','+25 Str'],
+                  alts: [] },
+        boots:  { name: "Immortal King's Pillar", base: 'War Boots', quality: 'set', icon: '👢',
+                  stats: ['+65% ED','+40 AR','+44 Life','+20 Str'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: ["Cat's Eye — 20% IAS + Dex"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Insight polearm — Meditation','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    /* ═════════════ DRUID ═════════════ */
+    windDruid: {
+      name: 'WIND', label: 'Wind',
+      className: 'DRUID', class: 'druid',
+      tier: 'S', stars: 5,
+      role: 'Elemental Caster', content: 'Endgame',
+      damage: 'Tornado / Hurricane',
+      aura: 'HEART OF WOLVERINE',
+      defense: '3,600',
+      stats: { str: '95', dex: '90', vit: '380', energy: '35',
+               life: '2,900 / 2,900', mana: '340 / 400', stamina: '780 / 780' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Druid)', quality: 'unique', stats: '+3 Druid Skills · +Stats · +Res' },
+        { name: 'Elemental Skiller ×6–8', quality: 'magic',  stats: '+1 Elemental — Tornado/Hurricane dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Tornado',          lvl: 20, tree: 'Elemental',       tier: 'max' },
+        { name: 'Hurricane',        lvl: 20, tree: 'Elemental',       tier: 'max' },
+        { name: 'Twister',          lvl: 20, tree: 'Elemental',       tier: 'max' },
+        { name: 'Cyclone Armor',    lvl: 20, tree: 'Elemental',       tier: 'max' },
+        { name: 'Arctic Blast',     lvl: 1,  tree: 'Elemental',       tier: 'prereq' },
+        { name: 'Oak Sage',         lvl: 1,  tree: 'Summoning',       tier: 'high' },
+        { name: 'Heart of Wolverine',lvl: 1, tree: 'Summoning',       tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: "Jalal's Mane", base: 'Totemic Mask', quality: 'unique', icon: '⛑',
+                  stats: ['+2 Druid Skills','+30 All Res','+20 Str','+20% FHR'],
+                  sockets: '1os via Larzuk — Um (all res) or 15% IAS Jewel',
+                  alts: ['Ravenlore — +3 Elemental, cold res debuff'] },
+        weapon: { name: 'Heart of the Oak', base: 'Flail 4os — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Ko · Vex · Pul · Thul','+3 All Skills','+40% FCR','+75% Damage to Demons'],
+                  alts: ['Spirit Sword — budget FCR'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch 4os — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Tal · Thul · Ort · Amn','+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: [] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Chains of Honor for res'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: ["Trang-Oul's Claws — +2 curses + FCR"] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit','+50% Poison Res'],
+                  alts: ['Waterwalk — +40 Dex + Life'] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res','+5 Attrs'],
+                  alts: [] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        ring2:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might — boosts your Tornado physical damage','Insight polearm — Meditation aura for merc mana','Fortitude Archon Plate — huge merc life & damage','Andariel’s Visage — Venom + 20% IAS'],
+                  alts: ['Infinity Cryptic Axe — Conviction aura breaks Immunes (endgame)','Reaper’s Toll — procs Decrepify on hit'] }
+      }
+    },
+
+    fireDruid: {
+      name: 'FIRE', label: 'Fire',
+      className: 'DRUID', class: 'druid',
+      tier: 'B', stars: 3,
+      role: 'Boss Burner', content: 'General',
+      damage: 'Fissure / Volcano / Armageddon',
+      aura: 'HEART OF WOLVERINE',
+      defense: '3,200',
+      stats: { str: '95', dex: '90', vit: '340', energy: '35',
+               life: '2,600 / 2,600', mana: '320 / 380', stamina: '780 / 780' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Druid)', quality: 'unique', stats: '+3 Druid Skills · +Stats' },
+        { name: 'Elemental Skiller ×6–8', quality: 'magic',  stats: '+1 Elemental — Fissure/Volcano dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Fissure',          lvl: 20, tree: 'Elemental',       tier: 'max' },
+        { name: 'Volcano',          lvl: 20, tree: 'Elemental',       tier: 'max' },
+        { name: 'Molten Boulder',   lvl: 20, tree: 'Elemental',       tier: 'max' },
+        { name: 'Armageddon',       lvl: 20, tree: 'Elemental',       tier: 'max' },
+        { name: 'Firestorm',        lvl: 1,  tree: 'Elemental',       tier: 'prereq' },
+        { name: 'Heart of Wolverine',lvl: 1, tree: 'Summoning',       tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Ravenlore', base: 'Sky Spirit', quality: 'unique', icon: '⛑',
+                  stats: ['+3 Elemental Skills','-15% Enemy Fire Res','+20 Energy'],
+                  alts: ["Jalal's Mane — +2 skills"] },
+        weapon: { name: 'Heart of the Oak', base: 'Flail — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['+3 Skills','+40% FCR','+75% Dmg vs Demons'],
+                  alts: ['Wizardspike — 50% FCR budget','Eschuta\'s — +3 Fire Skills'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: ['Homunculus — +2 skills + Res'] },
+        armor:  { name: 'Chains of Honor', base: 'Dusk Shroud — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+65% All Res','+8% DR'],
+                  alts: ['Enigma for teleport'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: [] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit','+50% Poison Res'],
+                  alts: [] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: ['+3 Elemental Rare Amulet'] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        ring2:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction (breaks FI)','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    summonDruid: {
+      name: 'SUMMON', label: 'Summon',
+      className: 'DRUID', class: 'druid',
+      tier: 'B', stars: 3,
+      role: 'Beast Master', content: 'Hardcore',
+      damage: 'Grizzly + Wolves + Spirits',
+      aura: 'OAK SAGE (Life)',
+      defense: '4,000',
+      stats: { str: '95', dex: '90', vit: '380', energy: '25',
+               life: '3,100 / 3,100', mana: '200 / 240', stamina: '820 / 820' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Druid)', quality: 'unique', stats: '+3 Druid Skills · +Stats' },
+        { name: 'Summon Skiller ×6–8',    quality: 'magic',  stats: '+1 Summoning — pet HP/dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FHR' }
+      ],
+      skills: [
+        { name: 'Grizzly',          lvl: 20, tree: 'Summoning',       tier: 'max' },
+        { name: 'Dire Wolves',      lvl: 20, tree: 'Summoning',       tier: 'max' },
+        { name: 'Spirit of Barbs',  lvl: 20, tree: 'Summoning',       tier: 'max' },
+        { name: 'Heart of Wolverine',lvl: 20,tree: 'Summoning',       tier: 'max' },
+        { name: 'Ravens',           lvl: 1,  tree: 'Summoning',       tier: 'prereq' },
+        { name: 'Oak Sage',         lvl: 1,  tree: 'Summoning',       tier: 'prereq' },
+        { name: 'Summon Spirit Wolf',lvl: 1, tree: 'Summoning',       tier: 'prereq' },
+        { name: 'Poison Creeper',   lvl: 1,  tree: 'Summoning',       tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: "Jalal's Mane", base: 'Totemic Mask', quality: 'unique', icon: '⛑',
+                  stats: ['+2 Druid Skills','+30 All Res','+20 Str'],
+                  alts: ['Ravenlore — for elemental hybrids'] },
+        weapon: { name: 'Beast', base: 'Berserker Axe 5os — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Ber · Tir · Um · Mal · Lum','Level 9 Fanaticism Aura','+40% IAS','+240–270% ED'],
+                  alts: ['Heart of the Oak for FCR caster'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: ['Rhyme — CBF + MF budget'] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Bramble — Thorns Aura','Chains of Honor'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: ["Trang-Oul's Claws — FCR + curses"] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: ["Verdungo's — Life+DR"] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit','+50% Poison Res'],
+                  alts: ['Waterwalk'] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: ['+3 Summon Rare Amulet'] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Insight polearm — Meditation','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    rabiesWolf: {
+      name: 'RABIES WOLF', label: 'Rabies Werewolf',
+      className: 'DRUID', class: 'druid',
+      tier: 'B', stars: 3,
+      role: 'PvP Poison', content: 'PvP',
+      damage: 'Rabies (Poison DoT)',
+      aura: 'HEART OF WOLVERINE',
+      defense: '5,200',
+      stats: { str: '156', dex: '110', vit: '380', energy: '25',
+               life: '3,200 / 3,200', mana: '180 / 220', stamina: '820 / 820' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Druid)', quality: 'unique', stats: '+3 Druid Skills · +Stats' },
+        { name: 'Shape-Shift Skiller ×6', quality: 'magic',  stats: '+1 Shape-Shifting — Rabies dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FHR' }
+      ],
+      skills: [
+        { name: 'Rabies',           lvl: 20, tree: 'Shape-Shifting',  tier: 'max' },
+        { name: 'Poison Creeper',   lvl: 20, tree: 'Summoning',       tier: 'max' },
+        { name: 'Poison Dagger',    lvl: 20, tree: 'Elemental',       tier: 'max' },
+        { name: 'Werewolf',         lvl: 20, tree: 'Shape-Shifting',  tier: 'max' },
+        { name: 'Lycanthropy',      lvl: 1,  tree: 'Shape-Shifting',  tier: 'high' },
+        { name: 'Feral Rage',       lvl: 1,  tree: 'Shape-Shifting',  tier: 'prereq' },
+        { name: 'Heart of Wolverine',lvl: 1, tree: 'Summoning',       tier: 'high' },
+        { name: 'Oak Sage',         lvl: 1,  tree: 'Summoning',       tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: "Jalal's Mane", base: 'Totemic Mask', quality: 'unique', icon: '⛑',
+                  stats: ['+2 Druid Skills','+30 All Res','+20 Str'],
+                  alts: ["Andariel's Visage — Venom + IAS"] },
+        weapon: { name: 'Beast', base: 'Berserker Axe — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Fanaticism Aura','+40% IAS','+240–270% ED'],
+                  alts: ["Death's Web — -40% Poison Res enemies"] },
+        shield: { name: 'Stormshield', base: 'Monarch', quality: 'unique', icon: '⛨',
+                  stats: ['35% DR','25% Block','+30 Str'],
+                  alts: ['Homunculus — +2 skills + Res'] },
+        armor:  { name: 'Bramble', base: 'Dusk Shroud — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Ral · Ohm · Sur · Eth','Thorns Aura','+50% Poison Skill Dmg'],
+                  alts: ['Enigma for teleport'] },
+        gloves: { name: "Trang-Oul's Claws", base: 'Heavy Bracers', quality: 'set', icon: '🧤',
+                  stats: ['+2 Necro Curses','20% FCR','+30% Cold/Poison Res'],
+                  alts: [] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: ["Verdungo's for +Life/DR"] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit','+50% Poison Res'],
+                  alts: ['Gore Rider'] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: ['+3 Shape-Shift Rare Amulet'] },
+        ring1:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+50 Life'] },
+        ring2:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Insight polearm — Meditation','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    furyWolf: {
+      name: 'FURY WOLF', label: 'Fury Werewolf',
+      className: 'DRUID', class: 'druid',
+      tier: 'A', stars: 4,
+      role: 'Melee Shape-Shift', content: 'General',
+      damage: 'Fury (Werewolf combo)',
+      aura: 'HEART OF WOLVERINE',
+      defense: '5,600',
+      stats: { str: '156', dex: '150', vit: '380', energy: '15',
+               life: '3,300 / 3,300', mana: '140 / 180', stamina: '900 / 900' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Druid)', quality: 'unique', stats: '+3 Druid Skills · +Stats' },
+        { name: 'Shape-Shift Skiller ×6', quality: 'magic',  stats: '+1 Shape-Shifting — Fury dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / +max dmg' }
+      ],
+      skills: [
+        { name: 'Werewolf',         lvl: 20, tree: 'Shape-Shifting',  tier: 'max' },
+        { name: 'Lycanthropy',      lvl: 20, tree: 'Shape-Shifting',  tier: 'max' },
+        { name: 'Fury',             lvl: 20, tree: 'Shape-Shifting',  tier: 'max' },
+        { name: 'Feral Rage',       lvl: 1,  tree: 'Shape-Shifting',  tier: 'high' },
+        { name: 'Rabies',           lvl: 1,  tree: 'Shape-Shifting',  tier: 'high' },
+        { name: 'Heart of Wolverine',lvl: 20,tree: 'Summoning',       tier: 'max' }
+      ],
+      slots: {
+        helm:   { name: "Jalal's Mane", base: 'Totemic Mask', quality: 'unique', icon: '⛑',
+                  stats: ['+2 Druid Skills','+30 All Res','+20 Str'],
+                  alts: ["Cerebus' Bite — +2 Shape-Shift","Andariel's Visage"] },
+        weapon: { name: 'Grief', base: 'Phase Blade — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['+340–400 Dmg','+30–40% IAS','ITD'],
+                  alts: ['Beast BA — Fanaticism aura'] },
+        shield: { name: 'Stormshield', base: 'Monarch', quality: 'unique', icon: '⛨',
+                  stats: ['35% DR','25% Block','+30 Str'],
+                  alts: [] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Fortitude — +300% ED'] },
+        gloves: { name: 'Steelrend', base: 'Ogre Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+50% ED','10% CB','+20 Str'],
+                  alts: ["Dracul's Grasp — Life Tap"] },
+        belt:   { name: "Verdungo's Hearty Cord", base: 'Mithril Coil', quality: 'unique', icon: '▬',
+                  stats: ['+100–120 Life','+30–40 Vit','10–15% DR'],
+                  alts: ['String of Ears — 15% DR'] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: ['Metalgrid — AR + Res'] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    fireClawWolf: {
+      name: 'FIRE CLAW WOLF', label: 'Fire Claw Werewolf',
+      className: 'DRUID', class: 'druid',
+      tier: 'B', stars: 3,
+      role: 'Elemental Melee', content: 'General',
+      damage: 'Fire Claws (elemental melee)',
+      aura: 'HEART OF WOLVERINE',
+      defense: '5,000',
+      stats: { str: '156', dex: '120', vit: '360', energy: '25',
+               life: '3,000 / 3,000', mana: '190 / 230', stamina: '850 / 850' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Druid)', quality: 'unique', stats: '+3 Druid Skills · +Stats' },
+        { name: 'Shape-Shift Skiller ×4', quality: 'magic',  stats: '+1 Shape-Shifting — Fire Claws dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FHR' }
+      ],
+      skills: [
+        { name: 'Fire Claws',       lvl: 20, tree: 'Shape-Shifting',  tier: 'max' },
+        { name: 'Volcano',          lvl: 20, tree: 'Elemental',       tier: 'max' },
+        { name: 'Molten Boulder',   lvl: 20, tree: 'Elemental',       tier: 'max' },
+        { name: 'Werewolf',         lvl: 20, tree: 'Shape-Shifting',  tier: 'max' },
+        { name: 'Lycanthropy',      lvl: 1,  tree: 'Shape-Shifting',  tier: 'high' },
+        { name: 'Heart of Wolverine',lvl: 1, tree: 'Summoning',       tier: 'high' },
+        { name: 'Oak Sage',         lvl: 1,  tree: 'Summoning',       tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: "Jalal's Mane", base: 'Totemic Mask', quality: 'unique', icon: '⛑',
+                  stats: ['+2 Druid Skills','+30 All Res'],
+                  alts: ['Ravenlore — +3 Elemental'] },
+        weapon: { name: 'Ribcracker', base: 'Quarterstaff', quality: 'unique', icon: '🗡',
+                  stats: ['+15% IAS','+300% ED','40% Chance CB','+50% Def'],
+                  alts: ['Eth Reaper\'s Toll — Decrepify proc','Passion Runeword'] },
+        shield: { name: 'Stormshield', base: 'Monarch', quality: 'unique', icon: '⛨',
+                  stats: ['35% DR','25% Block','+30 Str'],
+                  alts: ['Spirit Monarch — FCR hybrid'] },
+        armor:  { name: 'Chains of Honor', base: 'Dusk Shroud — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+65% All Res','+8% DR'],
+                  alts: ['Fortitude for damage'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: ["Dracul's Grasp — Life Tap"] },
+        belt:   { name: "Verdungo's Hearty Cord", base: 'Mithril Coil', quality: 'unique', icon: '▬',
+                  stats: ['+100–120 Life','+30–40 Vit','10–15% DR'],
+                  alts: ["Thundergod's — Light Absorb"] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: ['Sandstorm Trek — Str/Vit'] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: ['+3 Elemental Rare Amulet'] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    /* ═════════════ NECROMANCER ═════════════ */
+    summonmancer: {
+      name: 'SUMMONMANCER', label: 'Summonmancer',
+      className: 'NECROMANCER', class: 'necromancer',
+      tier: 'S', stars: 5,
+      role: 'Skeleton Army', content: 'Endgame',
+      damage: 'Skeleton Army + Curses',
+      aura: 'AMPLIFY DAMAGE',
+      defense: '2,800',
+      stats: { str: '60', dex: '55', vit: '380', energy: '35',
+               life: '2,700 / 2,700', mana: '320 / 380', stamina: '620 / 620' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Necro)', quality: 'unique', stats: '+3 Necro Skills · +Stats · +Res' },
+        { name: 'Summon Skiller ×6–8',    quality: 'magic',  stats: '+1 Summoning — Skeleton dmg/life' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Raise Skeleton',      lvl: 20, tree: 'Summoning',    tier: 'max' },
+        { name: 'Skeleton Mastery',    lvl: 20, tree: 'Summoning',    tier: 'max' },
+        { name: 'Raise Skeletal Mage', lvl: 20, tree: 'Summoning',    tier: 'max' },
+        { name: 'Summon Resist',       lvl: 20, tree: 'Summoning',    tier: 'max' },
+        { name: 'Amplify Damage',      lvl: 1,  tree: 'Curses',       tier: 'high' },
+        { name: 'Decrepify',           lvl: 1,  tree: 'Curses',       tier: 'high' },
+        { name: 'Corpse Explosion',    lvl: 1,  tree: 'Poison/Bone',  tier: 'high' },
+        { name: 'Bone Armor',          lvl: 1,  tree: 'Poison/Bone',  tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: 'Harlequin Crest (Shako)', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','+50% MF','10% DR'],
+                  sockets: '1os via Larzuk — Um (all res) or Ist (MF)',
+                  alts: ['White Runeword — +3 Skeleton Mastery, cheap'] },
+        weapon: { name: 'Call to Arms', base: 'Flail 5os — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Amn · Ral · Mal · Ist · Ohm','+1–6 BO','+1–4 Battle Command','+1 Skills'],
+                  alts: ['Heart of the Oak — FCR + skills'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch 4os — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Tal · Thul · Ort · Amn','+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: ['Homunculus — +2 Necro Skills'] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Chains of Honor for res'] },
+        gloves: { name: "Trang-Oul's Claws", base: 'Heavy Bracers', quality: 'set', icon: '🧤',
+                  stats: ['+2 Necro Curses','20% FCR','+30% Cold/Poison Res'],
+                  alts: ['Magefist'] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit','+50% Poison Res'],
+                  alts: ['Marrowwalk — +2 Skeleton Mastery bug'] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res','+5 Attrs'],
+                  alts: ['+3 Summon Rare Amulet'] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        ring2:  { name: "Bul-Kathos' Wedding Band", base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+50 Life'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might (buffs skeletons)','Infinity polearm — Conviction','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    bonemancer: {
+      name: 'BONEMANCER', label: 'Bonemancer',
+      className: 'NECROMANCER', class: 'necromancer',
+      tier: 'A', stars: 4,
+      role: 'PvM/PvP Caster', content: 'General',
+      damage: 'Bone Spear / Bone Spirit',
+      aura: 'AMPLIFY DAMAGE',
+      defense: '3,200',
+      stats: { str: '60', dex: '55', vit: '380', energy: '35',
+               life: '2,700 / 2,700', mana: '360 / 420', stamina: '620 / 620' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Necro)', quality: 'unique', stats: '+3 Necro Skills · +Stats' },
+        { name: 'Poison/Bone Skiller ×8', quality: 'magic',  stats: '+1 Poison/Bone — Bone Spear dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Bone Spear',        lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Bone Spirit',       lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Bone Wall',         lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Bone Prison',       lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Bone Armor',        lvl: 1,  tree: 'Poison/Bone',    tier: 'high' },
+        { name: 'Corpse Explosion',  lvl: 1,  tree: 'Poison/Bone',    tier: 'high' },
+        { name: 'Amplify Damage',    lvl: 1,  tree: 'Curses',         tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','+50% MF','10% DR'],
+                  alts: ['White Runeword — +3 Bone Spear/Spirit, best in slot!'] },
+        weapon: { name: 'Heart of the Oak', base: 'Flail — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['+3 Skills','+40% FCR','+75% Dmg vs Demons'],
+                  alts: ['Wizardspike — 50% FCR budget'] },
+        shield: { name: 'Homunculus', base: 'Hierophant Trophy', quality: 'unique', icon: '⛨',
+                  stats: ['+2 Necro Skills','20% FCR','+40 All Res','+300% Def'],
+                  alts: ['Spirit Monarch — FCR + res'] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Chains of Honor for res'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: ["Trang-Oul's Claws — +2 curses"] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit','+50% Poison Res'],
+                  alts: [] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: ['+3 Poison/Bone Rare Amulet'] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        ring2:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction (Bone Spear ignores)','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    poisonNova: {
+      name: 'POISON NOVA', label: 'Poison Nova',
+      className: 'NECROMANCER', class: 'necromancer',
+      tier: 'A', stars: 4,
+      role: 'AoE Poison', content: 'General',
+      damage: 'Poison Nova (+Lower Res)',
+      aura: 'LOWER RESIST',
+      defense: '3,000',
+      stats: { str: '60', dex: '55', vit: '360', energy: '35',
+               life: '2,600 / 2,600', mana: '340 / 400', stamina: '620 / 620' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Necro)', quality: 'unique', stats: '+3 Necro Skills · +Stats' },
+        { name: 'Poison/Bone Skiller ×8', quality: 'magic',  stats: '+1 Poison/Bone — Nova dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Poison Nova',       lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Poison Explosion',  lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Poison Dagger',     lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Lower Resist',      lvl: 20, tree: 'Curses',         tier: 'max' },
+        { name: 'Amplify Damage',    lvl: 1,  tree: 'Curses',         tier: 'high' },
+        { name: 'Corpse Explosion',  lvl: 1,  tree: 'Poison/Bone',    tier: 'high' },
+        { name: 'Bone Armor',        lvl: 1,  tree: 'Poison/Bone',    tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','+50% MF','10% DR'],
+                  alts: ['White Runeword — cheap +3 Nova'] },
+        weapon: { name: "Death's Web", base: 'Unearthed Wand', quality: 'unique', icon: '🗡',
+                  stats: ['+2 Poison/Bone','+1 All Skills','-40–50% Poison Res enemies'],
+                  alts: ['Heart of the Oak — hybrid'] },
+        shield: { name: 'Homunculus', base: 'Hierophant Trophy', quality: 'unique', icon: '⛨',
+                  stats: ['+2 Necro Skills','20% FCR','+40 All Res'],
+                  alts: ['Spirit Monarch'] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Chains of Honor'] },
+        gloves: { name: "Trang-Oul's Claws", base: 'Heavy Bracers', quality: 'set', icon: '🧤',
+                  stats: ['+2 Necro Curses','20% FCR','+30% Cold/Poison Res'],
+                  alts: ['Magefist'] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit','+50% Poison Res'],
+                  alts: [] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: ['+3 Poison Rare Amulet'] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        ring2:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    budgetSummonmancer: {
+      name: 'BUDGET SUMMON', label: 'Budget Summonmancer',
+      className: 'NECROMANCER', class: 'necromancer',
+      tier: 'B', stars: 3,
+      role: 'Starter', content: 'Leveling',
+      damage: 'Skeletons + Corpse Explosion',
+      aura: 'AMPLIFY DAMAGE',
+      defense: '1,900',
+      stats: { str: '50', dex: '45', vit: '280', energy: '35',
+               life: '2,100 / 2,100', mana: '250 / 300', stamina: '580 / 580' },
+      charms: [
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FHR' },
+        { name: 'Summon Skiller ×1–3',    quality: 'magic',  stats: '+1 Summoning if found — save for later' },
+        { name: "Gheed's Fortune",        quality: 'unique', stats: 'Optional MF/gold charm' }
+      ],
+      skills: [
+        { name: 'Raise Skeleton',      lvl: 20, tree: 'Summoning',    tier: 'max' },
+        { name: 'Skeleton Mastery',    lvl: 20, tree: 'Summoning',    tier: 'max' },
+        { name: 'Summon Resist',       lvl: 1,  tree: 'Summoning',    tier: 'high' },
+        { name: 'Amplify Damage',      lvl: 1,  tree: 'Curses',       tier: 'high' },
+        { name: 'Corpse Explosion',    lvl: 1,  tree: 'Poison/Bone',  tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Lore', base: '2os Helm — Runeword', quality: 'runeword', icon: '⛑',
+                  stats: ['Ort · Sol','+1 All Skills','+10 Energy','+2 Mana per Kill'],
+                  alts: ['Peasant Crown — +1 Skills'] },
+        weapon: { name: 'White', base: '2os Wand — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Dol · Io','+3 Bone Spear','+3 Bone Armor','+1 Skeleton Mastery'],
+                  alts: ['Rare +3 Skeleton Mastery Wand'] },
+        shield: { name: 'Rhyme', base: '2os Shield — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Shael · Eth','+25% All Res','CBF','25% MF'],
+                  alts: ['Boneflame — magic dmg + skills'] },
+        armor:  { name: 'Stealth', base: '2os Body Armor — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Tal · Eth','+25% FRW','+25% FCR','+6 Dex'],
+                  alts: ['Smoke — +50 All Res budget'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: ["Chance Guards — MF"] },
+        belt:   { name: 'Goldwrap', base: 'Heavy Belt', quality: 'unique', icon: '▬',
+                  stats: ['+30% MF','+10% IAS','+25–75 Gold Find'],
+                  alts: ['Tal Rasha\'s belt — +Life'] },
+        boots:  { name: 'Silkweave', base: 'Mesh Boots', quality: 'unique', icon: '👢',
+                  stats: ['+30% FRW','+80 Mana','+15 Def'],
+                  alts: ['Waterwalk — +Life if found'] },
+        amulet: { name: '+2 Necro Rare', base: 'Amulet', quality: 'rare', icon: '📿',
+                  stats: ['+2 Necro Skills','+Res','+Life/Mana'],
+                  alts: ["Mara's — endgame"] },
+        ring1:  { name: 'Manald Heal', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['Heal +5–8 Life','+8–12 Mana'] },
+        ring2:  { name: 'Nagelring', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+15–30% MF','+50–75 AR','+15 Def'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Insight polearm — Meditation','Smoke armor','Tal Rasha\'s helm'],
+                  alts: [] }
+      }
+    },
+
+    explosionNecro: {
+      name: 'CORPSE EXPLOSION', label: 'Corpse Explosion',
+      className: 'NECROMANCER', class: 'necromancer',
+      tier: 'A', stars: 4,
+      role: 'Speed Farm', content: 'Farming',
+      damage: 'Corpse Explosion Chain',
+      aura: 'AMPLIFY DAMAGE',
+      defense: '3,000',
+      stats: { str: '60', dex: '55', vit: '350', energy: '35',
+               life: '2,500 / 2,500', mana: '320 / 380', stamina: '620 / 620' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Necro)', quality: 'unique', stats: '+3 Necro Skills · +Stats' },
+        { name: 'Poison/Bone Skiller ×6', quality: 'magic',  stats: '+1 Poison/Bone — CE radius' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Corpse Explosion',  lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Bone Armor',        lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Bone Wall',         lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Amplify Damage',    lvl: 20, tree: 'Curses',         tier: 'max' },
+        { name: 'Decrepify',         lvl: 1,  tree: 'Curses',         tier: 'high' },
+        { name: 'Lower Resist',      lvl: 1,  tree: 'Curses',         tier: 'high' },
+        { name: 'Raise Skeleton',    lvl: 1,  tree: 'Summoning',      tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','+50% MF','10% DR'],
+                  alts: [] },
+        weapon: { name: 'Heart of the Oak', base: 'Flail — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['+3 Skills','+40% FCR','+75% Dmg Demons'],
+                  alts: ["Death's Web for +2 Poison/Bone"] },
+        shield: { name: 'Homunculus', base: 'Hierophant Trophy', quality: 'unique', icon: '⛨',
+                  stats: ['+2 Necro Skills','20% FCR','+40 All Res'],
+                  alts: ['Spirit Monarch'] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: [] },
+        gloves: { name: "Trang-Oul's Claws", base: 'Heavy Bracers', quality: 'set', icon: '🧤',
+                  stats: ['+2 Necro Curses','20% FCR','+30% Res'],
+                  alts: [] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'War Traveler', base: 'Battle Boots', quality: 'unique', icon: '👢',
+                  stats: ['+25% MF','+10 Vit/Str','+15% FRW'],
+                  alts: ['Sandstorm Trek'] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: [] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        ring2:  { name: 'Nagelring', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+30% MF','+75 AR'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    daggermancer: {
+      name: 'DAGGERMANCER', label: 'Daggermancer',
+      className: 'NECROMANCER', class: 'necromancer',
+      tier: 'B', stars: 3,
+      role: 'Poison Melee', content: 'General',
+      damage: 'Poison Dagger + Melee',
+      aura: 'AMPLIFY DAMAGE',
+      defense: '4,000',
+      stats: { str: '95', dex: '110', vit: '340', energy: '25',
+               life: '2,600 / 2,600', mana: '220 / 260', stamina: '680 / 680' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Necro)', quality: 'unique', stats: '+3 Necro Skills · +Stats' },
+        { name: 'Poison/Bone Skiller ×6', quality: 'magic',  stats: '+1 Poison/Bone — dagger dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / IAS' }
+      ],
+      skills: [
+        { name: 'Poison Dagger',     lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Poison Explosion',  lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Poison Nova',       lvl: 20, tree: 'Poison/Bone',    tier: 'max' },
+        { name: 'Lower Resist',      lvl: 20, tree: 'Curses',         tier: 'max' },
+        { name: 'Bone Armor',        lvl: 1,  tree: 'Poison/Bone',    tier: 'high' },
+        { name: 'Amplify Damage',    lvl: 1,  tree: 'Curses',         tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','+50% MF'],
+                  alts: [] },
+        weapon: { name: 'Plague', base: 'Dagger 3os — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Cham · Shael · Um','+1–2 All Skills','25% Chance Lower Resist','+Poison Dmg'],
+                  alts: ["Death's Web wand"] },
+        shield: { name: 'Homunculus', base: 'Hierophant Trophy', quality: 'unique', icon: '⛨',
+                  stats: ['+2 Necro Skills','20% FCR','+40 All Res'],
+                  alts: ['Spirit Monarch'] },
+        armor:  { name: 'Bramble', base: 'Dusk Shroud — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Thorns Aura','+50% Poison Skill Dmg'],
+                  alts: ['Enigma for teleport'] },
+        gloves: { name: "Trang-Oul's Claws", base: 'Heavy Bracers', quality: 'set', icon: '🧤',
+                  stats: ['+2 Necro Curses','20% FCR','+30% Res'],
+                  alts: [] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit','+50% Poison Res'],
+                  alts: [] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: [] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        ring2:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Insight polearm — Meditation','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    /* ═════════════ PALADIN (extras) ═════════════ */
+    hammerdin: {
+      name: 'HAMMERDIN', label: 'Hammerdin',
+      className: 'PALADIN', class: 'paladin',
+      tier: 'S', stars: 5,
+      role: 'Meta King', content: 'Endgame',
+      damage: 'Blessed Hammer + Concentration',
+      aura: 'CONCENTRATION',
+      defense: '2,800',
+      stats: { str: '65', dex: '65', vit: '380', energy: '35',
+               life: '2,800 / 2,800', mana: '380 / 440', stamina: '780 / 780' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Pally)', quality: 'unique', stats: '+3 Paladin Skills · +Stats' },
+        { name: 'Combat Skiller ×6–8',    quality: 'magic',  stats: '+1 Combat Skills — Hammer dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Blessed Hammer',    lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Concentration',     lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Vigor',             lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Blessed Aim',       lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Holy Bolt',         lvl: 1,  tree: 'Combat Skills',  tier: 'prereq' },
+        { name: 'Redemption',        lvl: 1,  tree: 'Offensive Auras',tier: 'high' },
+        { name: 'Prayer',            lvl: 1,  tree: 'Defensive Auras',tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','+50% MF','10% DR'],
+                  sockets: '1os via Larzuk — Um (all res) or Ist (MF)',
+                  alts: ['Griffon\'s Eye — light hybrids only'] },
+        weapon: { name: 'Heart of the Oak', base: 'Flail 4os — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Ko · Vex · Pul · Thul','+3 All Skills','+40% FCR','+75% Dmg Demons'],
+                  alts: ['Call to Arms on swap for BO'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch 4os — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Tal · Thul · Ort · Amn','+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: ['Herald of Zakarum + Um — cheaper'] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Jah · Ith · Ber','+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Chains of Honor for res'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: ["Trang-Oul's Claws — +2 curses + FCR"] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit','+50% Poison Res'],
+                  alts: ['Waterwalk — +40 Dex + Life'] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res','+5 Attrs'],
+                  alts: ['+3 Combat Rare Amulet'] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        ring2:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Insight polearm — Meditation','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    zealot: {
+      name: 'ZEALOT', label: 'Zealot',
+      className: 'PALADIN', class: 'paladin',
+      tier: 'A', stars: 4,
+      role: 'Melee Speed', content: 'General',
+      damage: 'Zeal (5-hit combo)',
+      aura: 'FANATICISM',
+      defense: '5,600',
+      stats: { str: '156', dex: '160', vit: '380', energy: '15',
+               life: '3,000 / 3,000', mana: '140 / 180', stamina: '900 / 900' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Pally)', quality: 'unique', stats: '+3 Paladin Skills · +Stats' },
+        { name: 'Combat Skiller ×6',      quality: 'magic',  stats: '+1 Combat — Zeal damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / IAS' }
+      ],
+      skills: [
+        { name: 'Zeal',              lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Sacrifice',         lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Fanaticism',        lvl: 20, tree: 'Offensive Auras',tier: 'max' },
+        { name: 'Holy Shield',       lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Salvation',         lvl: 1,  tree: 'Defensive Auras',tier: 'high' },
+        { name: 'Might',             lvl: 1,  tree: 'Offensive Auras',tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','+50% MF','10% DR'],
+                  alts: ["Andariel's Visage — venom + IAS","Guillaume's Face — CB/DS"] },
+        weapon: { name: 'Grief', base: 'Phase Blade — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['+30–40% IAS','+340–400 Dmg','Ignore Target Def'],
+                  alts: ['Last Wish — Might aura procs'] },
+        shield: { name: 'Herald of Zakarum', base: 'Gilded Shield', quality: 'unique', icon: '⛨',
+                  stats: ['+2 Pally Skills','+2 Combat Skills','+150% ED','+All Attrs'],
+                  alts: ['Exile — Defiance aura'] },
+        armor:  { name: 'Fortitude', base: 'Archon Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+300% ED','+200% ED (armor)','+15 All Res'],
+                  alts: ['Enigma for teleport'] },
+        gloves: { name: 'Laying of Hands', base: 'Bramble Mitts', quality: 'set', icon: '🧤',
+                  stats: ['20% IAS','+350% Dmg to Demons'],
+                  alts: ["Dracul's Grasp — Life Tap on Strike"] },
+        belt:   { name: 'String of Ears', base: 'Demonhide Sash', quality: 'unique', icon: '▬',
+                  stats: ['15% DR','+150 AR','6–8% LL'],
+                  alts: ["Verdungo's — +Life"] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: 'Angelic Amulet', base: 'Amulet', quality: 'set', icon: '📿',
+                  stats: ['+3 Skills (with Angelic Ring)','+20 Str','+12 Dex'],
+                  alts: ["Highlord's Wrath — IAS + DS"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: 'Angelic Halo', base: 'Ring', quality: 'set', icon: '◯',
+                  stats: ['+Massive AR (with Angelic Ammy)','+Life per Level'] },
+        merc:   { name: 'Act 2 Holy Freeze Merc', base: 'Nightmare Defensive · Holy Freeze Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Holy Freeze (chill)','Insight polearm — Meditation','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    foh: {
+      name: 'FOH', label: 'Fist of Heavens',
+      className: 'PALADIN', class: 'paladin',
+      tier: 'A', stars: 4,
+      role: 'Uber/PvM', content: 'Endgame',
+      damage: 'Fist of Heavens + Conviction',
+      aura: 'CONVICTION',
+      defense: '3,000',
+      stats: { str: '65', dex: '65', vit: '380', energy: '35',
+               life: '2,700 / 2,700', mana: '360 / 420', stamina: '780 / 780' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Pally)', quality: 'unique', stats: '+3 Paladin Skills · +Stats' },
+        { name: 'Combat Skiller ×6–8',    quality: 'magic',  stats: '+1 Combat — FoH damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Fist of Heavens',   lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Holy Bolt',         lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Holy Shock',        lvl: 20, tree: 'Offensive Auras',tier: 'max' },
+        { name: 'Conviction',        lvl: 20, tree: 'Offensive Auras',tier: 'max' },
+        { name: 'Redemption',        lvl: 1,  tree: 'Offensive Auras',tier: 'high' },
+        { name: 'Salvation',         lvl: 1,  tree: 'Defensive Auras',tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: "Griffon's Eye", base: 'Diadem', quality: 'unique', icon: '⛑',
+                  stats: ['+1 Skills','-15–20% Enemy Light Res','+10–15% Light Skill Dmg'],
+                  alts: ['Shako — +2 Skills'] },
+        weapon: { name: 'Heart of the Oak', base: 'Flail — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['+3 Skills','+40% FCR','+75% Dmg Demons'],
+                  alts: ['Wizardspike — 50% FCR budget'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: ['Herald of Zakarum'] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Chains of Honor for res'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: [] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit','+50% Poison Res'],
+                  alts: [] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: [] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        ring2:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction stacks','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    budgetHammerdin: {
+      name: 'BUDGET HDIN', label: 'Budget Hammerdin',
+      className: 'PALADIN', class: 'paladin',
+      tier: 'B', stars: 3,
+      role: 'Starter', content: 'Leveling',
+      damage: 'Blessed Hammer (early)',
+      aura: 'CONCENTRATION',
+      defense: '2,200',
+      stats: { str: '55', dex: '55', vit: '280', energy: '35',
+               life: '2,100 / 2,100', mana: '260 / 300', stamina: '720 / 720' },
+      charms: [
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' },
+        { name: 'Combat Skiller ×1–3',    quality: 'magic',  stats: '+1 Combat if found — save for later' },
+        { name: "Gheed's Fortune",        quality: 'unique', stats: 'Optional MF/gold charm' }
+      ],
+      skills: [
+        { name: 'Blessed Hammer',    lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Concentration',     lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Blessed Aim',       lvl: 1,  tree: 'Combat Skills',  tier: 'high' },
+        { name: 'Vigor',             lvl: 1,  tree: 'Combat Skills',  tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Lore', base: '2os Helm — Runeword', quality: 'runeword', icon: '⛑',
+                  stats: ['Ort · Sol','+1 All Skills','+10 Energy'],
+                  alts: ['Peasant Crown'] },
+        weapon: { name: 'Ancient\'s Pledge / Insight', base: 'Flail or Polearm — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Insight — Meditation Aura solves mana','+35% FCR ring/shield combo'],
+                  alts: ['+3 Blessed Hammer Rare Wand + Spirit sword'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: ['Rhyme — cheap CBF'] },
+        armor:  { name: 'Stealth', base: '2os Body Armor — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Tal · Eth','+25% FRW','+25% FCR','+6 Dex'],
+                  alts: ['Smoke — +50 Res'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: [] },
+        belt:   { name: 'Goldwrap', base: 'Heavy Belt', quality: 'unique', icon: '▬',
+                  stats: ['+30% MF','+10% IAS','+25–75 Gold Find'],
+                  alts: ['Tal Rasha\'s belt'] },
+        boots:  { name: 'Silkweave', base: 'Mesh Boots', quality: 'unique', icon: '👢',
+                  stats: ['+30% FRW','+80 Mana','+15 Def'],
+                  alts: ['War Traveler for MF'] },
+        amulet: { name: '+2 Combat Rare', base: 'Amulet', quality: 'rare', icon: '📿',
+                  stats: ['+2 Combat Skills','+FCR','+Res'],
+                  alts: ["Mara's Kaleidoscope"] },
+        ring1:  { name: 'Nagelring', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+15–30% MF','+50–75 AR'] },
+        ring2:  { name: 'Manald Heal', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['Heal +5–8 Life','+8–12 Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Insight polearm — Meditation','Smoke armor','Tal Rasha\'s helm'],
+                  alts: [] }
+      }
+    },
+
+    auradin: {
+      name: 'AURADIN', label: 'Auradin (Dream)',
+      className: 'PALADIN', class: 'paladin',
+      tier: 'A', stars: 4,
+      role: 'Uber Killer', content: 'Endgame',
+      damage: 'Holy Shock + Dream Auras',
+      aura: 'HOLY SHOCK + DREAM',
+      defense: '4,800',
+      stats: { str: '156', dex: '110', vit: '360', energy: '25',
+               life: '2,900 / 2,900', mana: '220 / 260', stamina: '850 / 850' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Pally)', quality: 'unique', stats: '+3 Paladin Skills · +Stats' },
+        { name: 'Combat Skiller ×6',      quality: 'magic',  stats: '+1 Combat — Zeal + Holy Shock' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / IAS' }
+      ],
+      skills: [
+        { name: 'Zeal',              lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Holy Shock',        lvl: 20, tree: 'Offensive Auras',tier: 'max' },
+        { name: 'Resist Lightning',  lvl: 20, tree: 'Defensive Auras',tier: 'max' },
+        { name: 'Holy Shield',       lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Salvation',         lvl: 1,  tree: 'Defensive Auras',tier: 'high' },
+        { name: 'Fanaticism',        lvl: 1,  tree: 'Offensive Auras',tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: 'Dream', base: 'Bone Visage 3os — Runeword', quality: 'runeword', icon: '⛑',
+                  stats: ['Io · Jah · Pul','Level 15 Holy Shock Aura','+20–30% FHR','+30 All Res'],
+                  alts: ['Shako for +Skills alternative'] },
+        weapon: { name: 'Hand of Justice (HoJ)', base: 'Phase Blade — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Sur · Cham · Amn · Lo','Level 16 Holy Fire','+33% IAS','+280–330% ED'],
+                  alts: ['Grief for pure Zeal damage'] },
+        shield: { name: 'Dream', base: 'Troll Nest 3os — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Io · Jah · Pul','Level 15 Holy Shock Aura','+30 All Res','+50 Life'],
+                  alts: ['Two Dreams stack for max damage'] },
+        armor:  { name: 'Fortitude', base: 'Archon Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+300% ED','+200% ED (armor)','+15 All Res'],
+                  alts: ['Chains of Honor for res'] },
+        gloves: { name: "Dracul's Grasp", base: 'Vampirebone Gloves', quality: 'unique', icon: '🧤',
+                  stats: ['25% Life Tap on Striking','+10–15 Str','+7–10% LL'],
+                  alts: ['Laying of Hands — demon dmg'] },
+        belt:   { name: "Thundergod's Vigor", base: 'War Belt', quality: 'unique', icon: '▬',
+                  stats: ['+200 Light Dmg','+10–20 Str/Vit','+10% Max Light Res'],
+                  alts: ['String of Ears — 15% DR'] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: ["Mara's Kaleidoscope"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: 'Wisp Projector', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+10–20% Light Absorb','+5% Max Light Res','Summon Wisp'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction (breaks LI)','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    tesladin: {
+      name: 'TESLADIN', label: 'Tesladin (Dragon)',
+      className: 'PALADIN', class: 'paladin',
+      tier: 'A', stars: 4,
+      role: 'Melee Caster', content: 'General',
+      damage: 'Zeal + Holy Fire (Dragon)',
+      aura: 'HOLY FIRE (Dragon)',
+      defense: '5,000',
+      stats: { str: '156', dex: '110', vit: '360', energy: '25',
+               life: '2,900 / 2,900', mana: '220 / 260', stamina: '850 / 850' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Pally)', quality: 'unique', stats: '+3 Paladin Skills · +Stats' },
+        { name: 'Combat Skiller ×6',      quality: 'magic',  stats: '+1 Combat — Zeal + Holy Fire' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / IAS' }
+      ],
+      skills: [
+        { name: 'Zeal',              lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Holy Fire',         lvl: 20, tree: 'Offensive Auras',tier: 'max' },
+        { name: 'Resist Fire',       lvl: 20, tree: 'Defensive Auras',tier: 'max' },
+        { name: 'Holy Shield',       lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Salvation',         lvl: 1,  tree: 'Defensive Auras',tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Dragon', base: '3os Helm — Runeword', quality: 'runeword', icon: '⛑',
+                  stats: ['Sur · Lo · Sol','Level 14 Holy Fire Aura','+3–5 Skills','+45 All Res'],
+                  alts: ['Shako'] },
+        weapon: { name: 'Hand of Justice', base: 'Phase Blade — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Level 16 Holy Fire','+33% IAS','+280–330% ED','Freeze Target'],
+                  alts: ['Grief for pure damage'] },
+        shield: { name: 'Dragon', base: '3os Shield — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Level 14 Holy Fire Aura','+3–5 Skills','+45 All Res','+50 Life'],
+                  alts: ['Herald of Zakarum'] },
+        armor:  { name: 'Dragon', base: '3os Body — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Level 14 Holy Fire Aura','+3–5 Skills','+45 All Res'],
+                  alts: ['Chains of Honor'] },
+        gloves: { name: 'Laying of Hands', base: 'Bramble Mitts', quality: 'set', icon: '🧤',
+                  stats: ['20% IAS','+350% Dmg to Demons'],
+                  alts: [] },
+        belt:   { name: "Thundergod's Vigor", base: 'War Belt', quality: 'unique', icon: '▬',
+                  stats: ['+200 Light Dmg','+10–20 Str/Vit','+10% Max Light Res'],
+                  alts: [] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: [] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: 'Rare LL/AR Ring', base: 'Ring', quality: 'rare', icon: '◯',
+                  stats: ['+Life Leech','+AR','+Attrs'] },
+        merc:   { name: 'Act 2 Holy Freeze Merc', base: 'Nightmare Defensive · Holy Freeze Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Holy Freeze','Infinity polearm — Conviction','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    charger: {
+      name: 'CHARGER', label: 'Charger',
+      className: 'PALADIN', class: 'paladin',
+      tier: 'B', stars: 3,
+      role: 'PvP Rusher', content: 'PvP',
+      damage: 'Charge (1-shot burst)',
+      aura: 'CONCENTRATION',
+      defense: '5,200',
+      stats: { str: '156', dex: '160', vit: '380', energy: '15',
+               life: '3,000 / 3,000', mana: '140 / 180', stamina: '900 / 900' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Pally)', quality: 'unique', stats: '+3 Paladin Skills · +Stats' },
+        { name: 'Combat Skiller ×6',      quality: 'magic',  stats: '+1 Combat — Charge damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FHR' }
+      ],
+      skills: [
+        { name: 'Charge',            lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Might',             lvl: 20, tree: 'Offensive Auras',tier: 'max' },
+        { name: 'Holy Shield',       lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Vigor',             lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Concentration',     lvl: 1,  tree: 'Combat Skills',  tier: 'high' },
+        { name: 'Fanaticism',        lvl: 1,  tree: 'Offensive Auras',tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','10% DR'],
+                  alts: ["Andariel's Visage — venom + IAS"] },
+        weapon: { name: 'Grief', base: 'Phase Blade — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['+30–40% IAS','+340–400 Dmg','Ignore Target Def'],
+                  alts: ['Baranar\'s Star — massive AR/CB'] },
+        shield: { name: 'Herald of Zakarum', base: 'Gilded Shield', quality: 'unique', icon: '⛨',
+                  stats: ['+2 Pally Skills','+2 Combat Skills','+150% ED'],
+                  alts: ['Exile — Defiance aura'] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW (crucial for Charge)','+1 Teleport'],
+                  alts: [] },
+        gloves: { name: "Dracul's Grasp", base: 'Vampirebone Gloves', quality: 'unique', icon: '🧤',
+                  stats: ['25% Life Tap on Striking','+10–15 Str','+7–10% LL'],
+                  alts: ['Steelrend'] },
+        belt:   { name: 'String of Ears', base: 'Demonhide Sash', quality: 'unique', icon: '▬',
+                  stats: ['15% DR','+150 AR','6–8% LL'],
+                  alts: [] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: 'Angelic Amulet', base: 'Amulet', quality: 'set', icon: '📿',
+                  stats: ['+3 Skills (with Angelic Ring)','+20 Str'],
+                  alts: ["Highlord's Wrath"] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: 'Angelic Halo', base: 'Ring', quality: 'set', icon: '◯',
+                  stats: ['+Massive AR (with Angelic Ammy)','+Life per Level'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Insight polearm — Meditation','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    avenger: {
+      name: 'AVENGER', label: 'Avenger',
+      className: 'PALADIN', class: 'paladin',
+      tier: 'A', stars: 4,
+      role: 'Elemental Melee', content: 'General',
+      damage: 'Vengeance (3-Element)',
+      aura: 'CONVICTION',
+      defense: '5,000',
+      stats: { str: '156', dex: '160', vit: '360', energy: '15',
+               life: '2,900 / 2,900', mana: '150 / 190', stamina: '850 / 850' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Pally)', quality: 'unique', stats: '+3 Paladin Skills · +Stats' },
+        { name: 'Combat Skiller ×6',      quality: 'magic',  stats: '+1 Combat — Vengeance damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / IAS' }
+      ],
+      skills: [
+        { name: 'Vengeance',         lvl: 20, tree: 'Combat Skills',  tier: 'max' },
+        { name: 'Conviction',        lvl: 20, tree: 'Offensive Auras',tier: 'max' },
+        { name: 'Resist Fire',       lvl: 20, tree: 'Defensive Auras',tier: 'max' },
+        { name: 'Resist Cold',       lvl: 20, tree: 'Defensive Auras',tier: 'max' },
+        { name: 'Holy Shield',       lvl: 1,  tree: 'Combat Skills',  tier: 'high' },
+        { name: 'Sacrifice',         lvl: 1,  tree: 'Combat Skills',  tier: 'prereq' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','10% DR'],
+                  alts: ["Griffon's Eye — light hybrids"] },
+        weapon: { name: 'Kingslayer', base: 'Berserker Axe 4os — RW', quality: 'runeword', icon: '🗡',
+                  stats: ['Mal · Um · Gul · Fal','+30% IAS','+230–270% ED','Prevent Monster Heal'],
+                  alts: ['Grief for pure damage','Last Wish for Might procs'] },
+        shield: { name: 'Herald of Zakarum', base: 'Gilded Shield', quality: 'unique', icon: '⛨',
+                  stats: ['+2 Pally Skills','+2 Combat Skills','+150% ED'],
+                  alts: ['Exile Runeword'] },
+        armor:  { name: 'Fortitude', base: 'Archon Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+300% ED','+200% ED (armor)','+15 All Res'],
+                  alts: ['Enigma for teleport'] },
+        gloves: { name: 'Laying of Hands', base: 'Bramble Mitts', quality: 'set', icon: '🧤',
+                  stats: ['20% IAS','+350% Dmg to Demons'],
+                  alts: [] },
+        belt:   { name: 'String of Ears', base: 'Demonhide Sash', quality: 'unique', icon: '▬',
+                  stats: ['15% DR','+150 AR','6–8% LL'],
+                  alts: [] },
+        boots:  { name: 'Gore Rider', base: 'War Boots', quality: 'unique', icon: '👢',
+                  stats: ['15% CB','10% DS','15% OW'],
+                  alts: [] },
+        amulet: { name: "Highlord's Wrath", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+1 Skills','+DS per Level','20% IAS'],
+                  alts: [] },
+        ring1:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        ring2:  { name: 'Rare LL/AR Ring', base: 'Ring', quality: 'rare', icon: '◯',
+                  stats: ['+Life Leech','+AR','+Attrs'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction stacks','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    /* ═════════════ SORCERESS ═════════════ */
+    frozenOrb: {
+      name: 'FROZEN ORB', label: 'Frozen Orb',
+      className: 'SORCERESS', class: 'sorceress',
+      tier: 'S', stars: 5,
+      role: 'Speed Farmer', content: 'Farming',
+      damage: 'Frozen Orb + Cold Mastery',
+      aura: 'ENERGY SHIELD',
+      defense: '2,600',
+      stats: { str: '60', dex: '55', vit: '350', energy: '75',
+               life: '2,400 / 2,400', mana: '600 / 700', stamina: '580 / 580' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Sorc)',  quality: 'unique', stats: '+3 Sorc Skills · +Stats · +Res' },
+        { name: 'Cold Skiller ×6–8',      quality: 'magic',  stats: '+1 Cold — Orb damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR / FHR' }
+      ],
+      skills: [
+        { name: 'Frozen Orb',        lvl: 20, tree: 'Cold Spells',    tier: 'max' },
+        { name: 'Cold Mastery',      lvl: 20, tree: 'Cold Spells',    tier: 'max' },
+        { name: 'Ice Bolt',          lvl: 20, tree: 'Cold Spells',    tier: 'max' },
+        { name: 'Ice Blast',         lvl: 20, tree: 'Cold Spells',    tier: 'max' },
+        { name: 'Static Field',      lvl: 1,  tree: 'Lightning',      tier: 'high' },
+        { name: 'Teleport',          lvl: 1,  tree: 'Lightning',      tier: 'high' },
+        { name: 'Warmth',            lvl: 1,  tree: 'Fire',           tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','+50% MF','10% DR'],
+                  sockets: '1os via Larzuk — Um (all res) or Ist (MF)',
+                  alts: ['Nightwing\'s Veil — +2 Skills + Cold Skill Dmg'] },
+        weapon: { name: 'Heart of the Oak', base: 'Flail 4os — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['Ko · Vex · Pul · Thul','+3 All Skills','+40% FCR','+75% Dmg Demons'],
+                  alts: ['Death\'s Fathom — +3 Cold Skills','Eschuta\'s Temper — +3 Cold/Light'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch 4os — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Tal · Thul · Ort · Amn','+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: [] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Chains of Honor for res'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: ['Chance Guards — MF'] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'War Traveler', base: 'Battle Boots', quality: 'unique', icon: '👢',
+                  stats: ['+25% MF','+10 Vit/Str','+15% FRW'],
+                  alts: ['Sandstorm Trek — Str/Vit'] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res','+5 Attrs'],
+                  alts: ['+3 Cold Skills Rare Amulet'] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        ring2:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction (breaks CI)','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    blizzard: {
+      name: 'BLIZZARD', label: 'Blizzard',
+      className: 'SORCERESS', class: 'sorceress',
+      tier: 'S', stars: 5,
+      role: 'Boss Killer', content: 'Endgame',
+      damage: 'Blizzard + Cold Mastery',
+      aura: 'ENERGY SHIELD',
+      defense: '2,600',
+      stats: { str: '60', dex: '55', vit: '350', energy: '75',
+               life: '2,400 / 2,400', mana: '600 / 700', stamina: '580 / 580' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Sorc)',  quality: 'unique', stats: '+3 Sorc Skills · +Stats' },
+        { name: 'Cold Skiller ×6–8',      quality: 'magic',  stats: '+1 Cold — Blizzard damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Blizzard',          lvl: 20, tree: 'Cold Spells',    tier: 'max' },
+        { name: 'Ice Blast',         lvl: 20, tree: 'Cold Spells',    tier: 'max' },
+        { name: 'Glacial Spike',     lvl: 20, tree: 'Cold Spells',    tier: 'max' },
+        { name: 'Cold Mastery',      lvl: 20, tree: 'Cold Spells',    tier: 'max' },
+        { name: 'Ice Bolt',          lvl: 1,  tree: 'Cold Spells',    tier: 'prereq' },
+        { name: 'Static Field',      lvl: 1,  tree: 'Lightning',      tier: 'high' },
+        { name: 'Teleport',          lvl: 1,  tree: 'Lightning',      tier: 'high' },
+        { name: 'Warmth',            lvl: 1,  tree: 'Fire',           tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: "Nightwing's Veil", base: 'Spired Helm', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+8–15% Cold Skill Damage','-5–9% Enemy Cold Res'],
+                  alts: ['Shako for MF/DR'] },
+        weapon: { name: "Death's Fathom", base: 'Dimensional Shard', quality: 'unique', icon: '🗡',
+                  stats: ['+3 Cold Skills','+15–30% Cold Skill Dmg','+25% All Res'],
+                  alts: ['Heart of the Oak — FCR + skills','Eschuta\'s Temper'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: [] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: [] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: ['Frostburn — +40% Max Mana'] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'War Traveler', base: 'Battle Boots', quality: 'unique', icon: '👢',
+                  stats: ['+25% MF','+10 Vit/Str','+15% FRW'],
+                  alts: ['Sandstorm Trek'] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: ['+3 Cold Rare Amulet'] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        ring2:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana','+25% Max Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction (breaks CI)','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    hydra: {
+      name: 'HYDRA', label: 'Hydra',
+      className: 'SORCERESS', class: 'sorceress',
+      tier: 'B', stars: 3,
+      role: 'Set & Forget', content: 'General',
+      damage: 'Hydra (3-headed fire)',
+      aura: 'ENERGY SHIELD',
+      defense: '2,400',
+      stats: { str: '60', dex: '55', vit: '340', energy: '75',
+               life: '2,300 / 2,300', mana: '580 / 680', stamina: '580 / 580' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Sorc)',  quality: 'unique', stats: '+3 Sorc Skills' },
+        { name: 'Fire Skiller ×6',        quality: 'magic',  stats: '+1 Fire — Hydra damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Hydra',             lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Fire Bolt',         lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Fire Ball',         lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Fire Mastery',      lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Warmth',            lvl: 1,  tree: 'Fire',           tier: 'high' },
+        { name: 'Teleport',          lvl: 1,  tree: 'Lightning',      tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','+50% MF'],
+                  alts: ["Nightwing's Veil"] },
+        weapon: { name: "Eschuta's Temper", base: 'Eldritch Orb', quality: 'unique', icon: '🗡',
+                  stats: ['+3 Fire/Light Skills','+10–20% Fire/Light Dmg','+40% Mana'],
+                  alts: ['Heart of the Oak'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: [] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: [] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: [] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit'],
+                  alts: [] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: ['+3 Fire Rare Amulet'] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        ring2:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction (breaks FI)','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    nova: {
+      name: 'NOVA', label: 'Nova',
+      className: 'SORCERESS', class: 'sorceress',
+      tier: 'A', stars: 4,
+      role: 'AoE Speed', content: 'Farming',
+      damage: 'Nova + Static Field',
+      aura: 'ENERGY SHIELD',
+      defense: '2,600',
+      stats: { str: '60', dex: '55', vit: '350', energy: '75',
+               life: '2,400 / 2,400', mana: '600 / 700', stamina: '580 / 580' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Sorc)',  quality: 'unique', stats: '+3 Sorc Skills' },
+        { name: 'Lightning Skiller ×6',   quality: 'magic',  stats: '+1 Light — Nova damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Nova',              lvl: 20, tree: 'Lightning',      tier: 'max' },
+        { name: 'Lightning Mastery', lvl: 20, tree: 'Lightning',      tier: 'max' },
+        { name: 'Static Field',      lvl: 20, tree: 'Lightning',      tier: 'max' },
+        { name: 'Charged Bolt',      lvl: 1,  tree: 'Lightning',      tier: 'prereq' },
+        { name: 'Lightning',         lvl: 1,  tree: 'Lightning',      tier: 'prereq' },
+        { name: 'Teleport',          lvl: 1,  tree: 'Lightning',      tier: 'high' },
+        { name: 'Warmth',            lvl: 1,  tree: 'Fire',           tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: "Griffon's Eye", base: 'Diadem', quality: 'unique', icon: '⛑',
+                  stats: ['+1 Skills','-15–20% Enemy Light Res','+10–15% Light Dmg'],
+                  alts: ['Shako'] },
+        weapon: { name: "Eschuta's Temper", base: 'Eldritch Orb', quality: 'unique', icon: '🗡',
+                  stats: ['+3 Fire/Light Skills','+10–20% Fire/Light Dmg'],
+                  alts: ['Heart of the Oak'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: [] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: [] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: [] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'War Traveler', base: 'Battle Boots', quality: 'unique', icon: '👢',
+                  stats: ['+25% MF','+10 Vit/Str'],
+                  alts: [] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: [] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        ring2:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction (breaks LI)','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    meteor: {
+      name: 'METEOR', label: 'Meteor',
+      className: 'SORCERESS', class: 'sorceress',
+      tier: 'B', stars: 3,
+      role: 'Fire Boss', content: 'General',
+      damage: 'Meteor + Fire Ball',
+      aura: 'ENERGY SHIELD',
+      defense: '2,400',
+      stats: { str: '60', dex: '55', vit: '340', energy: '75',
+               life: '2,300 / 2,300', mana: '580 / 680', stamina: '580 / 580' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Sorc)',  quality: 'unique', stats: '+3 Sorc Skills' },
+        { name: 'Fire Skiller ×6',        quality: 'magic',  stats: '+1 Fire — Meteor damage' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Meteor',            lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Fire Ball',         lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Fire Bolt',         lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Fire Mastery',      lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Warmth',            lvl: 1,  tree: 'Fire',           tier: 'high' },
+        { name: 'Teleport',          lvl: 1,  tree: 'Lightning',      tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats'],
+                  alts: ["Nightwing's Veil"] },
+        weapon: { name: "Eschuta's Temper", base: 'Eldritch Orb', quality: 'unique', icon: '🗡',
+                  stats: ['+3 Fire/Light Skills','+10–20% Fire/Light Dmg'],
+                  alts: ['Heart of the Oak'] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: [] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: [] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: [] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit'],
+                  alts: [] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: [] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        ring2:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction (breaks FI)','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    budgetSorc: {
+      name: 'BUDGET COLD', label: 'Budget Cold',
+      className: 'SORCERESS', class: 'sorceress',
+      tier: 'B', stars: 3,
+      role: 'Starter', content: 'Leveling',
+      damage: 'Frozen Orb + Static',
+      aura: 'ENERGY SHIELD',
+      defense: '1,800',
+      stats: { str: '45', dex: '35', vit: '260', energy: '75',
+               life: '2,000 / 2,000', mana: '450 / 550', stamina: '540 / 540' },
+      charms: [
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' },
+        { name: 'Cold Skiller ×1–3',      quality: 'magic',  stats: '+1 Cold if found — save' },
+        { name: "Gheed's Fortune",        quality: 'unique', stats: 'Optional MF/gold charm' }
+      ],
+      skills: [
+        { name: 'Frozen Orb',        lvl: 20, tree: 'Cold Spells',    tier: 'max' },
+        { name: 'Cold Mastery',      lvl: 20, tree: 'Cold Spells',    tier: 'max' },
+        { name: 'Static Field',      lvl: 1,  tree: 'Lightning',      tier: 'high' },
+        { name: 'Teleport',          lvl: 1,  tree: 'Lightning',      tier: 'high' },
+        { name: 'Warmth',            lvl: 1,  tree: 'Fire',           tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Lore', base: '2os Helm — Runeword', quality: 'runeword', icon: '⛑',
+                  stats: ['Ort · Sol','+1 All Skills','+10 Energy'],
+                  alts: ['Peasant Crown — +1 skills'] },
+        weapon: { name: 'Spirit Sword', base: 'Crystal Sword 4os — RW', quality: 'runeword', icon: '🗡',
+                  stats: ['Tal · Thul · Ort · Amn','+2 Skills','+25–35% FCR','+55 All Res'],
+                  alts: ['Wizardspike — 50% FCR mid-tier'] },
+        shield: { name: 'Ancient\'s Pledge', base: '3os Shield — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['Ral · Ort · Tal','+50% Resistances','Cheap early defense'],
+                  alts: ['Spirit Monarch endgame'] },
+        armor:  { name: 'Stealth', base: '2os Body — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['Tal · Eth','+25% FRW','+25% FCR','+6 Dex'],
+                  alts: ['Smoke — +50 All Res'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: ['Chance Guards — MF'] },
+        belt:   { name: 'Goldwrap', base: 'Heavy Belt', quality: 'unique', icon: '▬',
+                  stats: ['+30% MF','+10% IAS','+25–75 Gold Find'],
+                  alts: ['Tal Rasha\'s belt'] },
+        boots:  { name: 'War Traveler', base: 'Battle Boots', quality: 'unique', icon: '👢',
+                  stats: ['+25% MF','+10 Vit/Str','+15% FRW'],
+                  alts: ['Silkweave — mana boost'] },
+        amulet: { name: '+2 Sorc Rare', base: 'Amulet', quality: 'rare', icon: '📿',
+                  stats: ['+2 Sorc Skills','+Res','+Life/Mana'],
+                  alts: ["Mara's Kaleidoscope"] },
+        ring1:  { name: 'Nagelring', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+15–30% MF','+50–75 AR'] },
+        ring2:  { name: 'Manald Heal', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['Heal +5–8 Life','+8–12 Mana'] },
+        merc:   { name: 'Act 2 Prayer Merc', base: 'Hell Combat · Prayer Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Prayer','Insight polearm — Meditation','Smoke armor','Tal Rasha\'s helm'],
+                  alts: [] }
+      }
+    },
+
+    meteorb: {
+      name: 'METEORB', label: 'Meteorb',
+      className: 'SORCERESS', class: 'sorceress',
+      tier: 'S', stars: 5,
+      role: 'All-Purpose', content: 'General',
+      damage: 'Meteor + Frozen Orb hybrid',
+      aura: 'ENERGY SHIELD',
+      defense: '2,600',
+      stats: { str: '60', dex: '55', vit: '350', energy: '75',
+               life: '2,400 / 2,400', mana: '600 / 700', stamina: '580 / 580' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats · +Res' },
+        { name: 'Hellfire Torch (Sorc)',  quality: 'unique', stats: '+3 Sorc Skills · +Stats' },
+        { name: 'Cold/Fire Skiller mix',  quality: 'magic',  stats: '+1 Cold and Fire — split boost' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / FCR' }
+      ],
+      skills: [
+        { name: 'Frozen Orb',        lvl: 20, tree: 'Cold Spells',    tier: 'max' },
+        { name: 'Cold Mastery',      lvl: 20, tree: 'Cold Spells',    tier: 'max' },
+        { name: 'Meteor',            lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Fire Mastery',      lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Fire Ball',         lvl: 1,  tree: 'Fire',           tier: 'prereq' },
+        { name: 'Warmth',            lvl: 1,  tree: 'Fire',           tier: 'high' },
+        { name: 'Static Field',      lvl: 1,  tree: 'Lightning',      tier: 'high' },
+        { name: 'Teleport',          lvl: 1,  tree: 'Lightning',      tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','+50% MF','10% DR'],
+                  alts: ["Nightwing's Veil for Cold hybrid"] },
+        weapon: { name: 'Heart of the Oak', base: 'Flail — Runeword', quality: 'runeword', icon: '🗡',
+                  stats: ['+3 Skills','+40% FCR','+75% Dmg Demons'],
+                  alts: ["Eschuta's Temper — +3 Fire/Light"] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: [] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: [] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: [] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'War Traveler', base: 'Battle Boots', quality: 'unique', icon: '👢',
+                  stats: ['+25% MF','+10 Vit/Str','+15% FRW'],
+                  alts: [] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: [] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        ring2:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might','Infinity polearm — Conviction (breaks CI/FI)','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    },
+
+    enchantress: {
+      name: 'ENCHANTRESS', label: 'Enchantress',
+      className: 'SORCERESS', class: 'sorceress',
+      tier: 'B', stars: 3,
+      role: 'Party Buffer', content: 'General',
+      damage: 'Enchant + Melee/Ranged',
+      aura: 'ENERGY SHIELD',
+      defense: '3,600',
+      stats: { str: '95', dex: '110', vit: '340', energy: '35',
+               life: '2,400 / 2,400', mana: '380 / 440', stamina: '650 / 650' },
+      charms: [
+        { name: 'Annihilus',              quality: 'unique', stats: '+1 All Skills · +20 Stats' },
+        { name: 'Hellfire Torch (Sorc)',  quality: 'unique', stats: '+3 Sorc Skills' },
+        { name: 'Fire Skiller ×6',        quality: 'magic',  stats: '+1 Fire — Enchant fire dmg' },
+        { name: 'Small Charms',           quality: 'magic',  stats: '20 Life / 5+ Res / IAS' }
+      ],
+      skills: [
+        { name: 'Enchant',           lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Fire Mastery',      lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Warmth',            lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Fire Bolt',         lvl: 20, tree: 'Fire',           tier: 'max' },
+        { name: 'Teleport',          lvl: 1,  tree: 'Lightning',      tier: 'high' },
+        { name: 'Static Field',      lvl: 1,  tree: 'Lightning',      tier: 'high' }
+      ],
+      slots: {
+        helm:   { name: 'Shako', base: 'Shako', quality: 'unique', icon: '⛑',
+                  stats: ['+2 All Skills','+2 Stats','+50% MF'],
+                  alts: ['Peasant Crown — cheap +1 Skills'] },
+        weapon: { name: 'Demon Machine', base: 'Chu-Ko-Nu', quality: 'unique', icon: '🗡',
+                  stats: ['+150 Def','+40% IAS','+95 Fire Dmg','Fires Explosive Bolts'],
+                  alts: ["Eschuta's Temper — +3 Fire","Passion — Berserk on swap"] },
+        shield: { name: 'Spirit Monarch', base: 'Monarch — Runeword', quality: 'runeword', icon: '⛨',
+                  stats: ['+2 Skills','25–35% FCR','+55 All Res'],
+                  alts: ['(if using bow — no shield)'] },
+        armor:  { name: 'Enigma', base: 'Mage Plate — Runeword', quality: 'runeword', icon: '🛡',
+                  stats: ['+2 Skills','+45% FRW','+1 Teleport'],
+                  alts: ['Chains of Honor'] },
+        gloves: { name: 'Magefist', base: 'Light Gauntlets', quality: 'unique', icon: '🧤',
+                  stats: ['+1 Fire','20% FCR','25% Mana Regen'],
+                  alts: ['Laying of Hands — 20% IAS + demons'] },
+        belt:   { name: 'Arachnid Mesh', base: 'Spiderweb Sash', quality: 'unique', icon: '▬',
+                  stats: ['+1 Skills','20% FCR','+90–120 Mana'],
+                  alts: [] },
+        boots:  { name: 'Sandstorm Trek', base: 'Scarabshell Boots', quality: 'unique', icon: '👢',
+                  stats: ['+20% FRW','+10–15 Str/Vit'],
+                  alts: [] },
+        amulet: { name: "Mara's Kaleidoscope", base: 'Amulet', quality: 'unique', icon: '📿',
+                  stats: ['+2 All Skills','+20–30 All Res'],
+                  alts: ['+3 Fire Rare Amulet'] },
+        ring1:  { name: 'Stone of Jordan', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['+1 Skills','+20 Mana'] },
+        ring2:  { name: 'Raven Frost', base: 'Ring', quality: 'unique', icon: '◯',
+                  stats: ['CBF','+15–20 Dex','+150–250 AR'] },
+        merc:   { name: 'Act 2 Might Merc', base: 'Nightmare Offensive · Might Aura', quality: 'normal', icon: '🗡',
+                  stats: ['Aura: Might (+Enchant on merc = massive dmg)','Infinity polearm','Fortitude','Andariel\'s Visage'],
+                  alts: [] }
+      }
+    }
+    // Additional builds can be added here later — the viewer auto-populates.
+  };
+
+  // ─── DOM refs ───
+  const buildSelect = document.getElementById('d2-build-select');
+  const classSelect = document.getElementById('d2-class-select');
+  const nameplate   = document.getElementById('d2-nameplate');
+  const classplate  = document.getElementById('d2-classplate');
+  const tierEl      = document.getElementById('d2-tier');
+  const starsEl     = document.getElementById('d2-stars');
+  const roleEl      = document.getElementById('d2-role');
+  const contentEl   = document.getElementById('d2-content');
+  const damageEl    = document.getElementById('d2-damage');
+  const auraEl      = document.getElementById('d2-aura');
+  const defenseEl   = document.getElementById('d2-defense');
+  const charmListEl = document.getElementById('d2-charm-list');
+  const skillListEl = document.getElementById('d2-skill-list');
+
+  const modal       = document.getElementById('d2-item-modal');
+  const ttName      = document.getElementById('d2-tt-name');
+  const ttBase      = document.getElementById('d2-tt-base');
+  const ttStats     = document.getElementById('d2-tt-stats');
+  const ttSockets   = document.getElementById('d2-tt-sockets');
+  const ttSocketTxt = document.getElementById('d2-tt-socket-text');
+  const ttAlts      = document.getElementById('d2-tt-alts');
+  const ttAltList   = document.getElementById('d2-tt-alt-list');
+
+  const charmsModal  = document.getElementById('d2-charms-modal');
+  const skillsModal  = document.getElementById('d2-skills-modal');
+  const openCharmsBtn= document.getElementById('d2-open-charms');
+  const openSkillsBtn= document.getElementById('d2-open-skills');
+
+  const slotBtns    = viewer.querySelectorAll('.d2-slot, .d2-merc-slot');
+
+  // ─── Render one build into the paperdoll + stats ───
+  function renderBuild(key) {
+    const b = BUILDS[key];
+    if (!b) return;
+
+    nameplate.textContent  = b.name;
+    classplate.textContent = b.className;
+
+    // Tier / stars / role / content
+    if (tierEl) {
+      const tier = (b.tier || 'B').toUpperCase();
+      tierEl.textContent = tier;
+      tierEl.setAttribute('data-tier', tier);
+    }
+    if (starsEl) {
+      const n = Math.max(0, Math.min(5, b.stars || 0));
+      starsEl.innerHTML = '★'.repeat(n) + '<span class="empty">' + '☆'.repeat(5 - n) + '</span>';
+      starsEl.setAttribute('aria-label', `${n} out of 5 stars`);
+    }
+    if (roleEl)    roleEl.textContent    = (b.role    || '—').toUpperCase();
+    if (contentEl) contentEl.textContent = (b.content || '—').toUpperCase();
+
+    damageEl.textContent   = b.damage;
+    auraEl.textContent     = b.aura;
+    defenseEl.textContent  = b.defense;
+
+    // Inventory / Charms list
+    if (charmListEl) {
+      charmListEl.innerHTML = (b.charms || []).map(c =>
+        `<li class="d2-charm-item q-${c.quality || 'magic'}">
+           <span class="d2-charm-name">${c.name}</span>
+           <span class="d2-charm-stats">${c.stats || ''}</span>
+         </li>`
+      ).join('');
+    }
+
+    // Skill Allocation list
+    if (skillListEl) {
+      skillListEl.innerHTML = (b.skills || []).map(s =>
+        `<li class="d2-skill-item ${s.tier || ''}">
+           <span>
+             <span class="d2-skill-name">${s.name}</span>
+             <span class="d2-skill-tree">${s.tree || ''}</span>
+           </span>
+           <span class="d2-skill-lvl">${s.lvl}</span>
+         </li>`
+      ).join('');
+    }
+
+    // Update the primary attribute values (STR/DEX/VIT/ENR)
+    const attrMap = { str: 'd2-attr-str', dex: 'd2-attr-dex', vit: 'd2-attr-vit', nrg: 'd2-attr-nrg' };
+    ['str', 'dex', 'vit'].forEach(k => {
+      const row = document.getElementById(attrMap[k]);
+      if (row) row.querySelector('.d2-attr-val').textContent = b.stats[k] || '—';
+    });
+    const nrgRow = document.getElementById('d2-attr-nrg');
+    if (nrgRow) nrgRow.querySelector('.d2-attr-val').textContent = b.stats.energy || '—';
+
+    // Life/Mana/Stamina in the side cells
+    const vitSide = document.getElementById('d2-attr-vit');
+    if (vitSide) {
+      const parts = vitSide.querySelectorAll('.d2-side-val');
+      if (parts[0]) parts[0].textContent = b.stats.stamina || '—';
+      if (parts[1]) { parts[1].textContent = b.stats.life || '—'; parts[1].classList.add('d2-side-blue'); }
+    }
+    const nrgSide = document.getElementById('d2-attr-nrg');
+    if (nrgSide) {
+      const manaEl = nrgSide.querySelector('.d2-side-val');
+      if (manaEl) manaEl.textContent = b.stats.mana || '—';
+    }
+
+    // Populate each slot — the LABEL stays as the slot name ("Weapon", "Helm", etc.).
+    // We only toggle a quality class on the slot for the D2 color/glow, and mark it clickable.
+    const QUALITY_CLASSES = ['q-unique','q-set','q-magic','q-rare','q-runeword','q-crafted','q-normal'];
+    slotBtns.forEach(btn => {
+      const slotKey = btn.dataset.slot;
+      const item    = b.slots[slotKey];
+
+      // Clean previous quality/state classes
+      btn.classList.remove('has-item', 'empty', ...QUALITY_CLASSES);
+
+      if (!item) {
+        btn.classList.add('empty');
+        return;
+      }
+
+      btn.classList.add('has-item', 'q-' + (item.quality || 'normal'));
+    });
+  }
+
+  // ─── Modal open/close ───
+  function openItemModal(item) {
+    if (!item) return;
+    ttName.textContent = item.name;
+    ttName.className   = 'd2-tt-name q-' + (item.quality || 'normal');
+    ttBase.textContent = item.base || '';
+
+    ttStats.innerHTML = '';
+    (item.stats || []).forEach(s => {
+      const li = document.createElement('li');
+      // Blank line acts as separator
+      if (!s.trim()) { li.innerHTML = '&nbsp;'; li.style.padding = '0.15rem 0'; }
+      else if (s.startsWith('►')) { li.className = 'tt-gold'; li.textContent = s; }
+      else if (s.startsWith('+') || s.includes('%') || /\d/.test(s)) { li.textContent = s; }
+      else { li.textContent = s; }
+      ttStats.appendChild(li);
+    });
+
+    if (item.sockets) {
+      ttSockets.hidden = false;
+      ttSocketTxt.textContent = item.sockets;
+    } else {
+      ttSockets.hidden = true;
+    }
+
+    ttAltList.innerHTML = '';
+    if (item.alts && item.alts.length) {
+      ttAlts.hidden = false;
+      item.alts.forEach(a => {
+        const li = document.createElement('li');
+        li.textContent = a;
+        ttAltList.appendChild(li);
+      });
+    } else {
+      ttAlts.hidden = true;
+    }
+
+    modal.hidden = false;
+    // Focus the close button for keyboard users
+    setTimeout(() => modal.querySelector('.d2-item-close')?.focus(), 20);
+  }
+  function closeItemModal() {
+    modal.hidden = true;
+  }
+
+  // ─── Wire events ───
+  slotBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const currentBuild = BUILDS[buildSelect.value];
+      if (!currentBuild) return;
+      const item = currentBuild.slots[btn.dataset.slot];
+      if (!item) return;
+      openItemModal(item);
+    });
+  });
+
+  buildSelect.addEventListener('change', () => renderBuild(buildSelect.value));
+
+  // ─── Class filter: rebuild the Build dropdown to only show matching builds ───
+  function refreshBuildOptions(classFilter) {
+    const prev = buildSelect.value;
+    const matches = Object.entries(BUILDS).filter(([, b]) =>
+      classFilter === 'all' || b.class === classFilter
+    );
+    buildSelect.innerHTML = '';
+    if (!matches.length) {
+      const opt = document.createElement('option');
+      opt.value = ''; opt.disabled = true; opt.selected = true;
+      opt.textContent = '— No builds yet for this class —';
+      buildSelect.appendChild(opt);
+      buildSelect.disabled = true;
+      return;
+    }
+    buildSelect.disabled = false;
+    matches.forEach(([key, b]) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = b.label || (b.name.charAt(0) + b.name.slice(1).toLowerCase());
+      buildSelect.appendChild(opt);
+    });
+    // Preserve previous selection if it survived the filter, otherwise pick first
+    const keys = matches.map(([k]) => k);
+    buildSelect.value = keys.includes(prev) ? prev : keys[0];
+    renderBuild(buildSelect.value);
+  }
+
+  if (classSelect) {
+    classSelect.addEventListener('change', () => refreshBuildOptions(classSelect.value));
+  }
+
+  // ─── Open/close info modals (charms + skills) ───
+  function openInfoModal(m) {
+    if (!m) return;
+    m.hidden = false;
+    setTimeout(() => m.querySelector('.d2-item-close')?.focus(), 20);
+  }
+  function closeInfoModal(m) { if (m) m.hidden = true; }
+
+  openCharmsBtn?.addEventListener('click', () => openInfoModal(charmsModal));
+  openSkillsBtn?.addEventListener('click', () => openInfoModal(skillsModal));
+
+  [charmsModal, skillsModal].forEach(m => {
+    if (!m) return;
+    m.addEventListener('click', (e) => {
+      if (e.target.matches('[data-close-modal]')) closeInfoModal(m);
+    });
+  });
+
+  // Close on backdrop click, close-button click, or Escape key
+  modal.addEventListener('click', (e) => {
+    if (e.target.matches('[data-close-modal]')) closeItemModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (!modal.hidden)        closeItemModal();
+      if (charmsModal && !charmsModal.hidden) closeInfoModal(charmsModal);
+      if (skillsModal && !skillsModal.hidden) closeInfoModal(skillsModal);
+    }
+  });
+
+  // Initial render — respects the initially-selected class filter
+  refreshBuildOptions(classSelect ? classSelect.value : 'all');
+})();
+
 
 

@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Diablo II — Complete Guide</title>
+  <!-- Diablo-style typography (all free Google Fonts):
+         Cinzel + Cinzel Decorative → chiseled Roman titles (Exocet substitute)
+         MedievalSharp                → medieval body/UI text (AvQest substitute) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700;900&family=MedievalSharp&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -260,1564 +266,220 @@
       <h2 class="section-title">Builds &amp; Gear by Class</h2>
       <p class="section-desc">From beginner-friendly budget setups to endgame Best-in-Slot builds — pick your playstyle.</p>
 
-      <div class="filter-bar build-filter-bar">
-        <button class="filter-btn active" data-build-filter="all">All Classes</button>
-        <button class="filter-btn" data-build-filter="amazon">🏹 Amazon</button>
-        <button class="filter-btn" data-build-filter="necromancer">💀 Necro</button>
-        <button class="filter-btn" data-build-filter="barbarian">⚔️ Barb</button>
-        <button class="filter-btn" data-build-filter="sorceress">🔥 Sorc</button>
-        <button class="filter-btn" data-build-filter="paladin">🛡️ Pally</button>
-        <button class="filter-btn" data-build-filter="druid">🌿 Druid</button>
-        <button class="filter-btn" data-build-filter="assassin">🗡️ Assassin</button>
-      </div>
-
-      <!-- ═══════════════════ AMAZON ═══════════════════ -->
-      <div class="class-group theme-amazon" data-build-class="amazon">
-        <h3 class="class-group-title" id="build-amazon">🏹 Amazon Builds</h3>
-
-        <div class="build-card theme-amazon">
-          <div class="build-header">
-            <span class="build-icon">⚡</span>
-            <div>
-              <h3>Javazon <span class="build-badge badge-endgame">Endgame</span></h3>
-              <span class="build-rating">★★★★★<span class="tier-label">S-TIER</span></span>
-              <p class="build-sub">Lightning Fury / Charged Strike — PvM Cow Farmer &amp; Boss Killer</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Griffon's Eye (-15/-15) / Andariel's Visage</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Titan's Revenge (throw) / Thunderstroke</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Stormshield / Spirit Monarch</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma / Chains of Honor / Fortitude</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Bloodfist / Trang-Oul's Claws</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Razortail / Verdungo's Hearty Cord</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">War Traveler (MF) / Gore Rider (PvP)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Mara's Kaleidoscope</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Raven Frost / Bul-Kathos' Wedding Band</span></div>
-            <div class="row"><span class="k">Inventory</span><span class="v">Torch • Anni • Java Skillers • Life SCs</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Might (Act 2 NM Offensive)</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity • Fortitude • Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Primary</span><span class="v">Lightning Fury 20 • Charged Strike 20</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Lightning Bolt 20 • Power Strike 20</span></div>
-            <div class="row"><span class="k">Passive</span><span class="v">Valkyrie 1 • Decoy 1 • Pierce 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest   ENE: 0</span></div>
+      <!-- ═════════════ Interactive Character Window (D2 paperdoll) ═════════════ -->
+      <div class="d2-viewer-wrap" id="d2-viewer">
+        <div class="d2-viewer-header">
+          <div class="d2-viewer-title">⚔️ Interactive Build Viewer</div>
+          <div class="d2-viewer-picker">
+            <label for="d2-class-select">Class:</label>
+            <select id="d2-class-select" aria-label="Filter builds by class">
+              <option value="all">All Classes</option>
+              <option value="amazon">🏹 Amazon</option>
+              <option value="assassin">🥷 Assassin</option>
+              <option value="barbarian">⚔️ Barbarian</option>
+              <option value="druid">🌿 Druid</option>
+              <option value="necromancer">💀 Necromancer</option>
+              <option value="paladin" selected>🛡️ Paladin</option>
+              <option value="sorceress">🔥 Sorceress</option>
+            </select>
+            <label for="d2-build-select">Build:</label>
+            <select id="d2-build-select" aria-label="Choose a build to view">
+              <option value="smiter">Smiter</option>
+            </select>
           </div>
         </div>
 
-        <div class="build-card theme-amazon">
-          <div class="build-header">
-            <span class="build-icon">❄️</span>
-            <div>
-              <h3>Freezing Arrow Bowazon <span class="build-badge badge-mf">MF / Alt</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Cold Bow Amazon — Excellent Pindle / Countess MF Runner</p>
+        <div class="d2-window">
+          <!-- Left: Stats panel -->
+          <aside class="d2-stats-side">
+            <div class="d2-nameplate-row">
+              <div class="d2-cell d2-cell-name">
+                <div class="d2-cell-label">Name</div>
+                <div class="d2-cell-val d2-cell-buildname" id="d2-nameplate">SMITER</div>
+              </div>
+              <div class="d2-cell d2-cell-class">
+                <div class="d2-cell-label">Class</div>
+                <div class="d2-cell-val" id="d2-classplate">PALADIN</div>
+              </div>
             </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Andariel's Visage / Griffon's Eye</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Faith Grand Matron Bow (BiS) / Windforce</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">— (2H Bow)</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Fortitude / Enigma</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Laying of Hands / Bloodfist</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Razortail / Goldwrap (MF)</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">War Traveler (MF)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Cat's Eye / Highlord's Wrath</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Raven Frost / Nagelring (MF)</span></div>
-            <div class="row"><span class="k">Inventory</span><span class="v">Torch • Anni • Bow Skillers</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Might / Holy Freeze</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight • Treachery • Tal Rasha's Horadric Crest</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Primary</span><span class="v">Freezing Arrow 20 • Ice Arrow 20 • Cold Arrow 20</span></div>
-            <div class="row"><span class="k">Passive</span><span class="v">Penetrate 20 • Critical Strike 1</span></div>
-            <div class="row"><span class="k">Utility</span><span class="v">Valkyrie 1 • Decoy 1 • Pierce 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Bow req   DEX: Max   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
 
-        <div class="build-card theme-amazon">
-          <div class="build-header">
-            <span class="build-icon">🏹</span>
-            <div>
-              <h3>Multishot Bowazon <span class="build-badge badge-alt">Alt Bow</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Physical Bow — Screen-wide arrow spam</p>
+            <div class="d2-tier-row">
+              <div class="d2-cell d2-cell-tier">
+                <div class="d2-cell-label">Tier</div>
+                <div class="d2-cell-val d2-tier-val">
+                  <span class="d2-tier-letter" id="d2-tier" data-tier="S">S</span>
+                  <span class="d2-tier-stars" id="d2-stars" aria-label="5 out of 5 stars">★★★★★</span>
+                </div>
+              </div>
+              <div class="d2-cell">
+                <div class="d2-cell-label">Role</div>
+                <div class="d2-cell-val d2-tag-val" id="d2-role">UBER</div>
+              </div>
+              <div class="d2-cell">
+                <div class="d2-cell-label">Content</div>
+                <div class="d2-cell-val d2-tag-val" id="d2-content">ENDGAME</div>
+              </div>
             </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Andariel's Visage / +2 Bow Skills Circlet</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Faith (Fanaticism) 6L Grand Matron Bow / Windforce</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Fortitude / Enigma / Treachery</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Laying of Hands / Dracul's Grasp</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Razortail (pierce) / Nosferatu's Coil</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider / War Traveler (MF)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Cat's Eye</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Raven Frost / Ravenfrost + Rare +Dex</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Might / Prayer (Act 2)</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight • Fortitude • Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Bow</span><span class="v">Multishot 20 • Guided Arrow 20 • Strafe 1</span></div>
-            <div class="row"><span class="k">Passive</span><span class="v">Critical Strike 20 • Penetrate 20 • Pierce 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
 
-        <div class="build-card theme-amazon">
-          <div class="build-header">
-            <span class="build-icon">💰</span>
-            <div>
-              <h3>Budget Javazon <span class="build-badge badge-budget">Budget / Starter</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Under 5 Ists — Complete Hell with basic gear</p>
+            <div class="d2-attr-block">
+              <div class="d2-attr-row" id="d2-attr-str">
+                <span class="d2-attr-name">Strength</span>
+                <span class="d2-attr-val">156</span>
+                <div class="d2-attr-side"><span class="d2-side-lbl">Damage</span><span class="d2-side-val" id="d2-damage">Skill-based (Smite)</span></div>
+              </div>
+              <div class="d2-attr-row" id="d2-attr-dex">
+                <span class="d2-attr-name">Dexterity</span>
+                <span class="d2-attr-val">136</span>
+                <div class="d2-attr-side"><span class="d2-side-lbl">Aura</span><span class="d2-side-val" id="d2-aura">FANATICISM</span></div>
+              </div>
+              <div class="d2-attr-row d2-attr-spacer">
+                <span class="d2-attr-name">&nbsp;</span>
+                <span class="d2-attr-val">&nbsp;</span>
+                <div class="d2-attr-side"><span class="d2-side-lbl">Defense</span><span class="d2-side-val" id="d2-defense">11,017</span></div>
+              </div>
+              <div class="d2-attr-row" id="d2-attr-vit">
+                <span class="d2-attr-name">Vitality</span>
+                <span class="d2-attr-val">407</span>
+                <div class="d2-attr-side d2-attr-side-split">
+                  <div><span class="d2-side-lbl">Stamina</span><span class="d2-side-val">987 / 987</span></div>
+                  <div><span class="d2-side-lbl">Life</span><span class="d2-side-val d2-side-blue">3324 / 3333</span></div>
+                </div>
+              </div>
+              <div class="d2-attr-row" id="d2-attr-nrg">
+                <span class="d2-attr-name">Energy</span>
+                <span class="d2-attr-val">35</span>
+                <div class="d2-attr-side"><span class="d2-side-lbl">Mana</span><span class="d2-side-val d2-side-blue">142 / 369</span></div>
+              </div>
             </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Tal Rasha's Horadric Crest / Peasant Crown</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Titan's Revenge / Stormstrike</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Ancient's Pledge / Rhyme</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Spirit Sword + Rhyme</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Skin of the Vipermagi / Smoke Runeword</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist / Rare +2 Amazon Gloves</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">String of Ears / Razortail</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Goblin Toe / Waterwalk</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Rare +2 Javelin &amp; Spear / Highlord's</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Rare Life/Res Ring</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight polearm + Treachery + any helm</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Priority</span><span class="v">Charged Strike first, then Lightning Fury</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
 
-        <div class="build-card theme-amazon">
-          <div class="build-header">
-            <span class="build-icon">🎯</span>
-            <div>
-              <h3>Strafeazon <span class="build-badge badge-alt">Bow Physical</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Strafe — Auto-cycling multi-target arrow spam (Boss killer)</p>
+            <div class="d2-info-btns">
+              <button type="button" class="d2-info-btn" id="d2-open-charms">
+                <span class="d2-info-btn-icon">✦</span>
+                <span class="d2-info-btn-label">Inventory / Charms</span>
+                <span class="d2-info-btn-hint">View →</span>
+              </button>
+              <button type="button" class="d2-info-btn" id="d2-open-skills">
+                <span class="d2-info-btn-icon">⚔</span>
+                <span class="d2-info-btn-label">Skill Allocation</span>
+                <span class="d2-info-btn-hint">View →</span>
+              </button>
             </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Andariel's Visage / Griffon's Eye (Light)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Faith GMB (Fanaticism aura) / Windforce / Eaglehorn</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Fortitude (+300% enhanced dmg) / Enigma</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Laying of Hands (+ Demon dmg, 20 IAS)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Razortail (Pierce!) / String of Ears</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider (Deadly + Open Wounds)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Cat's Eye</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Raven Frost</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity + Fortitude + Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Bow</span><span class="v">Strafe 20 • Guided Arrow 1 • Multishot 1</span></div>
-            <div class="row"><span class="k">Passive</span><span class="v">Critical Strike 20 • Penetrate 20 • Pierce 1</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Valkyrie 1 • Decoy 1 • Dodge/Avoid pre-reqs</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Bow req   DEX: Max   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
 
-        <div class="build-card theme-amazon">
-          <div class="build-header">
-            <span class="build-icon">🔱</span>
-            <div>
-              <h3>Spearazon (Fend/Impale) <span class="build-badge badge-alt">Melee Ama</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Fend spear attack — untargetable multi-hit combo, physical DPS</p>
+            <div class="d2-viewer-hint">💡 Click any equipment slot to see the BiS item, stats &amp; alternatives.</div>
+          </aside>
+
+          <!-- Right: Paperdoll -->
+          <div class="d2-paperdoll">
+            <div class="d2-tabs">
+              <span class="d2-tab active">I</span><span class="d2-tab">II</span>
             </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Andariel's Visage / Guillaume's Face</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Lycander's Flank / Hone Sundan / Ghostflame</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Fortitude / Chains of Honor</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Dracul's Grasp (Life Tap) / Laying of Hands</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Verdungo's / Thundergod's</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's / Mara's / +2 Spear Amazon</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Bul-Kathos'</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Reaper's Toll (Decrepify) + Treachery + Andariel's</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Spear</span><span class="v">Fend 20 • Jab 20 • Impale 1</span></div>
-            <div class="row"><span class="k">Passive</span><span class="v">Critical Strike 20 • Penetrate 20 • Pierce 1</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Valkyrie 20 • Decoy 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
+
+            <div class="d2-paperdoll-grid">
+              <button class="d2-slot d2-slot-weapon"  data-slot="weapon"  type="button" aria-label="Weapon slot">
+                <span class="d2-slot-marker">🗡</span>
+                <span class="d2-slot-label">Weapon</span>
+              </button>
+              <button class="d2-slot d2-slot-helm"    data-slot="helm"    type="button" aria-label="Helm slot">
+                <span class="d2-slot-marker">⛑</span>
+                <span class="d2-slot-label">Helm</span>
+              </button>
+              <button class="d2-slot d2-slot-amulet"  data-slot="amulet"  type="button" aria-label="Amulet slot">
+                <span class="d2-slot-marker">📿</span>
+                <span class="d2-slot-label">Amu</span>
+              </button>
+              <button class="d2-slot d2-slot-shield"  data-slot="shield"  type="button" aria-label="Shield slot">
+                <span class="d2-slot-marker">⛨</span>
+                <span class="d2-slot-label">Shield</span>
+              </button>
+              <button class="d2-slot d2-slot-armor"   data-slot="armor"   type="button" aria-label="Body armor slot">
+                <span class="d2-slot-marker">🛡</span>
+                <span class="d2-slot-label">Armor</span>
+              </button>
+              <button class="d2-slot d2-slot-gloves"  data-slot="gloves"  type="button" aria-label="Gloves slot">
+                <span class="d2-slot-marker">🧤</span>
+                <span class="d2-slot-label">Gloves</span>
+              </button>
+              <button class="d2-slot d2-slot-ring1"   data-slot="ring1"   type="button" aria-label="Left ring slot">
+                <span class="d2-slot-marker">◯</span>
+                <span class="d2-slot-label">Ring</span>
+              </button>
+              <button class="d2-slot d2-slot-belt"    data-slot="belt"    type="button" aria-label="Belt slot">
+                <span class="d2-slot-marker">▬</span>
+                <span class="d2-slot-label">Belt</span>
+              </button>
+              <button class="d2-slot d2-slot-ring2"   data-slot="ring2"   type="button" aria-label="Right ring slot">
+                <span class="d2-slot-marker">◯</span>
+                <span class="d2-slot-label">Ring</span>
+              </button>
+              <button class="d2-slot d2-slot-boots"   data-slot="boots"   type="button" aria-label="Boots slot">
+                <span class="d2-slot-marker">👢</span>
+                <span class="d2-slot-label">Boots</span>
+              </button>
+            </div>
+
+            <div class="d2-merc-bar">
+              <button class="d2-merc-slot" data-slot="merc" type="button" aria-label="Mercenary loadout">
+                <span class="d2-slot-marker">🗡</span>
+                <span class="d2-merc-label">MERCENARY</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- ═══════════════════ NECROMANCER ═══════════════════ -->
-      <div class="class-group theme-necromancer" data-build-class="necromancer">
-        <h3 class="class-group-title" id="build-necromancer">💀 Necromancer Builds</h3>
-
-        <div class="build-card theme-necromancer">
-          <div class="build-header">
-            <span class="build-icon">🦴</span>
-            <div>
-              <h3>Summonmancer <span class="build-badge badge-endgame">Endgame</span></h3>
-              <span class="build-rating">★★★★★<span class="tier-label">S-TIER</span></span>
-              <p class="build-sub">Skeleton Army — Hardcore-Safe, Group-Friendly</p>
-            </div>
+      <!-- ═════════════ D2-style item tooltip modal ═════════════ -->
+      <div id="d2-item-modal" class="d2-item-modal" hidden>
+        <div class="d2-item-backdrop" data-close-modal></div>
+        <div class="d2-item-tooltip" role="dialog" aria-modal="true" aria-labelledby="d2-tt-name">
+          <button class="d2-item-close" type="button" data-close-modal aria-label="Close">✕</button>
+          <div class="d2-tt-header">
+            <div class="d2-tt-name" id="d2-tt-name">—</div>
+            <div class="d2-tt-base" id="d2-tt-base">—</div>
           </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Harlequin Crest (Shako) / +3 Summon Circlet</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Beast (Fanaticism Aura) / White Wand +3 SM</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Homunculus / Spirit Monarch</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma (Teleport is mandatory)</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Trang-Oul's Claws (+2 Curses)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Marrowwalk / Sandstorm Trek</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope / +3 Summon Necro Amulet</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan</span></div>
-            <div class="row"><span class="k">Inventory</span><span class="v">Torch • Anni • Summon Skillers</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Might / Holy Freeze</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight • Reaper's Toll • Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Primary</span><span class="v">Raise Skeleton 20 • Skeleton Mastery 20</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Summon Resist 20 • Skeletal Mage 1</span></div>
-            <div class="row"><span class="k">Curses</span><span class="v">Amp Damage 1 • Decrepify 1 • Lower Resist 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
+          <div class="d2-tt-body">
+            <ul class="d2-tt-stats" id="d2-tt-stats"></ul>
           </div>
-        </div>
-
-        <div class="build-card theme-necromancer">
-          <div class="build-header">
-            <span class="build-icon">🩸</span>
-            <div>
-              <h3>Bonemancer <span class="build-badge badge-pvp">PvP / Alt</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Bone Spear / Bone Spirit — Immune to Physical Immunes</p>
-            </div>
+          <div class="d2-tt-sockets" id="d2-tt-sockets" hidden>
+            <div class="d2-tt-sublabel">Sockets:</div>
+            <div class="d2-tt-socket-text" id="d2-tt-socket-text"></div>
           </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Harlequin Crest (Shako)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Death's Web (BiS) / Heart of the Oak</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Homunculus / Spirit Monarch</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist / Trang-Oul's Claws</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek / Marrowwalk</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan / 10 FCR Rare</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Holy Freeze</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight • Treachery • Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Primary</span><span class="v">Bone Spear 20 • Bone Spirit 20 • Bone Wall 20</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Bone Prison 20 • Teeth 1</span></div>
-            <div class="row"><span class="k">Curses</span><span class="v">Amp Damage 1 • Lower Resist 1 • Bone Armor 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-necromancer">
-          <div class="build-header">
-            <span class="build-icon">☠️</span>
-            <div>
-              <h3>Poison Nova Necromancer <span class="build-badge badge-alt">Poisonmancer</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">DoT Boss Killer — Chaos, Baal & Cows melt</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Harlequin Crest (Shako) / +3 Poison Circlet</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Death's Web (BiS) / Blackbog's Sharp / Trang-Oul's Wing</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Homunculus / Spirit Monarch</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma / Bramble (Thorns aura for merc)</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Trang-Oul's Claws (+25% Poison Skill Damage)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh (+1 skill, FCR)</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek / Marrowwalk</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan / Bul-Kathos'</span></div>
-            <div class="row"><span class="k">Inventory</span><span class="v">Poison Facets in Shield/Helm • Poison Skillers</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Might (A2 Offensive)</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity (breaks Poison Immunes!) • Andariel's • Fortitude</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Primary</span><span class="v">Poison Nova 20 • Poison Explosion 20 • Poison Dagger 1</span></div>
-            <div class="row"><span class="k">Curses</span><span class="v">Lower Resist 20 • Amp Damage 1 • Decrepify 1</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Clay Golem 1 • Golem Mastery 1 • Summon Resist 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-necromancer">
-          <div class="build-header">
-            <span class="build-icon">💰</span>
-            <div>
-              <h3>Budget Summonmancer <span class="build-badge badge-budget">Budget / Starter</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Cheap and reliable — clear Hell with common items</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Lore Runeword / Peasant Crown</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">White Wand (Dol + Io — cheap runeword)</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Rhyme / +2 Necro Head Shrunken</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Skin of the Vipermagi / Smoke</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Trang-Oul's Claws / Magefist</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Goldwrap / String of Ears</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Goblin Toe / Silkweave</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">+2 Necro Amulet (cheap)</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Rare +Life / +Mana rings</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight polearm + Treachery = complete</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Priority</span><span class="v">Raise Skeleton → Skeleton Mastery → Curses</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-necromancer">
-          <div class="build-header">
-            <span class="build-icon">💥</span>
-            <div>
-              <h3>Explosion Necromancer <span class="build-badge badge-alt">CE Farmer</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Corpse Explosion + Amp Damage — clears entire screens in 2 clicks</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Harlequin Crest (Shako) / +3 Poison &amp; Bone Circlet</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Death's Web (mandatory endgame) / Heart of the Oak</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Homunculus (+3 Poison &amp; Bone)</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma (Teleport for corpse-hopping)</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Trang-Oul's Claws (+2 Curses!)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Marrowwalk (skill oskill bug — Bone Prison)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope / +3 Poison &amp; Bone Ammy</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight + Reaper's Toll (Decrepify) + Andariel's</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Primary</span><span class="v">Corpse Explosion 20 • Amplify Damage 1</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Bone Spear 20 • Bone Spirit 20 (corpse generators)</span></div>
-            <div class="row"><span class="k">Curses</span><span class="v">Lower Resist 1 • Decrepify 1 • Terror 1</span></div>
-            <div class="row"><span class="k">Summon</span><span class="v">Raise Skeleton 1 (starter corpse) • Bone Armor 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-necromancer">
-          <div class="build-header">
-            <span class="build-icon">🗡️</span>
-            <div>
-              <h3>Daggermancer <span class="build-badge badge-pvp">PvP Melee</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Poison Dagger + Venom — Melee poison necromancer (PvP staple)</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Andariel's Visage (poison bonus) / Shako</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Fleshripper / +3 Poison Dagger Rare</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Homunculus (+3 Poison &amp; Bone)</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Bramble (+50% Poison Damage) / Enigma</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Trang-Oul's Claws (+25% Poison Skill Dmg)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Marrowwalk / Sandstorm Trek</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's / +3 Poison Necro Ammy</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Rare +Life / +Str Ring</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Primary</span><span class="v">Poison Dagger 20 • Poison Explosion 20 • Poison Nova 20</span></div>
-            <div class="row"><span class="k">Curses</span><span class="v">Lower Resist 20 • Amp Damage 1</span></div>
-            <div class="row"><span class="k">Utility</span><span class="v">Bone Armor 1 • Bone Wall 1 • Dim Vision 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Weapon req   DEX: Max Block   VIT: Rest</span></div>
+          <div class="d2-tt-alts" id="d2-tt-alts" hidden>
+            <div class="d2-tt-sublabel">Alternatives:</div>
+            <ul class="d2-tt-alt-list" id="d2-tt-alt-list"></ul>
           </div>
         </div>
       </div>
 
-      <!-- ═══════════════════ BARBARIAN ═══════════════════ -->
-      <div class="class-group theme-barbarian" data-build-class="barbarian">
-        <h3 class="class-group-title" id="build-barbarian">⚔️ Barbarian Builds</h3>
-
-        <div class="build-card theme-barbarian">
-          <div class="build-header">
-            <span class="build-icon">🌀</span>
-            <div>
-              <h3>Whirlwind Barbarian <span class="build-badge badge-endgame">Endgame</span></h3>
-              <span class="build-rating">★★★★★<span class="tier-label">S-TIER</span></span>
-              <p class="build-sub">Dual-Wield WW / BvC — Fast Boss Runs</p>
-            </div>
+      <!-- ═════════════ Charms modal ═════════════ -->
+      <div id="d2-charms-modal" class="d2-item-modal" hidden>
+        <div class="d2-item-backdrop" data-close-modal></div>
+        <div class="d2-item-tooltip d2-info-tooltip" role="dialog" aria-modal="true" aria-labelledby="d2-charms-title">
+          <button class="d2-item-close" type="button" data-close-modal aria-label="Close">✕</button>
+          <div class="d2-tt-header">
+            <div class="d2-tt-name" id="d2-charms-title">Inventory / Charms</div>
+            <div class="d2-tt-base">Recommended charm loadout</div>
           </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Arreat's Face (+2 Barb Skills)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Grief PB (Main) + Grief / Beast (Off-hand)</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">— (Dual-Wield)</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit / Lidless</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma / Fortitude / Chains of Honor</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Dracul's Grasp / Steelrend</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Verdungo's Hearty Cord / Nosferatu's Coil</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider (Deadly Strike + CB)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Metalgrid</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Raven Frost / Bul-Kathos' / Dwarf Star</span></div>
-            <div class="row"><span class="k">Inventory</span><span class="v">Torch • Anni • Combat / Warcry Skillers</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Might (Act 2 NM Offensive)</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity • Fortitude • Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Primary</span><span class="v">Whirlwind 20 • Berserk 1 (IM immune)</span></div>
-            <div class="row"><span class="k">Mastery</span><span class="v">Sword / Axe Mastery 20</span></div>
-            <div class="row"><span class="k">Warcries</span><span class="v">Battle Orders 20 • Shout 1 • Battle Command 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-barbarian">
-          <div class="build-header">
-            <span class="build-icon">💢</span>
-            <div>
-              <h3>Frenzy Barbarian <span class="build-badge badge-alt">Alt / Speed</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Faster Movement, Faster Attack — Group Farmer</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Arreat's Face / Guillaume's Face</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">2× Grief (Berserker Axe or Phase Blade)</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Fortitude / Enigma</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Steelrend / Laying of Hands</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">String of Ears / Verdungo's</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Metalgrid</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Rare Leech / IAS Ring</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity • Fortitude • Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Primary</span><span class="v">Frenzy 20 • Double Swing 20 • Taunt 1</span></div>
-            <div class="row"><span class="k">Mastery</span><span class="v">Sword/Axe Mastery 20</span></div>
-            <div class="row"><span class="k">Warcries</span><span class="v">Battle Orders 20 • Shout 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max AR   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-barbarian">
-          <div class="build-header">
-            <span class="build-icon">�</span>
-            <div>
-              <h3>Berserker Barbarian <span class="build-badge badge-alt">PI Killer</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Magic Damage Berserk — Kills any Physical Immune</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Arreat's Face / Guillaume's Face (Deadly Strike)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Grief Berserker Axe / Breath of the Dying / Doombringer</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Stormshield (Max Block)</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Fortitude (300% ED!) / Chains of Honor</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Steelrend / Dracul's Grasp (life tap)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Verdungo's / String of Ears</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider (Deadly Strike + Open Wounds)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Cat's Eye</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Rare Life/Res / Bul-Kathos'</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight • Andariel's • Treachery (Fade)</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Combat</span><span class="v">Berserk 20 • Battle Orders 20 • Shout 20</span></div>
-            <div class="row"><span class="k">Masteries</span><span class="v">Sword/Axe Mastery 20 • Iron Skin 5</span></div>
-            <div class="row"><span class="k">Warcries</span><span class="v">Battle Command 1 • Howl 1 • Taunt 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-barbarian">
-          <div class="build-header">
-            <span class="build-icon">�💰</span>
-            <div>
-              <h3>Budget WW Barb <span class="build-badge badge-budget">Budget / Starter</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Cheap gear that still farms Hell</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Rockstopper / Peasant Crown</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">2× Oath Berserker Axe (great budget option)</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Duress / Stone Runeword</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Bloodfist / Sigon's Gage</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">String of Ears / Goldwrap</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Goblin Toe / Gore Rider</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Cat's Eye / Highlord's</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Manald Heal + Raven Frost</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight + Rockstopper + Duriel's Shell</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Priority</span><span class="v">Whirlwind → Sword Mastery → Battle Orders</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-barbarian">
-          <div class="build-header">
-            <span class="build-icon">🎯</span>
-            <div>
-              <h3>Concentrate Barb <span class="build-badge badge-alt">HC Safe</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Concentrate — Un-interruptable single-target attack. Hardcore-friendly</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Arreat's Face (Berserker's Axe req) / Kira's</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Breath of the Dying (BotD) Colossus Blade / Grief PB</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Stormshield (Max Block + Damage Reduce)</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Chains of Honor / Fortitude</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Steelrend / Dracul's Grasp</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Verdungo's (Damage Reduce) / String of Ears</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's / Metalgrid</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Bul-Kathos'</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Combat</span><span class="v">Concentrate 20 • Battle Orders 20 • Battle Cry 1</span></div>
-            <div class="row"><span class="k">Masteries</span><span class="v">Sword Mastery 20 • Iron Skin 20</span></div>
-            <div class="row"><span class="k">Warcries</span><span class="v">Battle Command 1 • Shout 1 • Find Potion 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-barbarian">
-          <div class="build-header">
-            <span class="build-icon">🎤</span>
-            <div>
-              <h3>Singer Barb <span class="build-badge badge-pvp">War Cry PvP</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">War Cry — Caster Barbarian. Pure magic damage from screaming</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Halaberd's Reign / +3 War Cry Barb Helm</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">2× Call to Arms (double BO!) / Heart of the Oak</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma (Teleport) / Chains of Honor</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Trang-Oul's Claws / Magefist (FCR)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh / Verdungo's</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek / Waterwalk</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope / +3 Warcry Ammy</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan / FCR Rare</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Warcries</span><span class="v">War Cry 20 • Battle Cry 20 • Battle Orders 20</span></div>
-            <div class="row"><span class="k">Synergy</span><span class="v">Battle Command 20 • Shout 1</span></div>
-            <div class="row"><span class="k">Combat</span><span class="v">Iron Skin 1 • Natural Resist 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-barbarian">
-          <div class="build-header">
-            <span class="build-icon">🪃</span>
-            <div>
-              <h3>Throw Barb <span class="build-badge badge-alt">Ranged Melee</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Double Throw — Ranged javelin/axe barbarian. Insane fun-factor</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Arreat's Face / Andariel's Visage</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">2× Lacerator (Amp Damage CtC) / Warshrike / Ethereal throwers</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Fortitude / Enigma</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Laying of Hands / Dracul's Grasp</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Thundergod's / Razortail (Pierce)</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider / War Traveler (MF)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's / Metalgrid</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Angelic Ring (with Angelic Amulet)</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Combat</span><span class="v">Double Throw 20 • Double Swing 20 • Throw 1</span></div>
-            <div class="row"><span class="k">Masteries</span><span class="v">Throwing Mastery 20 • Iron Skin 20</span></div>
-            <div class="row"><span class="k">Warcries</span><span class="v">Battle Orders 20 • Battle Command 1 • Shout 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Weapon req   DEX: Weapon req   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-barbarian">
-          <div class="build-header">
-            <span class="build-icon">👑</span>
-            <div>
-              <h3>Immortal King Barb (IK Set) <span class="build-badge badge-endgame">Set Meta</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Full IK Set — Free build once complete, top-tier without Enigma</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR (FULL SET)</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Immortal King's Will (Avenger Guard)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Immortal King's Stone Crusher (Ogre Maul)</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Immortal King's Soul Cage (Sacred Armor)</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Immortal King's Forge (War Gauntlets)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Immortal King's Detail (War Belt)</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Immortal King's Pillar (War Boots)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Cat's Eye</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Bul-Kathos'</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight + Fortitude + Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Combat</span><span class="v">Whirlwind 20 • Mace Mastery 20 • Frenzy 1</span></div>
-            <div class="row"><span class="k">Warcries</span><span class="v">Battle Orders 20 • Shout 20 • Battle Command 1</span></div>
-            <div class="row"><span class="k">Combat</span><span class="v">Iron Skin 1 • Increased Speed 1 • Natural Resist 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest</span></div>
+          <div class="d2-tt-body">
+            <ul class="d2-charm-list" id="d2-charm-list"></ul>
           </div>
         </div>
       </div>
 
-      <!-- ═══════════════════ SORCERESS ═══════════════════ -->
-      <div class="class-group theme-sorceress" data-build-class="sorceress">
-        <h3 class="class-group-title" id="build-sorceress">🔥 Sorceress Builds</h3>
-
-        <div class="build-card theme-sorceress">
-          <div class="build-header">
-            <span class="build-icon">❄️</span>
-            <div>
-              <h3>Frozen Orb Sorceress <span class="build-badge badge-mf">Endgame / MF</span></h3>
-              <span class="build-rating">★★★★★<span class="tier-label">S-TIER</span></span>
-              <p class="build-sub">Best MF Farmer — Mephisto / Pindle / Pit Runner</p>
-            </div>
+      <!-- ═════════════ Skills modal ═════════════ -->
+      <div id="d2-skills-modal" class="d2-item-modal" hidden>
+        <div class="d2-item-backdrop" data-close-modal></div>
+        <div class="d2-item-tooltip d2-info-tooltip" role="dialog" aria-modal="true" aria-labelledby="d2-skills-title">
+          <button class="d2-item-close" type="button" data-close-modal aria-label="Close">✕</button>
+          <div class="d2-tt-header">
+            <div class="d2-tt-name" id="d2-skills-title">Skill Allocation</div>
+            <div class="d2-tt-base">Point distribution</div>
           </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Harlequin Crest (Shako) / Nightwing's Veil</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Death's Fathom (Best) / The Oculus</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Spirit Monarch (35 FCR)</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Chains of Honor / Enigma / Skin of the Vipermagi</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist / Frostburn</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">War Traveler (MF) / Sandstorm Trek</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan (or SoJ + 10 FCR Ring)</span></div>
-            <div class="row"><span class="k">Inventory</span><span class="v">Torch • Anni • Gheed's • 9 Cold GCs</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Holy Freeze (Act 2 NM Defensive)</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity • Fortitude • Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Cold</span><span class="v">Frozen Orb 20 • Ice Bolt 20 • Cold Mastery 15–20</span></div>
-            <div class="row"><span class="k">Utility</span><span class="v">Static 1 • Teleport 1 • Warmth 1 • Frozen Armor 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-sorceress">
-          <div class="build-header">
-            <span class="build-icon">🌨️</span>
-            <div>
-              <h3>Blizzard Sorceress <span class="build-badge badge-alt">Alt Cold</span></h3>
-              <span class="build-rating">★★★★★<span class="tier-label">S-TIER</span></span>
-              <p class="build-sub">Pure Cold Nuker — Boss Killer with massive burst</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Nightwing's Veil (BiS) / Shako</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Death's Fathom / Eschuta's Temper</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Spirit Monarch</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Chains of Honor / Ormus' Robes (+Blizzard)</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist / Frostburn</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek / War Traveler</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's / Tal Rasha's Amulet</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Cold</span><span class="v">Blizzard 20 • Ice Blast 20 • Glacial Spike 20</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Cold Mastery 20 • Ice Bolt 1</span></div>
-            <div class="row"><span class="k">Utility</span><span class="v">Static 1 • Teleport 1 • Warmth 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-sorceress">
-          <div class="build-header">
-            <span class="build-icon">🐍</span>
-            <div>
-              <h3>Hydra / Fire Ball Sorceress <span class="build-badge badge-alt">Fire Alt</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Pyromancer — Hybrid Hydra + Fireball / Meteor</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Griffon's Eye (with fire facets) / Nightwing's</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Eschuta's Temper / Death's Fathom (fire facets)</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Spirit Monarch</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Chains of Honor / Enigma / Ormus' Robes (+Hydra)</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist (fire skill)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan</span></div>
-            <div class="row"><span class="k">Inventory</span><span class="v">Fire Skiller GCs, Torch, Anni</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity • Fortitude • Andariel's (facets)</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Fire</span><span class="v">Hydra 20 • Fire Bolt 20 • Fire Ball 20</span></div>
-            <div class="row"><span class="k">Mastery</span><span class="v">Fire Mastery 20</span></div>
-            <div class="row"><span class="k">Utility</span><span class="v">Warmth 1 • Static 1 • Teleport 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-sorceress">
-          <div class="build-header">
-            <span class="build-icon">⚡</span>
-            <div>
-              <h3>Lightning / Nova Sorceress <span class="build-badge badge-alt">Alt Lightning</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Chain Lightning + Nova — Fast clears in packed areas</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Griffon's Eye (with -%Light Res facets)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Heart of the Oak / Eschuta's Temper</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Spirit Monarch</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Chains of Honor / Enigma / Ormus' (+Nova)</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity mandatory (breaks Lightning Immunes)</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Lightning</span><span class="v">Chain Lightning 20 • Lightning 20 • Nova 20</span></div>
-            <div class="row"><span class="k">Mastery</span><span class="v">Lightning Mastery 20</span></div>
-            <div class="row"><span class="k">Utility</span><span class="v">Static Field 1 • Teleport 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-sorceress">
-          <div class="build-header">
-            <span class="build-icon">☄️</span>
-            <div>
-              <h3>Meteor / Fireball Sorceress <span class="build-badge badge-alt">Classic Fire</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Traditional Fire Sorc — Ancient Tunnels farmer</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Shako / Nightwing's Veil (fire facets)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Eschuta's Temper (BiS Fire) / Heart of the Oak</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Spirit Monarch</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Skin of the Vipermagi / Chains of Honor</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Fire</span><span class="v">Fireball 20 • Meteor 20 • Fire Bolt 20</span></div>
-            <div class="row"><span class="k">Mastery</span><span class="v">Fire Mastery 20</span></div>
-            <div class="row"><span class="k">Utility</span><span class="v">Warmth 1 • Static 1 • Teleport 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-sorceress">
-          <div class="build-header">
-            <span class="build-icon">💰</span>
-            <div>
-              <h3>Budget Sorceress <span class="build-badge badge-budget">Budget / Starter</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Complete Hell for under 3 Ists — Frozen Orb / Meteor</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Lore Runeword / Tal Rasha's Horadric Crest</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Spirit Sword / Ondal's Wisdom / Occulus</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Ancient's Pledge / Rhyme / Spirit Monarch</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Skin of the Vipermagi / Smoke</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist / Frostburn</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Goldwrap / String of Ears</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Silkweave / Waterwalk / War Traveler</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Rare +2 Sorc / Tal Rasha's</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Nagelring (MF) / Rare +Life</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight Polearm + Treachery + Any Helm</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Priority</span><span class="v">Frozen Orb first — cheapest, works in Hell</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-sorceress">
-          <div class="build-header">
-            <span class="build-icon">☄️</span>
-            <div>
-              <h3>Meteorb Sorc <span class="build-badge badge-mf">Ultimate Hybrid MF</span></h3>
-              <span class="build-rating">★★★★★<span class="tier-label">S-TIER</span></span>
-              <p class="build-sub">Meteor + Frozen Orb — Dual-tree hybrid, breaks fire AND cold immunes</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Harlequin Crest (Shako) / Nightwing's Veil</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Heart of the Oak / Death's Fathom / Eschuta's Temper</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Spirit Monarch (35 FCR) / Lidless Wall</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Skin of the Vipermagi / Enigma / Chains of Honor</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist (+1 Fire, +20 FCR)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek / War Traveler (MF)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope / Tal Rasha's Adjudication</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan / FCR Rares</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Holy Freeze (mandatory for kiting)</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity (Conviction) • Fortitude • Andariel's</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Fire</span><span class="v">Meteor 20 • Fire Ball 20 • Fire Bolt 20</span></div>
-            <div class="row"><span class="k">Cold</span><span class="v">Frozen Orb 20 • Cold Mastery 1</span></div>
-            <div class="row"><span class="k">Utility</span><span class="v">Teleport 1 • Warmth 1 • Static Field 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-sorceress">
-          <div class="build-header">
-            <span class="build-icon">🕯️</span>
-            <div>
-              <h3>Enchantress <span class="build-badge badge-alt">Support / Melee</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Enchant + Fireball — Buff-caster / bow-hybrid Sorc (great for party/HC)</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Harlequin Crest (Shako) / +3 Fire Circlet</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Demon Machine (Crossbow) / Wizardspike (Enchant caster)</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Spirit Monarch (only if not using bow)</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Skin of the Vipermagi / Ormus' Robes (+3 Fire Ball!)</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist (+1 Fire Skills, +20 FCR)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh / Goldwrap</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek / War Traveler</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's / +3 Fire Skills Amulet</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan / Raven Frost</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity + Fortitude + Andariel's (Enchant your merc!)</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Fire</span><span class="v">Enchant 20 • Warmth 20 • Fire Mastery 20</span></div>
-            <div class="row"><span class="k">Fire</span><span class="v">Fire Ball 20 (main damage) • Fire Bolt 1</span></div>
-            <div class="row"><span class="k">Utility</span><span class="v">Teleport 1 • Static Field 1 • Energy Shield 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
+          <div class="d2-tt-body">
+            <ul class="d2-skill-list" id="d2-skill-list"></ul>
           </div>
         </div>
       </div>
 
-      <!-- ═══════════════════ PALADIN ═══════════════════ -->
-      <div class="class-group theme-paladin" data-build-class="paladin">
-        <h3 class="class-group-title" id="build-paladin">🛡️ Paladin Builds</h3>
-
-        <div class="build-card theme-paladin">
-          <div class="build-header">
-            <span class="build-icon">🔨</span>
-            <div>
-              <h3>Hammerdin <span class="build-badge badge-endgame">Endgame / King</span></h3>
-              <span class="build-rating">★★★★★<span class="tier-label">S-TIER</span></span>
-              <p class="build-sub">Blessed Hammer — The strongest PvM &amp; PvP build</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Harlequin Crest (Shako)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Heart of the Oak (HotO) Flail</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Herald of Zakarum / Spirit Sacred Targe</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma (mandatory for Teleport)</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist (+20 FCR)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">War Traveler / Sandstorm Trek</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan / 10 FCR Rare</span></div>
-            <div class="row"><span class="k">Inventory</span><span class="v">Torch • Anni • Combat Skillers</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Holy Freeze / Defiance</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight • Fortitude • Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Combat</span><span class="v">Blessed Hammer 20 • Concentration 20 • Blessed Aim 20</span></div>
-            <div class="row"><span class="k">Aura</span><span class="v">Vigor 20 (synergy) • Holy Shield 1</span></div>
-            <div class="row"><span class="k">FCR</span><span class="v">Target 125% FCR breakpoint</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-paladin">
-          <div class="build-header">
-            <span class="build-icon">👊</span>
-            <div>
-              <h3>Smiter <span class="build-badge badge-uber">Uber Killer</span></h3>
-              <span class="build-rating">★★★★★<span class="tier-label">S-TIER</span></span>
-              <p class="build-sub">Smite / Charge — Uber Tristram Boss Killer</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Guillaume's Face (Crushing Blow + Deadly Strike)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Grief Phase Blade / Astreon's Iron Ward</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Herald of Zakarum / Exile Runeword</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma / Fortitude</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Dracul's Grasp (Life Tap!) — mandatory</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Verdungo's / Thundergod's Vigor</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider (25% CB, 25% DS)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Mara's</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Bul-Kathos'</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Reaper's Toll (Decrepify) + Fortitude + Andariel's</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Combat</span><span class="v">Smite 20 • Holy Shield 20 • Charge 1</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Fanaticism 20 (aura) / Conviction 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-paladin">
-          <div class="build-header">
-            <span class="build-icon">⚔️</span>
-            <div>
-              <h3>Zealot <span class="build-badge badge-alt">Alt Physical</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Zeal / Fanaticism — Fast melee attacker</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Guillaume's Face / Andariel's Visage</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Grief Phase Blade (best) / Kingslayer</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Herald of Zakarum / Exile</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Fortitude / Chains of Honor</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Dracul's Grasp / Laying of Hands</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Thundergod's Vigor / Verdungo's</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's / Angelic Amulet</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Angelic Ring set</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Combat</span><span class="v">Zeal 20 • Sacrifice 20 • Holy Shield 20</span></div>
-            <div class="row"><span class="k">Aura</span><span class="v">Fanaticism 20 • Conviction 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-paladin">
-          <div class="build-header">
-            <span class="build-icon">⚡</span>
-            <div>
-              <h3>FoH Paladin <span class="build-badge badge-alt">Fist of Heavens</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Lightning + Holy Bolt — Undead & Demon slayer</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Harlequin Crest / Griffon's Eye (Lightning)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Heart of the Oak / Death's Fathom (staff swap)</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Herald of Zakarum / Spirit Monarch</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma / Chains of Honor</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist (+1 Fire, FCR)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek / Waterwalk</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope / Highlord's</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan / FCR Rares</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Might / Holy Freeze</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity (breaks Lightning Immunes!) • Andariel's</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Combat</span><span class="v">Fist of the Heavens 20 • Holy Bolt 20 • Holy Shock 20</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Conviction 20 • Resist Lightning 1 • Salvation 1</span></div>
-            <div class="row"><span class="k">Defensive</span><span class="v">Vigor 1 • Redemption 1 • Cleansing 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-paladin">
-          <div class="build-header">
-            <span class="build-icon">💰</span>
-            <div>
-              <h3>Budget Hammerdin <span class="build-badge badge-budget">Budget / Starter</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Under 5 Ists — Farm your way to Enigma</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Peasant Crown / Lore Runeword</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Heart of the Oak (still cheap for Paladin) / Spirit Sword</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Ancient's Pledge / Rhyme / Spirit Targe</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Skin of the Vipermagi / Smoke</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist / Chance Guards (MF)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Goldwrap / String of Ears</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Silkweave / Tearhaunch</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Rare +2 Combat Skills Amulet</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Rare +FCR / +Life</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight polearm + Treachery + Any Helm</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Priority</span><span class="v">Blessed Hammer → Concentration → Vigor</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-paladin">
-          <div class="build-header">
-            <span class="build-icon">✨</span>
-            <div>
-              <h3>Auradin <span class="build-badge badge-alt">Aura Stacker</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Dream+Dream+HoJ — Damage from stacked auras alone. Uber-safe elementalist</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Dream Runeword (Io + Jah + Pul) — Holy Shock aura</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Hand of Justice (Sur+Cham+Amn+Lo) Phase Blade — Holy Fire</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Dream Runeword (Io + Jah + Pul) Sacred Rondache — 2× Holy Shock stack</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Chains of Honor / Enigma</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Dracul's Grasp / Steelrend</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Thundergod's Vigor (+20% Light Res, +Light Skills)</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider / Sandstorm Trek</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Mara's</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Wisp Projector (+light absorb)</span></div>
-            <div class="row"><span class="k">Inventory</span><span class="v">Torch • Anni • Combat Skillers</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Might (Act 2 NM Offensive)</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity • Fortitude • Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Combat</span><span class="v">Zeal 1 • Holy Shield 20 • Sacrifice 20</span></div>
-            <div class="row"><span class="k">Aura</span><span class="v">Salvation 20 (max res boost) • Conviction 1</span></div>
-            <div class="row"><span class="k">Utility</span><span class="v">Resist Lightning 1 • Resist Fire 1 • Redemption 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-paladin">
-          <div class="build-header">
-            <span class="build-icon">⚡</span>
-            <div>
-              <h3>Tesladin <span class="build-badge badge-alt">Zeal + Holy Shock</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Zeal Paladin + Holy Shock aura — Lightning damage per hit stacks with Grief</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Dream Runeword (Bone Visage) — Holy Shock aura!</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Grief Phase Blade (huge base dmg + IAS)</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Dream Runeword Sacred Rondache — 2nd Holy Shock stack</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Chains of Honor / Fortitude</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Dracul's Grasp (Life Tap)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Thundergod's Vigor / Verdungo's</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider / Sandstorm Trek</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath (+Deadly Strike + Light Skills)</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Wisp Projector</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity + Fortitude + Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Combat</span><span class="v">Zeal 20 • Sacrifice 20 • Holy Shield 20</span></div>
-            <div class="row"><span class="k">Aura</span><span class="v">Fanaticism 20 • Conviction 1 • Salvation 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-paladin">
-          <div class="build-header">
-            <span class="build-icon">🐎</span>
-            <div>
-              <h3>Charger <span class="build-badge badge-pvp">PvP Fun</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Charge Paladin — One-shot cheese king of PvP dueling</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Guillaume's Face (Deadly Strike + Crushing Blow)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Grief Phase Blade (400+ flat damage bonus)</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Herald of Zakarum / Stormshield</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma (mandatory — Teleport = mobility)</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Dracul's Grasp (Life Tap + open wounds)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Verdungo's / Thundergod's</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider (deadly + open wounds)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath (Deadly Strike scaling)</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Bul-Kathos' Wedding Band</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Reaper's Toll + Treachery + Andariel's</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Combat</span><span class="v">Charge 20 • Holy Shield 20 • Smite 1</span></div>
-            <div class="row"><span class="k">Aura</span><span class="v">Fanaticism 20 • Might 20 • Vigor 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-paladin">
-          <div class="build-header">
-            <span class="build-icon">⚖️</span>
-            <div>
-              <h3>Avenger (Vengeance) <span class="build-badge badge-alt">Tri-Element Melee</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Vengeance — Physical + Fire + Cold + Lightning on every strike. Breaks all immunes</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Andariel's Visage / Guillaume's Face</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Kingslayer Phase Blade / Grief / Doombringer</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Herald of Zakarum / Exile Runeword (Defiance aura)</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Chains of Honor (best) / Fortitude</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Dracul's Grasp / Laying of Hands (+Demon Dmg)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Thundergod's Vigor / String of Ears</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Mara's Kaleidoscope</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Bul-Kathos'</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Might (A2 NM Offensive)</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity (breaks Fire/Light immunes) • Fortitude • Andariel's</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Combat</span><span class="v">Vengeance 20 • Holy Shield 20 • Sacrifice 1</span></div>
-            <div class="row"><span class="k">Synergy</span><span class="v">Resist Fire 20 • Resist Cold 20 • Resist Lightning 20</span></div>
-            <div class="row"><span class="k">Aura</span><span class="v">Fanaticism 1 • Conviction 1 • Salvation 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ═══════════════════ DRUID ═══════════════════ -->
-      <div class="class-group theme-druid" data-build-class="druid">
-        <h3 class="class-group-title" id="build-druid">🌿 Druid Builds</h3>
-
-        <div class="build-card theme-druid">
-          <div class="build-header">
-            <span class="build-icon">🌪️</span>
-            <div>
-              <h3>Wind Druid <span class="build-badge badge-endgame">Endgame</span></h3>
-              <span class="build-rating">★★★★★<span class="tier-label">S-TIER</span></span>
-              <p class="build-sub">Tornado / Hurricane — Physical &amp; Cold Immune Buster</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Jalal's Mane (+2 Druid, +30 FCR)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Heart of the Oak (HotO)</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Spirit Monarch (35 FCR)</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma / Chains of Honor</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist / Trang-Oul's Claws</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Holy Freeze</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight • Fortitude • Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Elemental</span><span class="v">Tornado 20 • Hurricane 20 • Twister 20</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Cyclone Armor 20 • Arctic Blast 1</span></div>
-            <div class="row"><span class="k">Summon</span><span class="v">Oak Sage 1 • Heart of Wolverine 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-druid">
-          <div class="build-header">
-            <span class="build-icon">🔥</span>
-            <div>
-              <h3>Fire Druid <span class="build-badge badge-alt">Alt Elemental</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Fissure / Volcano / Armageddon — Boss burner</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Ravenlore (+3 Fire Skills, -res)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Heart of the Oak / Wizardspike / Eschuta's</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Spirit Monarch / Homunculus</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Chains of Honor / Enigma</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist (fire skill)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's / +3 Elemental Amulet</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity (breaks Fire immunes with Conviction)</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Fire</span><span class="v">Fissure 20 • Volcano 20 • Molten Boulder 20</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Armageddon 20 • Firestorm 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-druid">
-          <div class="build-header">
-            <span class="build-icon">�</span>
-            <div>
-              <h3>Summon Druid <span class="build-badge badge-budget">Beast Master</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Grizzly + Wolves + Ravens — Zero-effort HC farming</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Jalal's Mane (+2 skills, +Summon) / Ravenlore (+3 Ravens)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Beast Runeword (Fanaticism aura!) / Heart of the Oak</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Spirit Monarch / Rhyme (cannot be frozen)</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma / Chains of Honor / Bramble</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist / Trang-Oul's Claws</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh / Verdungo's</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek / Waterwalk</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's / +3 Summoning Amulet</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan / Bul-Kathos'</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Might / Holy Freeze</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight • Fortitude • Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Summon</span><span class="v">Grizzly 20 • Dire Wolves 20 • Spirit of Barbs 20</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Heart of Wolverine 20 • Ravens 1 • Oak Sage 1</span></div>
-            <div class="row"><span class="k">Utility</span><span class="v">Summon Spirit Wolf 1 • Poison Creeper 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-druid">
-          <div class="build-header">
-            <span class="build-icon">🦠</span>
-            <div>
-              <h3>Rabies Werewolf <span class="build-badge badge-pvp">PvP Poison</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Poison Werewolf — PvP dueller & PI-friendly</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Jalal's Mane / Andariel's Visage (IAS + poison dmg)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Beast BA / Death's Web on switch (Poison +2)</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Stormshield / Homunculus</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma / Bramble (Thorns + Poison bonus)</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Trang-Oul's Claws (+25% Poison Skill Dmg)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh / Verdungo's</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek / Gore Rider</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope / +3 Shape-Shift</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Bul-Kathos' / Raven Frost</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Poison</span><span class="v">Rabies 20 • Poison Creeper 20 • Poison Dagger 1</span></div>
-            <div class="row"><span class="k">Shape</span><span class="v">Werewolf 20 • Lycanthropy 20 • Feral Rage 1</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Heart of Wolverine 1 • Oak Sage 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Base   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-druid">
-          <div class="build-header">
-            <span class="build-icon">�🐺</span>
-            <div>
-              <h3>Fury Werewolf <span class="build-badge badge-alt">Alt Melee</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Shape-Shift Melee — High DPS PvP / PvM</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Jalal's Mane / Cerebus' Bite (+2 Shape-Shifting) / Andariel's Visage (IAS)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Grief Phase Blade / Beast (Fanaticism aura)</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Stormshield</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma / Fortitude</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Steelrend / Dracul's Grasp</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Verdungo's / String of Ears</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's / Metalgrid</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Raven Frost / Bul-Kathos'</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Shape</span><span class="v">Werewolf 20 • Lycanthropy 20 • Fury 20</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Feral Rage 1 • Rabies 1 • Heart of Wolverine 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-druid">
-          <div class="build-header">
-            <span class="build-icon">🔥🐺</span>
-            <div>
-              <h3>Fire Claw Werewolf <span class="build-badge badge-alt">Elemental Melee</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Werewolf + Fire Claws — Elemental melee druid. Breaks physical immunes via fire damage</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Jalal's Mane / Ravenlore (+3 Fire Skills!)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Ribcracker / Ethereal Reaper's Toll / Passion (Zeal aura)</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Stormshield / Spirit Monarch</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Chains of Honor / Fortitude</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist (+1 Fire) / Dracul's Grasp</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Verdungo's / Thundergod's</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider / Sandstorm Trek</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's / +3 Elemental Amulet</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Raven Frost / Bul-Kathos'</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity (breaks fire immunes) + Fortitude + Andariel's</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Fire</span><span class="v">Fire Claws 20 • Volcano 20 • Molten Boulder 20</span></div>
-            <div class="row"><span class="k">Shape</span><span class="v">Werewolf 20 • Lycanthropy 1</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Heart of Wolverine 1 • Oak Sage 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ═══════════════════ ASSASSIN ═══════════════════ -->
-      <div class="class-group theme-assassin" data-build-class="assassin">
-        <h3 class="class-group-title" id="build-assassin">🗡️ Assassin Builds</h3>
-
-        <div class="build-card theme-assassin">
-          <div class="build-header">
-            <span class="build-icon">⚡</span>
-            <div>
-              <h3>Trapsin <span class="build-badge badge-endgame">Endgame</span></h3>
-              <span class="build-rating">★★★★★<span class="tier-label">S-TIER</span></span>
-              <p class="build-sub">Lightning Sentry — Chaos Sanctuary Speedrunner</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Griffon's Eye / Harlequin Crest (Shako)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Bartuc's Cut-Throat / Chaos Runic Talons</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Off-hand Claw (Bartuc's / +3 LS Claw)</span></div>
-            <div class="row"><span class="k">Switch</span><span class="v">Call to Arms + Spirit</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma / Chains of Honor</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Trang-Oul's Claws / Magefist</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">War Traveler / Shadow Dancer</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's Kaleidoscope</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan / Raven Frost</span></div>
-            <div class="row"><span class="k">Inventory</span><span class="v">Torch • Anni • Trap Skillers</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Holy Freeze / Might</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity (-Lightning Res) • Fortitude • Andariel's</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Traps</span><span class="v">Lightning Sentry 20 • Death Sentry 20</span></div>
-            <div class="row"><span class="k">Synergy</span><span class="v">Shock Web 20 • Charged Bolt Sentry 20</span></div>
-            <div class="row"><span class="k">Shadow</span><span class="v">Fade 1 • Shadow Master 1 • Burst of Speed 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Gear   VIT: Rest   ENE: 0</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-assassin">
-          <div class="build-header">
-            <span class="build-icon">🦶</span>
-            <div>
-              <h3>Kicksin (Dragon Talon) <span class="build-badge badge-alt">Alt / Uber</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Martial Arts Kicker — Great Uber Tristram Killer</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Guillaume's Face (Crushing Blow)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Chaos Runic Talons / Bartuc's Cut-Throat</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">— (Dual-Wield Claw)</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Enigma / Fortitude</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Dracul's Grasp (Life Tap!)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Verdungo's / Thundergod's</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider (mandatory for CB)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Mara's</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Bul-Kathos'</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Reaper's Toll + Fortitude + Andariel's</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Kicks</span><span class="v">Dragon Talon 20 • Dragon Flight 1</span></div>
-            <div class="row"><span class="k">Support</span><span class="v">Venom 20 • Weapon Block 20</span></div>
-            <div class="row"><span class="k">Shadow</span><span class="v">Fade 1 • Shadow Master 1 • Burst of Speed 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-assassin">
-          <div class="build-header">
-            <span class="build-icon">🌀</span>
-            <div>
-              <h3>Whirlwind Assassin <span class="build-badge badge-alt">Chaos Sin</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Chaos Runeword WW — Fastest melee attack in the game</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Guillaume's Face (Deadly Strike, CtC Crushing Blow)</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Chaos (Fal + Ohm + Um) Suwayyah — Primary</span></div>
-            <div class="row"><span class="k">Off-Hand</span><span class="v">Chaos / Fury Runeword / Rare +3 WW Claw</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Fortitude / Enigma / Chains of Honor</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Dracul's Grasp (Life Tap CtC!)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Verdungo's Hearty Cord / Nosferatu's</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider (Deadly + Open Wounds + CB)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Mara's</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Bul-Kathos' Wedding Band</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Aura</span><span class="v">Might / Holy Freeze</span></div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight • Fortitude • Andariel's Visage</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Traps</span><span class="v">Whirlwind (from Chaos) auto-cast</span></div>
-            <div class="row"><span class="k">Passive</span><span class="v">Venom 20 • Weapon Block 20 • Claw Mastery 20</span></div>
-            <div class="row"><span class="k">Shadow</span><span class="v">Shadow Master 20 • Fade 1 • Burst of Speed 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-assassin">
-          <div class="build-header">
-            <span class="build-icon">💰</span>
-            <div>
-              <h3>Budget Trapsin <span class="build-badge badge-budget">Budget / Starter</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Fastest budget farmer in the game</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Lore Runeword / +3 Trap Circlet</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Suwayyah with +3 LS / +3 DS / Rare Trap Claw</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Off-hand +3 Trap Claw</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Skin of the Vipermagi / Smoke</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Magefist / Trang-Oul's</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Goldwrap / String of Ears</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Silkweave / Waterwalk</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Rare +2 Assassin Amulet</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Rare +Life / +Mana</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Insight polearm + Treachery + any helm</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">Priority</span><span class="v">Lightning Sentry → Death Sentry → Shock Web</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Gear   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-assassin">
-          <div class="build-header">
-            <span class="build-icon">🔥</span>
-            <div>
-              <h3>Phoenix Striker (Martial Arts) <span class="build-badge badge-alt">MA Charge-Up</span></h3>
-              <span class="build-rating">★★★★<span class="star-off">★</span><span class="tier-label">A-TIER</span></span>
-              <p class="build-sub">Phoenix Strike + Dragon Talon — Elemental charge-up melee. Screen-nuke potential</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Guillaume's Face / Andariel's Visage</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">2× Bartuc's Cut-Throat / Chaos Runic Talons</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Chains of Honor / Fortitude / Enigma</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Dracul's Grasp (Life Tap!)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Thundergod's Vigor / Verdungo's</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Gore Rider (mandatory for CB proc)</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Highlord's Wrath / Mara's</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">Raven Frost + Bul-Kathos'</span></div>
-            <div class="build-section">MERCENARY</div>
-            <div class="row"><span class="k">Gear</span><span class="v">Infinity + Fortitude + Andariel's</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">MA</span><span class="v">Phoenix Strike 20 • Dragon Talon 20 • Cobra Strike 1</span></div>
-            <div class="row"><span class="k">Passive</span><span class="v">Claw Mastery 20 • Weapon Block 20 • Venom 20</span></div>
-            <div class="row"><span class="k">Shadow</span><span class="v">Fade 1 • Shadow Master 1 • Burst of Speed 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-
-        <div class="build-card theme-assassin">
-          <div class="build-header">
-            <span class="build-icon">🗡️</span>
-            <div>
-              <h3>Blade Fury Sin <span class="build-badge badge-alt">Ranged Sin</span></h3>
-              <span class="build-rating">★★★<span class="star-off">★★</span><span class="tier-label">B-TIER</span></span>
-              <p class="build-sub">Blade Fury + Blade Shield — Poison ranged Sin (kite &amp; poison DoT)</p>
-            </div>
-          </div>
-          <div class="build-table">
-            <div class="build-section">GEAR</div>
-            <div class="row"><span class="k">Helm</span><span class="v">Harlequin Crest (Shako) / +3 MA Circlet</span></div>
-            <div class="row"><span class="k">Weapon</span><span class="v">Death's Web (Poison +2) / +3 MA Rare Claw</span></div>
-            <div class="row"><span class="k">Shield</span><span class="v">Off-Hand +3 MA Claw</span></div>
-            <div class="row"><span class="k">Armor</span><span class="v">Bramble (+50% Poison) / Chains of Honor</span></div>
-            <div class="row"><span class="k">Gloves</span><span class="v">Trang-Oul's Claws (+25% Poison)</span></div>
-            <div class="row"><span class="k">Belt</span><span class="v">Arachnid Mesh</span></div>
-            <div class="row"><span class="k">Boots</span><span class="v">Sandstorm Trek / War Traveler</span></div>
-            <div class="row"><span class="k">Amulet</span><span class="v">Mara's / +3 MA Ammy</span></div>
-            <div class="row"><span class="k">Rings</span><span class="v">2× Stone of Jordan / Raven Frost</span></div>
-            <div class="build-section">SKILLS</div>
-            <div class="row"><span class="k">MA</span><span class="v">Blade Fury 20 • Blade Shield 20 • Blade Sentinel 1</span></div>
-            <div class="row"><span class="k">Passive</span><span class="v">Claw Mastery 20 • Venom 20 • Weapon Block 20</span></div>
-            <div class="row"><span class="k">Shadow</span><span class="v">Shadow Master 20 • Burst of Speed 1 • Fade 1</span></div>
-            <div class="build-section">STATS</div>
-            <div class="row"><span class="k">Allocation</span><span class="v">STR: Gear   DEX: Max Block   VIT: Rest</span></div>
-          </div>
-        </div>
-      </div>
 
     </div>
   </section>
@@ -2383,6 +1045,14 @@
         </div>
 
         <div class="rw-card" data-type="armor">
+          <div class="rw-header"><h3>Lionheart</h3><span class="rw-type armor">Armor</span></div>
+          <div class="rw-runes"><span class="rune">Hel</span><span class="rune">Lum</span><span class="rune">Fal</span></div>
+          <div class="rw-base">3-Socket Body Armor</div>
+          <ul class="rw-stats"><li>+20% Enhanced Damage</li><li>+25 to Strength, +10 to Energy, +20 to Vitality, +15 to Dexterity</li><li>+50 to Life</li><li>All Resistances +30</li><li>Requirements -15%</li></ul>
+          <div class="rw-rating">★★★☆☆</div>
+        </div>
+
+        <div class="rw-card" data-type="armor">
           <div class="rw-header"><h3>Principle</h3><span class="rw-type armor">Armor</span></div>
           <div class="rw-runes"><span class="rune">Ral</span><span class="rune">Gul</span><span class="rune">Eld</span></div>
           <div class="rw-base">3-Socket Body Armor (Paladin)</div>
@@ -2825,16 +1495,7 @@
           <div class="rw-rating">★★★★☆</div>
         </div>
 
-        <div class="rw-card" data-type="polearm">
-          <div class="rw-header"><h3>Obsession</h3><span class="rw-type polearm">Polearm</span></div>
-          <div class="rw-runes"><span class="rune">Zod</span><span class="rune">Ist</span><span class="rune">Lem</span><span class="rune">Lum</span><span class="rune">Io</span><span class="rune">Nef</span></div>
-          <div class="rw-base">6-Socket Staff</div>
-          <ul class="rw-stats"><li>Indestructible</li><li>+4 to All Skills</li><li>+65% Faster Cast Rate</li><li>All Resistances +60–70</li></ul>
-          <div class="rw-rating">★★★★☆</div>
-        </div>
-
-        <!-- ═══ MISSILE WEAPONS ═══ -->
-        <div class="rw-card" data-type="missile">
+        <!-- ═══ MISSILE WEAPONS ═══ -->        <div class="rw-card" data-type="missile">
           <div class="rw-header"><h3>Zephyr</h3><span class="rw-type missile">Missile</span></div>
           <div class="rw-runes"><span class="rune">Ort</span><span class="rune">Eth</span></div>
           <div class="rw-base">2-Socket Missile Weapon</div>
@@ -2895,14 +1556,6 @@
           <div class="rw-runes"><span class="rune">Jah</span><span class="rune">Lo</span><span class="rune">Mal</span><span class="rune">Gul</span></div>
           <div class="rw-base">4-Socket Missile Weapon</div>
           <ul class="rw-stats"><li>35% Chance to Cast Bone Spear</li><li>+260–340% Enhanced Damage</li><li>Ignore Target's Defense</li><li>Prevent Monster Heal</li></ul>
-          <div class="rw-rating">★★★★☆</div>
-        </div>
-
-        <div class="rw-card" data-type="missile">
-          <div class="rw-header"><h3>Mist</h3><span class="rw-type missile">Missile</span></div>
-          <div class="rw-runes"><span class="rune">Cham</span><span class="rune">Shael</span><span class="rune">Gul</span><span class="rune">Thul</span><span class="rune">Ith</span></div>
-          <div class="rw-base">5-Socket Missile Weapon</div>
-          <ul class="rw-stats"><li>Concentration Aura (Level 8–12)</li><li>+325% Enhanced Damage</li><li>Cannot Be Frozen</li><li>+24 to Vitality</li></ul>
           <div class="rw-rating">★★★★☆</div>
         </div>
 
@@ -5070,7 +3723,7 @@
         <!-- LEFT: Item pickers -->
         <div class="calc-pickers">
           <div class="calc-preset-row">
-            <label class="calc-label">Class (for FCR):</label>
+            <label class="calc-label">Class (FCR + items):</label>
             <select id="calcClass" class="calc-select calc-class-select">
               <option value="sorc">Sorceress (Teleport)</option>
               <option value="necro">Necromancer</option>
@@ -5372,7 +4025,26 @@
 
         <article class="tip-card" data-tips-cat="combat">
           <div class="tip-head">
-            <span class="tip-icon">🛡️</span>
+            <span class="tip-icon">�</span>
+            <h3>Fixing Mana Starvation</h3>
+            <span class="tip-cat combat">Combat</span>
+          </div>
+          <p class="tip-lead">Reaper's Toll and other no-leech weapons burn your mana pool fast — here's how to never run dry.</p>
+          <ul class="tip-details">
+            <li><strong>#1 fix — Insight on your merc.</strong> Runeword <em>Ral · Tir · Tal · Sol</em> in a 4os polearm (Cryptic Axe, Thresher, Great Poleaxe). Gives Lv 12–17 <strong>Meditation aura</strong> → ~50 mana/sec to you when merc is nearby. Solves 90% of mana issues on any melee build.</li>
+            <li><strong>Add Mana Leech to gear</strong> — target <strong>8%+ total ML</strong>: <em>Nosferatu's Coil</em> belt (5–10% ML), rare/crafted rings with 4–8% ML, rare amulet with ML + res.</li>
+            <li><strong>Dracul's Grasp gloves</strong> — 25% chance to cast Life Tap on strike. Life Tap refunds 50% of physical damage as life; combined with even 4% ML you'll never run dry.</li>
+            <li><strong>Class tools:</strong> Paladin → 1 point in <em>Redemption</em>, spam on corpses for life+mana • Sorc → max <em>Warmth</em> • Druid → <em>Oak Sage</em> raises life so mana pool drops matter less.</li>
+            <li><strong>Charms & jewelry:</strong> +Mana small charms stack cheaply • <em>Stone of Jordan</em> (+25% Max Mana + 20 flat) • <em>Frostburn</em> gloves (+40% Max Mana budget option).</li>
+          </ul>
+          <div class="tip-callout">
+            <strong>Golden rule:</strong> If you're using Reaper's Toll <em>yourself</em>, put Insight on your merc's polearm. If Reaper's is on your <em>merc</em>, you need to leech mana from your own weapon or gear instead.
+          </div>
+        </article>
+
+        <article class="tip-card" data-tips-cat="combat">
+          <div class="tip-head">
+            <span class="tip-icon">�🛡️</span>
             <h3>Cap Resistances at 75%</h3>
             <span class="tip-cat combat">Combat</span>
           </div>
@@ -5499,7 +4171,26 @@
 
         <article class="tip-card" data-tips-cat="loot">
           <div class="tip-head">
-            <span class="tip-icon">💎</span>
+            <span class="tip-icon">�</span>
+            <h3>Larzuk Socket Rules</h3>
+            <span class="tip-cat loot">Loot</span>
+          </div>
+          <p class="tip-lead">Act 5 quest reward — the outcome depends entirely on the item's rarity.</p>
+          <ul class="tip-details">
+            <li><strong>Unique / Set items:</strong> always <em>exactly 1 socket</em>, regardless of the base's max.</li>
+            <li><strong>Rare / Magic items:</strong> rolls <strong>1–2 sockets</strong> (random, within base max).</li>
+            <li><strong>White / Grey (normal) items:</strong> rolls the <strong>max sockets</strong> for that base — this is how you socket runeword bases.</li>
+            <li><strong>Pre-socketed uniques</strong> (Ali Baba 2os, Hone Sundan 3os, etc.): sockets are built into the drop — Larzuk cannot re-socket them.</li>
+            <li>You get <strong>1 quest reward per difficulty</strong> (Normal / Nightmare / Hell). Save the Hell one for your best runeword base.</li>
+          </ul>
+          <div class="tip-callout">
+            <strong>Tip:</strong> For runewords, always find a <em>white/grey</em> base (not magic or rare) — magic bases roll 1–2 sockets randomly and can waste the quest.
+          </div>
+        </article>
+
+        <article class="tip-card" data-tips-cat="loot">
+          <div class="tip-head">
+            <span class="tip-icon">�💎</span>
             <h3>Perfect Gem Recipes</h3>
             <span class="tip-cat loot">Loot</span>
           </div>
